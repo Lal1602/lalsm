@@ -91,25 +91,35 @@ function GSAPEffects() {
                     });
                 }
             }["GSAPEffects.useEffect"]);
-            // Staggered fade-in
-            __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].utils.toArray("[data-scroll]").forEach({
-                "GSAPEffects.useEffect": (elem)=>{
-                    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].fromTo(elem, {
-                        y: 50,
-                        opacity: 0
-                    }, {
-                        y: 0,
-                        opacity: 1,
-                        duration: 1,
-                        ease: "power3.out",
-                        scrollTrigger: {
-                            trigger: elem,
-                            start: "top 85%",
-                            toggleActions: "play none none reverse"
-                        }
-                    });
-                }
-            }["GSAPEffects.useEffect"]);
+            // Detect if device is a mobile or touch-enabled device
+            const isMobileDevice = ("TURBOPACK compile-time value", "object") !== "undefined" && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0);
+            if (!isMobileDevice) {
+                // Staggered fade-in
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].utils.toArray("[data-scroll]").forEach({
+                    "GSAPEffects.useEffect": (elem)=>{
+                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].fromTo(elem, {
+                            y: 50,
+                            opacity: 0
+                        }, {
+                            y: 0,
+                            opacity: 1,
+                            duration: 1,
+                            ease: "power3.out",
+                            scrollTrigger: {
+                                trigger: elem,
+                                start: "top 85%",
+                                toggleActions: "play none none reverse"
+                            }
+                        });
+                    }
+                }["GSAPEffects.useEffect"]);
+            } else {
+                // Direct instant display on mobile to ensure 100% visibility
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].set("[data-scroll]", {
+                    y: 0,
+                    opacity: 1
+                });
+            }
             // Marquee
             __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].to(".marquee-wrapper", {
                 xPercent: -50,
@@ -141,27 +151,37 @@ function GSAPEffects() {
                     }
                 }["GSAPEffects.useEffect"]
             });
-            // Achievements reveal
-            __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].fromTo(".achievements-marquee-wrapper", {
-                scale: 0.4,
-                y: 200,
-                rotationX: 45,
-                opacity: 0,
-                transformPerspective: 1000,
-                transformOrigin: "center center"
-            }, {
-                scale: 1,
-                y: 0,
-                rotationX: 0,
-                opacity: 1,
-                ease: "none",
-                scrollTrigger: {
-                    trigger: ".ach-marquee-section",
-                    start: "top 90%",
-                    end: "top 40%",
-                    scrub: 1
-                }
-            });
+            if (!isMobileDevice) {
+                // Achievements reveal
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].fromTo(".achievements-marquee-wrapper", {
+                    scale: 0.4,
+                    y: 200,
+                    rotationX: 45,
+                    opacity: 0,
+                    transformPerspective: 1000,
+                    transformOrigin: "center center"
+                }, {
+                    scale: 1,
+                    y: 0,
+                    rotationX: 0,
+                    opacity: 1,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: ".ach-marquee-section",
+                        start: "top 90%",
+                        end: "top 40%",
+                        scrub: 1
+                    }
+                });
+            } else {
+                // Direct instant display on mobile
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].set(".achievements-marquee-wrapper", {
+                    scale: 1,
+                    y: 0,
+                    rotationX: 0,
+                    opacity: 1
+                });
+            }
             // Footer auto-glow
             __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$ScrollTrigger$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ScrollTrigger"].create({
                 trigger: ".mega-link",

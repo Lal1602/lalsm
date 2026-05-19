@@ -66,17 +66,43 @@ export default function WorkflowKinetic() {
     const items = document.querySelectorAll<HTMLElement>(".workflow-text-item");
     if (!floatingCard || !items.length) return;
 
+    // Store active tweens globally within useEffect so handleLeave can access and kill them
+    const activeTweens = new Map<HTMLElement, gsap.core.Tween | gsap.core.Timeline | null>();
+
+    let currentlyHoveredItem: HTMLElement | null = null;
+    let currentlyHoveredIndex: number = -1;
+    let currentlyHoveredChars: HTMLElement[] = [];
+
+    const handleLeave = (item: HTMLElement, index: number, chars: HTMLElement[]) => {
+      const activeTween = activeTweens.get(item);
+      if (activeTween) {
+        activeTween.kill();
+        activeTweens.set(item, null);
+      }
+      const anim = ANIM[index] || ANIM[0];
+      const leaveTween = anim.leave(chars);
+      activeTweens.set(item, leaveTween);
+      gsap.to(floatingCard, { opacity: 0, scale: 0.82, duration: 0.2, ease: "power2.in" });
+    };
+
     const xTo = gsap.quickTo(floatingCard, "x", { duration: 0.45, ease: "power3" });
     const yTo = gsap.quickTo(floatingCard, "y", { duration: 0.45, ease: "power3" });
 
     items.forEach((item, index) => {
       const chars = splitChars(item);
       const anim = ANIM[index] || ANIM[0];
-      let activeTween: gsap.core.Tween | gsap.core.Timeline | null = null;
 
       item.addEventListener("mouseenter", () => {
-        if (activeTween) { activeTween.kill(); activeTween = null; }
-        activeTween = anim.enter(chars);
+        currentlyHoveredItem = item;
+        currentlyHoveredIndex = index;
+        currentlyHoveredChars = chars;
+
+        const activeTween = activeTweens.get(item);
+        if (activeTween) {
+          activeTween.kill();
+        }
+        const enterTween = anim.enter(chars);
+        activeTweens.set(item, enterTween);
 
         const iconEl = floatingCard.querySelector<HTMLElement>(".float-icon");
         const titleEl = floatingCard.querySelector<HTMLElement>(".float-title");
@@ -96,11 +122,46 @@ export default function WorkflowKinetic() {
       });
 
       item.addEventListener("mouseleave", () => {
-        if (activeTween) { activeTween.kill(); activeTween = null; }
-        activeTween = anim.leave(chars);
-        gsap.to(floatingCard, { opacity: 0, scale: 0.82, duration: 0.2, ease: "power2.in" });
+        if (currentlyHoveredItem === item) {
+          currentlyHoveredItem = null;
+          currentlyHoveredIndex = -1;
+          currentlyHoveredChars = [];
+        }
+        handleLeave(item, index, chars);
       });
     });
+
+    // Track mouse coordinates globally to handle scroll out of hover bounds
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    const trackMouseGlobal = (e: MouseEvent) => {
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    };
+    window.addEventListener("mousemove", trackMouseGlobal, { passive: true });
+
+    const checkHoverOnScroll = () => {
+      if (!currentlyHoveredItem) return;
+      const elementUnderMouse = document.elementFromPoint(lastMouseX, lastMouseY);
+      
+      // If there is no element under mouse or the element is not the item or its child, trigger mouseleave
+      if (!elementUnderMouse || (!currentlyHoveredItem.contains(elementUnderMouse) && elementUnderMouse !== currentlyHoveredItem)) {
+        handleLeave(currentlyHoveredItem, currentlyHoveredIndex, currentlyHoveredChars);
+        currentlyHoveredItem = null;
+        currentlyHoveredIndex = -1;
+        currentlyHoveredChars = [];
+      }
+    };
+    window.addEventListener("scroll", checkHoverOnScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("mousemove", trackMouseGlobal);
+      window.removeEventListener("scroll", checkHoverOnScroll);
+      // Clean up all GSAP tweens to prevent memory leaks
+      activeTweens.forEach((tween) => {
+        if (tween) tween.kill();
+      });
+    };
   }, []);
 
   return null;

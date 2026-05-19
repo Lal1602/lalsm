@@ -67,23 +67,34 @@ export default function GSAPEffects() {
       });
     });
 
-    // Staggered fade-in
-    gsap.utils.toArray<HTMLElement>("[data-scroll]").forEach((elem) => {
-      gsap.fromTo(elem,
-        { y: 50, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: elem,
-            start: "top 85%",
-            toggleActions: "play none none reverse",
+    // Detect if device is a mobile or touch-enabled device
+    const isMobileDevice = typeof window !== "undefined" && (
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      navigator.maxTouchPoints > 0
+    );
+
+    if (!isMobileDevice) {
+      // Staggered fade-in
+      gsap.utils.toArray<HTMLElement>("[data-scroll]").forEach((elem) => {
+        gsap.fromTo(elem,
+          { y: 50, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: elem,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            }
           }
-        }
-      );
-    });
+        );
+      });
+    } else {
+      // Direct instant display on mobile to ensure 100% visibility
+      gsap.set("[data-scroll]", { y: 0, opacity: 1 });
+    }
 
     // Marquee
     gsap.to(".marquee-wrapper", { xPercent: -50, repeat: -1, duration: 15, ease: "linear" });
@@ -100,11 +111,16 @@ export default function GSAPEffects() {
       },
     });
 
-    // Achievements reveal
-    gsap.fromTo(".achievements-marquee-wrapper",
-      { scale: 0.4, y: 200, rotationX: 45, opacity: 0, transformPerspective: 1000, transformOrigin: "center center" },
-      { scale: 1, y: 0, rotationX: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: ".ach-marquee-section", start: "top 90%", end: "top 40%", scrub: 1 } }
-    );
+    if (!isMobileDevice) {
+      // Achievements reveal
+      gsap.fromTo(".achievements-marquee-wrapper",
+        { scale: 0.4, y: 200, rotationX: 45, opacity: 0, transformPerspective: 1000, transformOrigin: "center center" },
+        { scale: 1, y: 0, rotationX: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: ".ach-marquee-section", start: "top 90%", end: "top 40%", scrub: 1 } }
+      );
+    } else {
+      // Direct instant display on mobile
+      gsap.set(".achievements-marquee-wrapper", { scale: 1, y: 0, rotationX: 0, opacity: 1 });
+    }
 
     // Footer auto-glow
     ScrollTrigger.create({ trigger: ".mega-link", start: "top 65%", toggleClass: "active" });

@@ -161,6 +161,29 @@ function WorkflowKinetic() {
             const floatingCard = document.querySelector(".floating-workflow-card");
             const items = document.querySelectorAll(".workflow-text-item");
             if (!floatingCard || !items.length) return;
+            // Store active tweens globally within useEffect so handleLeave can access and kill them
+            const activeTweens = new Map();
+            let currentlyHoveredItem = null;
+            let currentlyHoveredIndex = -1;
+            let currentlyHoveredChars = [];
+            const handleLeave = {
+                "WorkflowKinetic.useEffect.handleLeave": (item, index, chars)=>{
+                    const activeTween = activeTweens.get(item);
+                    if (activeTween) {
+                        activeTween.kill();
+                        activeTweens.set(item, null);
+                    }
+                    const anim = ANIM[index] || ANIM[0];
+                    const leaveTween = anim.leave(chars);
+                    activeTweens.set(item, leaveTween);
+                    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].to(floatingCard, {
+                        opacity: 0,
+                        scale: 0.82,
+                        duration: 0.2,
+                        ease: "power2.in"
+                    });
+                }
+            }["WorkflowKinetic.useEffect.handleLeave"];
             const xTo = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].quickTo(floatingCard, "x", {
                 duration: 0.45,
                 ease: "power3"
@@ -173,14 +196,17 @@ function WorkflowKinetic() {
                 "WorkflowKinetic.useEffect": (item, index)=>{
                     const chars = splitChars(item);
                     const anim = ANIM[index] || ANIM[0];
-                    let activeTween = null;
                     item.addEventListener("mouseenter", {
                         "WorkflowKinetic.useEffect": ()=>{
+                            currentlyHoveredItem = item;
+                            currentlyHoveredIndex = index;
+                            currentlyHoveredChars = chars;
+                            const activeTween = activeTweens.get(item);
                             if (activeTween) {
                                 activeTween.kill();
-                                activeTween = null;
                             }
-                            activeTween = anim.enter(chars);
+                            const enterTween = anim.enter(chars);
+                            activeTweens.set(item, enterTween);
                             const iconEl = floatingCard.querySelector(".float-icon");
                             const titleEl = floatingCard.querySelector(".float-title");
                             const descEl = floatingCard.querySelector(".float-desc");
@@ -205,21 +231,56 @@ function WorkflowKinetic() {
                     }["WorkflowKinetic.useEffect"]);
                     item.addEventListener("mouseleave", {
                         "WorkflowKinetic.useEffect": ()=>{
-                            if (activeTween) {
-                                activeTween.kill();
-                                activeTween = null;
+                            if (currentlyHoveredItem === item) {
+                                currentlyHoveredItem = null;
+                                currentlyHoveredIndex = -1;
+                                currentlyHoveredChars = [];
                             }
-                            activeTween = anim.leave(chars);
-                            __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].to(floatingCard, {
-                                opacity: 0,
-                                scale: 0.82,
-                                duration: 0.2,
-                                ease: "power2.in"
-                            });
+                            handleLeave(item, index, chars);
                         }
                     }["WorkflowKinetic.useEffect"]);
                 }
             }["WorkflowKinetic.useEffect"]);
+            // Track mouse coordinates globally to handle scroll out of hover bounds
+            let lastMouseX = 0;
+            let lastMouseY = 0;
+            const trackMouseGlobal = {
+                "WorkflowKinetic.useEffect.trackMouseGlobal": (e)=>{
+                    lastMouseX = e.clientX;
+                    lastMouseY = e.clientY;
+                }
+            }["WorkflowKinetic.useEffect.trackMouseGlobal"];
+            window.addEventListener("mousemove", trackMouseGlobal, {
+                passive: true
+            });
+            const checkHoverOnScroll = {
+                "WorkflowKinetic.useEffect.checkHoverOnScroll": ()=>{
+                    if (!currentlyHoveredItem) return;
+                    const elementUnderMouse = document.elementFromPoint(lastMouseX, lastMouseY);
+                    // If there is no element under mouse or the element is not the item or its child, trigger mouseleave
+                    if (!elementUnderMouse || !currentlyHoveredItem.contains(elementUnderMouse) && elementUnderMouse !== currentlyHoveredItem) {
+                        handleLeave(currentlyHoveredItem, currentlyHoveredIndex, currentlyHoveredChars);
+                        currentlyHoveredItem = null;
+                        currentlyHoveredIndex = -1;
+                        currentlyHoveredChars = [];
+                    }
+                }
+            }["WorkflowKinetic.useEffect.checkHoverOnScroll"];
+            window.addEventListener("scroll", checkHoverOnScroll, {
+                passive: true
+            });
+            return ({
+                "WorkflowKinetic.useEffect": ()=>{
+                    window.removeEventListener("mousemove", trackMouseGlobal);
+                    window.removeEventListener("scroll", checkHoverOnScroll);
+                    // Clean up all GSAP tweens to prevent memory leaks
+                    activeTweens.forEach({
+                        "WorkflowKinetic.useEffect": (tween)=>{
+                            if (tween) tween.kill();
+                        }
+                    }["WorkflowKinetic.useEffect"]);
+                }
+            })["WorkflowKinetic.useEffect"];
         }
     }["WorkflowKinetic.useEffect"], []);
     return null;
