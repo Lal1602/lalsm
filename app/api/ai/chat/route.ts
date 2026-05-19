@@ -95,7 +95,7 @@ Aturan Respon:
     contents.push({ role: 'user', parts: [{ text: message }] });
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemma-4-31b',
       contents: contents,
       config: {
         systemInstruction: systemInstruction,
