@@ -1,0 +1,3 @@
+- ubah warna background biru dari tombol bintang agar menjadi lebih gelap agar menyatu dengan tema Utama websitenya.
+
+- buatlah ai nya memiliki kendali atas navigasi website agar Ketika user menanyakan tentang website ini, maka ai akan berpikir dan memilih decision untuk mengendalikan tampilan agar memberi arah/tau ke user seperti contoh si ai dapat mengscroll halaman dan memberi highlight temporal untuk section/bagian website yang ditunjuk oleh user.
