@@ -94,18 +94,51 @@ Aturan Respon:
     // Add current user message
     contents.push({ role: 'user', parts: [{ text: message }] });
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-flash-latest',
-      contents: contents,
-      config: {
-        systemInstruction: systemInstruction,
-        temperature: 0.7,
-        maxOutputTokens: 500,
-      }
-    });
+    // List of models to try in sequence if one hits quota/rate limits (failover fallback queue)
+    const modelsToTry = [
+      'gemini-flash-latest',       // Dynamic latest stable flash (often 20 RPD on free tiers)
+      'gemini-3.1-flash-lite',     // Gemini 3 Flash (Instruction-tuned, medium 500 RPD limit!)
+      'gemini-3-flash',            // Gemini 3 Flash (20 RPD)
+      'gemini-2.5-flash-lite',     // Gemini 2.5 Flash Lite (20 RPD)
+      'gemma-4-31b-it'             // Gemma 4 31B (Instruction-tuned, huge 1.5K RPD limit!)
+    ];
 
-    const reply = response.text || 'Maaf, saya sedang tidak dapat merespon saat ini.';
-    return NextResponse.json({ reply });
+    let reply = '';
+    let success = false;
+    let lastError = null;
+
+    for (const modelName of modelsToTry) {
+      try {
+        console.log(`Attempting Gemini chat generation with model: ${modelName}`);
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: contents,
+          config: {
+            systemInstruction: systemInstruction,
+            temperature: 0.7,
+            maxOutputTokens: 2000,
+          }
+        });
+        
+        if (response && response.text) {
+          reply = response.text;
+          success = true;
+          console.log(`Successfully generated response using model: ${modelName}`);
+          break;
+        }
+      } catch (err: any) {
+        console.warn(`Model ${modelName} failed or limit reached:`, err.message || err);
+        lastError = err;
+        // Continue to the next model in the queue
+      }
+    }
+
+    if (success) {
+      return NextResponse.json({ reply });
+    } else {
+      // Throw error to trigger the local static simulation fallback
+      throw lastError || new Error('All models in failover list failed to generate response.');
+    }
 
   } catch (error: any) {
     console.error('Error in chatbot route handler, falling back to local simulation:', error);
