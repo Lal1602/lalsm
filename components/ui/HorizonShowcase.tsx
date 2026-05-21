@@ -32,13 +32,9 @@ export default function HorizonShowcase() {
 
   // Client WebGL mounting states to prevent SSR mismatches
   const [mounted, setMounted] = useState(false);
-  const [showWebGL, setShowWebGL] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined") {
-      setShowWebGL(window.innerWidth >= 968);
-    }
 
     const container = containerRef.current;
     const wrapper = wrapperRef.current;
@@ -271,7 +267,7 @@ export default function HorizonShowcase() {
         {/* SLIDE 1: KINETIC TYPOGRAPHY */}
         <div className="horizon-slide slide--kinetic">
           <div className="slide-background-glow glow--violet"></div>
-          {mounted && showWebGL && <Creative3DScene />}
+          {mounted && <Creative3DScene />}
           <div className="horizon-slide-content">
             <p className="slide-badge">// PLAYGROUND.01</p>
             <h2 className="kinetic-hero-title parallax-slide-layer" data-depth="0.3">

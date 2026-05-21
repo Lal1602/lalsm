@@ -1641,13 +1641,9 @@ function HorizonShowcase() {
     const [currentFps, setCurrentFps] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(60);
     // Client WebGL mounting states to prevent SSR mismatches
     const [mounted, setMounted] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [showWebGL, setShowWebGL] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "HorizonShowcase.useEffect": ()=>{
             setMounted(true);
-            if ("TURBOPACK compile-time truthy", 1) {
-                setShowWebGL(window.innerWidth >= 968);
-            }
             const container = containerRef.current;
             const wrapper = wrapperRef.current;
             if (!container || !wrapper) return;
@@ -1915,13 +1911,13 @@ function HorizonShowcase() {
                             className: "slide-background-glow glow--violet"
                         }, void 0, false, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 273,
+                            lineNumber: 269,
                             columnNumber: 11
                         }, this),
-                        mounted && showWebGL && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$CreativeBlob$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                        mounted && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$CreativeBlob$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 274,
-                            columnNumber: 36
+                            lineNumber: 270,
+                            columnNumber: 23
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "horizon-slide-content",
@@ -1931,7 +1927,7 @@ function HorizonShowcase() {
                                     children: "// PLAYGROUND.01"
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 276,
+                                    lineNumber: 272,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1941,7 +1937,7 @@ function HorizonShowcase() {
                                         "CREATIVE",
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 278,
+                                            lineNumber: 274,
                                             columnNumber: 23
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1949,13 +1945,13 @@ function HorizonShowcase() {
                                             children: "PLAYGROUND"
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 279,
+                                            lineNumber: 275,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 277,
+                                    lineNumber: 273,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1964,19 +1960,19 @@ function HorizonShowcase() {
                                     children: "Scroll horizontally to morph the space, distortion perspectives, and trigger interactive experimental physics."
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 281,
+                                    lineNumber: 277,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 275,
+                            lineNumber: 271,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                    lineNumber: 272,
+                    lineNumber: 268,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1989,7 +1985,7 @@ function HorizonShowcase() {
                             className: "slide-background-glow glow--cyan"
                         }, void 0, false, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 294,
+                            lineNumber: 290,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
@@ -1997,7 +1993,7 @@ function HorizonShowcase() {
                             ref: canvasRef
                         }, void 0, false, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 295,
+                            lineNumber: 291,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2013,7 +2009,7 @@ function HorizonShowcase() {
                                                 children: "// PLAYGROUND.02"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 300,
+                                                lineNumber: 296,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2021,7 +2017,7 @@ function HorizonShowcase() {
                                                 children: "GRAVITY NODE LAB"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 301,
+                                                lineNumber: 297,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2029,13 +2025,13 @@ function HorizonShowcase() {
                                                 children: "Move your cursor to dynamically pull particles, construct holographic cybernetic lines, and morph gravity fields in real-time."
                                             }, void 0, false, {
                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 302,
+                                                lineNumber: 298,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                        lineNumber: 299,
+                                        lineNumber: 295,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2048,21 +2044,21 @@ function HorizonShowcase() {
                                                         className: "terminal-dot"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 310,
+                                                        lineNumber: 306,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         className: "terminal-dot"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 311,
+                                                        lineNumber: 307,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         className: "terminal-dot"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 312,
+                                                        lineNumber: 308,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2070,13 +2066,13 @@ function HorizonShowcase() {
                                                         children: "// CYBERNETIC.CONTROL"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 313,
+                                                        lineNumber: 309,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 309,
+                                                lineNumber: 305,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2090,13 +2086,41 @@ function HorizonShowcase() {
                                                                 children: "SYSTEM STATE:"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                                lineNumber: 318,
+                                                                lineNumber: 314,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "readout-value active",
                                                                 children: "ONLINE"
                                                             }, void 0, false, {
+                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
+                                                                lineNumber: 315,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
+                                                        lineNumber: 313,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "readout-row",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "readout-label",
+                                                                children: "FPS ENGINE:"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
+                                                                lineNumber: 318,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "readout-value",
+                                                                children: [
+                                                                    currentFps,
+                                                                    " FPS"
+                                                                ]
+                                                            }, void 0, true, {
                                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
                                                                 lineNumber: 319,
                                                                 columnNumber: 21
@@ -2112,7 +2136,7 @@ function HorizonShowcase() {
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "readout-label",
-                                                                children: "FPS ENGINE:"
+                                                                children: "ACTIVE NODES:"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
                                                                 lineNumber: 322,
@@ -2120,11 +2144,8 @@ function HorizonShowcase() {
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "readout-value",
-                                                                children: [
-                                                                    currentFps,
-                                                                    " FPS"
-                                                                ]
-                                                            }, void 0, true, {
+                                                                children: nodeCount
+                                                            }, void 0, false, {
                                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
                                                                 lineNumber: 323,
                                                                 columnNumber: 21
@@ -2134,36 +2155,11 @@ function HorizonShowcase() {
                                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
                                                         lineNumber: 321,
                                                         columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "readout-row",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "readout-label",
-                                                                children: "ACTIVE NODES:"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                                lineNumber: 326,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "readout-value",
-                                                                children: nodeCount
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                                lineNumber: 327,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 325,
-                                                        columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 316,
+                                                lineNumber: 312,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2178,7 +2174,7 @@ function HorizonShowcase() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 332,
+                                                        lineNumber: 328,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2190,7 +2186,7 @@ function HorizonShowcase() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 339,
+                                                        lineNumber: 335,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2202,36 +2198,36 @@ function HorizonShowcase() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 346,
+                                                        lineNumber: 342,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 331,
+                                                lineNumber: 327,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                        lineNumber: 308,
+                                        lineNumber: 304,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                lineNumber: 298,
+                                lineNumber: 294,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 297,
+                            lineNumber: 293,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                    lineNumber: 288,
+                    lineNumber: 284,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2241,7 +2237,7 @@ function HorizonShowcase() {
                             className: "slide-background-glow glow--violet"
                         }, void 0, false, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 360,
+                            lineNumber: 356,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2252,7 +2248,7 @@ function HorizonShowcase() {
                                     children: "// PLAYGROUND.03"
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 362,
+                                    lineNumber: 358,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2260,7 +2256,7 @@ function HorizonShowcase() {
                                     children: "EXPERIMENTAL CONCEPTS"
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 363,
+                                    lineNumber: 359,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2275,7 +2271,7 @@ function HorizonShowcase() {
                                                     className: "glitch-card-ambient"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 371,
+                                                    lineNumber: 367,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2285,7 +2281,7 @@ function HorizonShowcase() {
                                                             className: "glitch-overlay-noise"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 373,
+                                                            lineNumber: 369,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -2293,13 +2289,13 @@ function HorizonShowcase() {
                                                             alt: "Neural Shader Artwork"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 374,
+                                                            lineNumber: 370,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 372,
+                                                    lineNumber: 368,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2310,7 +2306,7 @@ function HorizonShowcase() {
                                                             children: "01 //"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 377,
+                                                            lineNumber: 373,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
@@ -2318,7 +2314,7 @@ function HorizonShowcase() {
                                                             children: "NEURAL SHADER"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 378,
+                                                            lineNumber: 374,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2326,19 +2322,19 @@ function HorizonShowcase() {
                                                             children: "GPU-accelerated vector fields that dynamically generate real-time feedback loops based on sound inputs."
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 379,
+                                                            lineNumber: 375,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 376,
+                                                    lineNumber: 372,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 367,
+                                            lineNumber: 363,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -2349,7 +2345,7 @@ function HorizonShowcase() {
                                                     className: "glitch-card-ambient"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 388,
+                                                    lineNumber: 384,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2359,7 +2355,7 @@ function HorizonShowcase() {
                                                             className: "glitch-overlay-noise"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 390,
+                                                            lineNumber: 386,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -2367,13 +2363,13 @@ function HorizonShowcase() {
                                                             alt: "Synapse Engine Artwork"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 391,
+                                                            lineNumber: 387,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 389,
+                                                    lineNumber: 385,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2384,7 +2380,7 @@ function HorizonShowcase() {
                                                             children: "02 //"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 394,
+                                                            lineNumber: 390,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
@@ -2392,7 +2388,7 @@ function HorizonShowcase() {
                                                             children: "SYNAPSE ENGINE"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 395,
+                                                            lineNumber: 391,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2400,37 +2396,37 @@ function HorizonShowcase() {
                                                             children: "Monolithic data structures rendering physics-backed canvases that coordinate smooth horizontal scrolling triggers."
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 396,
+                                                            lineNumber: 392,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 393,
+                                                    lineNumber: 389,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 384,
+                                            lineNumber: 380,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 365,
+                                    lineNumber: 361,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 361,
+                            lineNumber: 357,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                    lineNumber: 359,
+                    lineNumber: 355,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2440,7 +2436,7 @@ function HorizonShowcase() {
                             className: "slide-background-glow glow--cyan"
                         }, void 0, false, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 405,
+                            lineNumber: 401,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2451,7 +2447,7 @@ function HorizonShowcase() {
                                     children: "// PLAYGROUND.04"
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 407,
+                                    lineNumber: 403,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -2461,7 +2457,7 @@ function HorizonShowcase() {
                                         "ENTER THE",
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 409,
+                                            lineNumber: 405,
                                             columnNumber: 24
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2469,13 +2465,13 @@ function HorizonShowcase() {
                                             children: "SYSTEM"
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 410,
+                                            lineNumber: 406,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 408,
+                                    lineNumber: 404,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2483,7 +2479,7 @@ function HorizonShowcase() {
                                     children: "You are prepared. Explore complete finished project systems and creative deployments in the dynamic stack below."
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 412,
+                                    lineNumber: 408,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2494,39 +2490,39 @@ function HorizonShowcase() {
                                         children: "↓"
                                     }, void 0, false, {
                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                        lineNumber: 416,
+                                        lineNumber: 412,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 415,
+                                    lineNumber: 411,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 406,
+                            lineNumber: 402,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                    lineNumber: 404,
+                    lineNumber: 400,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-            lineNumber: 269,
+            lineNumber: 265,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-        lineNumber: 263,
+        lineNumber: 259,
         columnNumber: 5
     }, this);
 }
-_s(HorizonShowcase, "S5N5yvdcju0G+egQKiNB13VuoFg=");
+_s(HorizonShowcase, "Iud/ExKmDDgV+vcYs8F9CinPOQ4=");
 _c = HorizonShowcase;
 var _c;
 __turbopack_context__.k.register(_c, "HorizonShowcase");
