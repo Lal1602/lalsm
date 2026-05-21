@@ -27,6 +27,7 @@ __turbopack_context__.v((parentImport) => {
 
 __turbopack_context__.v((parentImport) => {
     return Promise.all([
+  "static/chunks/node_modules_gsap_02ih-40._.js",
   "static/chunks/components_ui_CustomCursor_tsx_0f25r6l._.js",
   "static/chunks/components_ui_CustomCursor_tsx_00l5wdl._.js"
 ].map((chunk) => __turbopack_context__.l(chunk))).then(() => {

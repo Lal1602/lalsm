@@ -2,6 +2,7 @@
 import HeroSection from "@/components/ui/HeroSection";
 import AboutSection from "@/components/ui/AboutSection";
 import WorkflowSection from "@/components/ui/WorkflowSection";
+import HorizonShowcase from "@/components/ui/HorizonShowcase";
 import ProjectsSection from "@/components/ui/ProjectsSection";
 import AchievementsSection from "@/components/ui/AchievementsSection";
 import ContactSection from "@/components/ui/ContactSection";
@@ -34,6 +35,7 @@ export default function Home() {
 
         <AboutSection />
         <WorkflowSection />
+        <HorizonShowcase />
         <ProjectsSection />
         <AchievementsSection />
         <ContactSection />

@@ -1,10 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "BILAL | Creative Developer",
   description:
     "Bilal - Creative Developer & Full Stack Engineer Portfolio. Showcasing immersive web experiences and modern tech stacks.",
+  themeColor: "#050505",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#050505",
 };
 
 export default function RootLayout({
@@ -20,7 +29,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Roboto+Mono:wght@300;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Roboto+Mono:wght@300;500&family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
           rel="stylesheet"
         />
         <link rel="icon" href="/B-logo.jpg" type="image/jpg" />
@@ -35,7 +44,10 @@ export default function RootLayout({
           async
         ></script>
       </head>
-      <body>{children}</body>
+      <body>
+        <div className="grain-overlay" aria-hidden="true"></div>
+        {children}
+      </body>
     </html>
   );
 }

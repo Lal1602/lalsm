@@ -83,16 +83,30 @@ export default function GlobalInteractions() {
       if (card) card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)";
     }
 
+    // Spotlight card hover border glow
+    function onSpotlightMove(e: MouseEvent) {
+      const card = (e.target as Element).closest<HTMLElement>(".glass-card, .project-card, .achievement-card, .about-layer-card, .workflow-step-card");
+      if (card) {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty("--mouse-x", `${x}px`);
+        card.style.setProperty("--mouse-y", `${y}px`);
+      }
+    }
+
     document.addEventListener("click", onBurstClick);
     document.addEventListener("click", onCardClick);
     document.addEventListener("mousemove", onTiltMove);
     document.addEventListener("mouseout", onTiltOut);
+    document.addEventListener("mousemove", onSpotlightMove);
 
     return () => {
       document.removeEventListener("click", onBurstClick);
       document.removeEventListener("click", onCardClick);
       document.removeEventListener("mousemove", onTiltMove);
       document.removeEventListener("mouseout", onTiltOut);
+      document.removeEventListener("mousemove", onSpotlightMove);
     };
   }, []);
 

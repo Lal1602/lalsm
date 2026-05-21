@@ -91,10 +91,10 @@ function GSAPEffects() {
                     });
                 }
             }["GSAPEffects.useEffect"]);
-            // Detect if device is a mobile or touch-enabled device
-            const isMobileDevice = ("TURBOPACK compile-time value", "object") !== "undefined" && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0);
+            // Detect mobile via CSS media query — reliable cross-browser, no UA sniffing
+            const isMobileDevice = ("TURBOPACK compile-time value", "object") !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
             if (!isMobileDevice) {
-                // Staggered fade-in
+                // Desktop: staggered fade-in driven by scroll position
                 __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].utils.toArray("[data-scroll]").forEach({
                     "GSAPEffects.useEffect": (elem)=>{
                         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].fromTo(elem, {
@@ -107,19 +107,27 @@ function GSAPEffects() {
                             ease: "power3.out",
                             scrollTrigger: {
                                 trigger: elem,
-                                start: "top 85%",
-                                toggleActions: "play none none reverse"
+                                start: "top 90%",
+                                toggleActions: "play none none none"
                             }
                         });
                     }
                 }["GSAPEffects.useEffect"]);
             } else {
-                // Direct instant display on mobile to ensure 100% visibility
+                // Mobile: show everything immediately — no scroll-trigger dependency
                 __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].set("[data-scroll]", {
                     y: 0,
-                    opacity: 1
+                    opacity: 1,
+                    clearProps: "transform"
                 });
             }
+            // Recalculate all ScrollTrigger positions after CSS layout settles
+            // This is critical after any layout-affecting CSS hot-reload or page load
+            const refreshTimer = setTimeout({
+                "GSAPEffects.useEffect.refreshTimer": ()=>{
+                    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$ScrollTrigger$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ScrollTrigger"].refresh(true);
+                }
+            }["GSAPEffects.useEffect.refreshTimer"], 350);
             // Marquee
             __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].to(".marquee-wrapper", {
                 xPercent: -50,
@@ -238,6 +246,7 @@ function GSAPEffects() {
             }["GSAPEffects.useEffect"]);
             return ({
                 "GSAPEffects.useEffect": ()=>{
+                    clearTimeout(refreshTimer);
                     window.removeEventListener("scroll", updateProgress);
                     __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$ScrollTrigger$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ScrollTrigger"].getAll().forEach({
                         "GSAPEffects.useEffect": (t)=>t.kill()

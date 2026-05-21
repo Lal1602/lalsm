@@ -67,14 +67,12 @@ export default function GSAPEffects() {
       });
     });
 
-    // Detect if device is a mobile or touch-enabled device
-    const isMobileDevice = typeof window !== "undefined" && (
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-      navigator.maxTouchPoints > 0
-    );
+    // Detect mobile via CSS media query — reliable cross-browser, no UA sniffing
+    const isMobileDevice = typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 768px)").matches;
 
     if (!isMobileDevice) {
-      // Staggered fade-in
+      // Desktop: staggered fade-in driven by scroll position
       gsap.utils.toArray<HTMLElement>("[data-scroll]").forEach((elem) => {
         gsap.fromTo(elem,
           { y: 50, opacity: 0 },
@@ -85,16 +83,22 @@ export default function GSAPEffects() {
             ease: "power3.out",
             scrollTrigger: {
               trigger: elem,
-              start: "top 85%",
-              toggleActions: "play none none reverse",
+              start: "top 90%",   // wider threshold so elements near viewport edge don't get stuck
+              toggleActions: "play none none none",  // never reverse — elements stay visible once seen
             }
           }
         );
       });
     } else {
-      // Direct instant display on mobile to ensure 100% visibility
-      gsap.set("[data-scroll]", { y: 0, opacity: 1 });
+      // Mobile: show everything immediately — no scroll-trigger dependency
+      gsap.set("[data-scroll]", { y: 0, opacity: 1, clearProps: "transform" });
     }
+
+    // Recalculate all ScrollTrigger positions after CSS layout settles
+    // This is critical after any layout-affecting CSS hot-reload or page load
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh(true);
+    }, 350);
 
     // Marquee
     gsap.to(".marquee-wrapper", { xPercent: -50, repeat: -1, duration: 15, ease: "linear" });
@@ -153,6 +157,7 @@ export default function GSAPEffects() {
     });
 
     return () => {
+      clearTimeout(refreshTimer);
       window.removeEventListener("scroll", updateProgress);
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };

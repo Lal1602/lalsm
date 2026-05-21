@@ -7,7 +7,7 @@ export default function AboutSection() {
       <div className="container">
         <h2 className="section-title" data-scroll>About Me</h2>
 
-        <div className="about-card-stack">
+        <div className="about-card-stack" data-cursor-text="DRAG">
 
           {/* Card 1 - Frontend */}
           <article className="about-layer-card card--cyan is-front" aria-label="Frontend Engineering">

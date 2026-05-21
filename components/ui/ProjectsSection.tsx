@@ -39,6 +39,7 @@ export default function ProjectsSection() {
                     data-tech={p.tech}
                     data-image={p.image}
                     data-link={p.link}
+                    data-cursor-text="VIEW"
                   >
                     <button className="btn-quick-view" aria-label={`Quick View ${p.title}`}>
                       {/* @ts-ignore */}
