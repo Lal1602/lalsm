@@ -1109,6 +1109,16 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 ;
 ;
 ;
+// Silence THREE.Clock deprecation warning from internal Three.js/R3F library calls
+if ("TURBOPACK compile-time truthy", 1) {
+    const originalWarn = console.warn;
+    console.warn = (...args)=>{
+        if (args[0] && typeof args[0] === "string" && args[0].includes("THREE.Clock") && args[0].includes("deprecated")) {
+            return;
+        }
+        originalWarn(...args);
+    };
+}
 // Glowing Cybernetic Core Sphere built with Points (highly stable, 100% bug-free)
 // Parent-Child Hoberman Sphere with Momentum Throw Mechanics
 function CyberSphere({ isIdle, isCollapsed, mouse }) {
@@ -1260,7 +1270,7 @@ function CyberSphere({ isIdle, isCollapsed, mouse }) {
                                 ]
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/CreativeBlob.tsx",
-                                lineNumber: 163,
+                                lineNumber: 179,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("bufferAttribute", {
@@ -1271,13 +1281,13 @@ function CyberSphere({ isIdle, isCollapsed, mouse }) {
                                 ]
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/CreativeBlob.tsx",
-                                lineNumber: 167,
+                                lineNumber: 183,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 162,
+                        lineNumber: 178,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("pointsMaterial", {
@@ -1289,13 +1299,13 @@ function CyberSphere({ isIdle, isCollapsed, mouse }) {
                         depthWrite: false
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 172,
+                        lineNumber: 188,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/CreativeBlob.tsx",
-                lineNumber: 161,
+                lineNumber: 177,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -1307,7 +1317,7 @@ function CyberSphere({ isIdle, isCollapsed, mouse }) {
                         ]
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 184,
+                        lineNumber: 200,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshBasicMaterial", {
@@ -1319,19 +1329,19 @@ function CyberSphere({ isIdle, isCollapsed, mouse }) {
                         depthWrite: false
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 185,
+                        lineNumber: 201,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/CreativeBlob.tsx",
-                lineNumber: 183,
+                lineNumber: 199,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/ui/CreativeBlob.tsx",
-        lineNumber: 159,
+        lineNumber: 175,
         columnNumber: 5
     }, this);
 }
@@ -1373,7 +1383,7 @@ function OrbitingRings() {
                         ]
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 214,
+                        lineNumber: 230,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshBasicMaterial", {
@@ -1384,13 +1394,13 @@ function OrbitingRings() {
                         depthWrite: false
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 215,
+                        lineNumber: 231,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/CreativeBlob.tsx",
-                lineNumber: 213,
+                lineNumber: 229,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -1409,7 +1419,7 @@ function OrbitingRings() {
                         ]
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 225,
+                        lineNumber: 241,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshBasicMaterial", {
@@ -1420,19 +1430,19 @@ function OrbitingRings() {
                         depthWrite: false
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 226,
+                        lineNumber: 242,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/CreativeBlob.tsx",
-                lineNumber: 224,
+                lineNumber: 240,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/ui/CreativeBlob.tsx",
-        lineNumber: 211,
+        lineNumber: 227,
         columnNumber: 5
     }, this);
 }
@@ -1528,7 +1538,7 @@ function Creative3DScene() {
                         intensity: 0.5
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 293,
+                        lineNumber: 309,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(CyberSphere, {
@@ -1537,12 +1547,12 @@ function Creative3DScene() {
                         mouse: mouse
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 296,
+                        lineNumber: 312,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(OrbitingRings, {}, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 299,
+                        lineNumber: 315,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$core$2f$OrbitControls$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["OrbitControls"], {
@@ -1552,13 +1562,13 @@ function Creative3DScene() {
                         autoRotateSpeed: 0.4
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 302,
+                        lineNumber: 318,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/CreativeBlob.tsx",
-                lineNumber: 287,
+                lineNumber: 303,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1568,7 +1578,7 @@ function Creative3DScene() {
                         className: `hud-pulse-dot ${isCollapsed ? "active" : isIdle ? "idle" : "active"}`
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 307,
+                        lineNumber: 323,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1576,19 +1586,19 @@ function Creative3DScene() {
                         children: isCollapsed ? "STATUS: COMPRESSION_CORE - HYPER_VORTEX_SPIN ENGAGED" : isIdle ? "STATUS: COLD_BREATH - MATHEMATICAL SWIRL RUNNING..." : "STATUS: INTERACTIVE - CONNECTED_TILT_ENGAGED"
                     }, void 0, false, {
                         fileName: "[project]/components/ui/CreativeBlob.tsx",
-                        lineNumber: 308,
+                        lineNumber: 324,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/CreativeBlob.tsx",
-                lineNumber: 306,
+                lineNumber: 322,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/ui/CreativeBlob.tsx",
-        lineNumber: 286,
+        lineNumber: 302,
         columnNumber: 5
     }, this);
 }
@@ -1611,918 +1621,108 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/gsap/index.js [app-client] (ecmascript) <locals>");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$ScrollTrigger$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/gsap/ScrollTrigger.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$CreativeBlob$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/CreativeBlob.tsx [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
-;
-;
-// Ensure ScrollTrigger is registered safely on client side
-if ("TURBOPACK compile-time truthy", 1) {
-    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].registerPlugin(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$ScrollTrigger$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ScrollTrigger"]);
-}
 function HorizonShowcase() {
     _s();
-    const containerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const wrapperRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const canvasRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    // Playground state for Slide 2 Interactive Lab
-    const [gravityActive, setGravityActive] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
-    const [particleSpeed, setParticleSpeed] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(1);
-    const [nodeCount, setNodeCount] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(80);
-    const [mousePos, setMousePos] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
-        x: -1000,
-        y: -1000
-    });
-    const [currentFps, setCurrentFps] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(60);
     // Client WebGL mounting states to prevent SSR mismatches
     const [mounted, setMounted] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "HorizonShowcase.useEffect": ()=>{
             setMounted(true);
-            const container = containerRef.current;
-            const wrapper = wrapperRef.current;
-            if (!container || !wrapper) return;
-            // Detect if viewport is desktop to activate GSAP Horizontal Pinning
-            const isDesktop = window.innerWidth >= 968;
-            let ctx = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].context({
-                "HorizonShowcase.useEffect.ctx": ()=>{
-                    if (isDesktop) {
-                        // Pin container and slide wrapper horizontally
-                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].to(wrapper, {
-                            x: {
-                                "HorizonShowcase.useEffect.ctx": ()=>-(wrapper.scrollWidth - window.innerWidth)
-                            }["HorizonShowcase.useEffect.ctx"],
-                            ease: "none",
-                            scrollTrigger: {
-                                trigger: container,
-                                pin: true,
-                                scrub: 0.8,
-                                start: "top top",
-                                end: {
-                                    "HorizonShowcase.useEffect.ctx": ()=>`+=${wrapper.scrollWidth - window.innerWidth}`
-                                }["HorizonShowcase.useEffect.ctx"],
-                                invalidateOnRefresh: true,
-                                onUpdate: {
-                                    "HorizonShowcase.useEffect.ctx": (self)=>{
-                                        // 3D tilt camera effect based on scroll velocity
-                                        const velocity = self.getVelocity();
-                                        const tilt = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].utils.clamp(-4, 4, velocity / 300);
-                                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].to(wrapper, {
-                                            rotationY: tilt,
-                                            rotationZ: tilt * 0.2,
-                                            transformPerspective: 1200,
-                                            duration: 0.5,
-                                            ease: "power2.out",
-                                            overwrite: "auto"
-                                        });
-                                    }
-                                }["HorizonShowcase.useEffect.ctx"],
-                                onLeave: {
-                                    "HorizonShowcase.useEffect.ctx": ()=>{
-                                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].to(wrapper, {
-                                            rotationY: 0,
-                                            rotationZ: 0,
-                                            duration: 0.5
-                                        });
-                                    }
-                                }["HorizonShowcase.useEffect.ctx"],
-                                onEnterBack: {
-                                    "HorizonShowcase.useEffect.ctx": ()=>{
-                                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].to(wrapper, {
-                                            rotationY: 0,
-                                            rotationZ: 0,
-                                            duration: 0.5
-                                        });
-                                    }
-                                }["HorizonShowcase.useEffect.ctx"]
-                            }
-                        });
-                        // Parallax depth shifts on individual slides
-                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].utils.toArray(".parallax-slide-layer").forEach({
-                            "HorizonShowcase.useEffect.ctx": (layer)=>{
-                                const depth = parseFloat(layer.getAttribute("data-depth") || "0.2");
-                                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$gsap$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"].fromTo(layer, {
-                                    x: 100 * depth
-                                }, {
-                                    x: -100 * depth,
-                                    ease: "none",
-                                    scrollTrigger: {
-                                        trigger: container,
-                                        scrub: true,
-                                        start: "top top",
-                                        end: {
-                                            "HorizonShowcase.useEffect.ctx": ()=>`+=${wrapper.scrollWidth - window.innerWidth}`
-                                        }["HorizonShowcase.useEffect.ctx"]
-                                    }
-                                });
-                            }
-                        }["HorizonShowcase.useEffect.ctx"]);
-                    }
-                }
-            }["HorizonShowcase.useEffect.ctx"], containerRef);
-            return ({
-                "HorizonShowcase.useEffect": ()=>ctx.revert()
-            })["HorizonShowcase.useEffect"];
         }
     }["HorizonShowcase.useEffect"], []);
-    // Generative Particle Physics Canvas Loop
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "HorizonShowcase.useEffect": ()=>{
-            const canvas = canvasRef.current;
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-            if (!ctx) return;
-            let animationFrameId;
-            let particles = [];
-            let width = canvas.width = canvas.offsetWidth;
-            let height = canvas.height = canvas.offsetHeight;
-            const initParticles = {
-                "HorizonShowcase.useEffect.initParticles": ()=>{
-                    particles = [];
-                    for(let i = 0; i < nodeCount; i++){
-                        particles.push({
-                            x: Math.random() * width,
-                            y: Math.random() * height,
-                            vx: (Math.random() - 0.5) * 1.5 * particleSpeed,
-                            vy: (Math.random() - 0.5) * 1.5 * particleSpeed,
-                            radius: Math.random() * 2 + 1,
-                            color: Math.random() > 0.5 ? "#00f3ff" : "#bc13fe"
-                        });
-                    }
-                }
-            }["HorizonShowcase.useEffect.initParticles"];
-            initParticles();
-            // Handle canvas resize
-            const resizeObserver = new ResizeObserver({
-                "HorizonShowcase.useEffect": ()=>{
-                    if (canvas.offsetWidth && canvas.offsetHeight) {
-                        width = canvas.width = canvas.offsetWidth;
-                        height = canvas.height = canvas.offsetHeight;
-                        initParticles();
-                    }
-                }
-            }["HorizonShowcase.useEffect"]);
-            resizeObserver.observe(canvas);
-            // Track FPS
-            let lastTime = performance.now();
-            let frameCount = 0;
-            const drawLoop = {
-                "HorizonShowcase.useEffect.drawLoop": ()=>{
-                    ctx.clearRect(0, 0, width, height);
-                    // Draw grid backdrop
-                    ctx.strokeStyle = "rgba(255, 255, 255, 0.02)";
-                    ctx.lineWidth = 1;
-                    const gridSize = 40;
-                    for(let x = 0; x < width; x += gridSize){
-                        ctx.beginPath();
-                        ctx.moveTo(x, 0);
-                        ctx.lineTo(x, height);
-                        ctx.stroke();
-                    }
-                    for(let y = 0; y < height; y += gridSize){
-                        ctx.beginPath();
-                        ctx.moveTo(0, y);
-                        ctx.lineTo(width, y);
-                        ctx.stroke();
-                    }
-                    // Physics loop
-                    particles.forEach({
-                        "HorizonShowcase.useEffect.drawLoop": (p, idx)=>{
-                            // Gravity attraction to mouse
-                            if (gravityActive && mousePos.x >= 0 && mousePos.y >= 0) {
-                                const dx = mousePos.x - p.x;
-                                const dy = mousePos.y - p.y;
-                                const dist = Math.sqrt(dx * dx + dy * dy);
-                                if (dist < 220) {
-                                    const force = (220 - dist) / 220 * 0.08 * particleSpeed;
-                                    p.vx += dx / dist * force;
-                                    p.vy += dy / dist * force;
-                                }
-                            }
-                            // Apply velocities & friction
-                            p.x += p.vx;
-                            p.y += p.vy;
-                            p.vx *= 0.98;
-                            p.vy *= 0.98;
-                            // Add standard idle drifting speed
-                            const drift = 0.1 * particleSpeed;
-                            p.vx += (Math.random() - 0.5) * drift;
-                            p.vy += (Math.random() - 0.5) * drift;
-                            // Screen boundary bounds
-                            if (p.x < 0) {
-                                p.x = 0;
-                                p.vx *= -1;
-                            }
-                            if (p.x > width) {
-                                p.x = width;
-                                p.vx *= -1;
-                            }
-                            if (p.y < 0) {
-                                p.y = 0;
-                                p.vy *= -1;
-                            }
-                            if (p.y > height) {
-                                p.y = height;
-                                p.vy *= -1;
-                            }
-                            // Draw node
-                            ctx.beginPath();
-                            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                            ctx.fillStyle = p.color;
-                            ctx.shadowBlur = 10;
-                            ctx.shadowColor = p.color;
-                            ctx.fill();
-                            ctx.shadowBlur = 0; // reset shadow
-                            // Connect lines
-                            for(let j = idx + 1; j < particles.length; j++){
-                                const p2 = particles[j];
-                                const dx = p.x - p2.x;
-                                const dy = p.y - p2.y;
-                                const dist = Math.sqrt(dx * dx + dy * dy);
-                                if (dist < 90) {
-                                    ctx.beginPath();
-                                    ctx.moveTo(p.x, p.y);
-                                    ctx.lineTo(p2.x, p2.y);
-                                    const alpha = (90 - dist) / 90 * 0.18;
-                                    ctx.strokeStyle = p.color === "#00f3ff" ? `rgba(0, 243, 255, ${alpha})` : `rgba(188, 19, 254, ${alpha})`;
-                                    ctx.lineWidth = 0.8;
-                                    ctx.stroke();
-                                }
-                            }
-                        }
-                    }["HorizonShowcase.useEffect.drawLoop"]);
-                    // Calculate FPS
-                    frameCount++;
-                    const now = performance.now();
-                    if (now - lastTime >= 1000) {
-                        setCurrentFps(Math.round(frameCount * 1000 / (now - lastTime)));
-                        frameCount = 0;
-                        lastTime = now;
-                    }
-                    animationFrameId = requestAnimationFrame(drawLoop);
-                }
-            }["HorizonShowcase.useEffect.drawLoop"];
-            drawLoop();
-            return ({
-                "HorizonShowcase.useEffect": ()=>{
-                    cancelAnimationFrame(animationFrameId);
-                    resizeObserver.disconnect();
-                }
-            })["HorizonShowcase.useEffect"];
-        }
-    }["HorizonShowcase.useEffect"], [
-        nodeCount,
-        particleSpeed,
-        gravityActive,
-        mousePos
-    ]);
-    // Track relative mouse position inside canvas lab
-    const handleCanvasMouseMove = (e)=>{
-        const rect = e.currentTarget.getBoundingClientRect();
-        setMousePos({
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        });
-    };
-    const handleCanvasMouseLeave = ()=>{
-        setMousePos({
-            x: -1000,
-            y: -1000
-        });
-    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
         className: "horizon-container",
-        ref: containerRef,
         id: "playground",
         "aria-label": "Horizon Playground Section",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "horizon-wrapper",
-            ref: wrapperRef,
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "horizon-slide slide--kinetic",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "slide-background-glow glow--violet"
-                        }, void 0, false, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 269,
-                            columnNumber: 11
-                        }, this),
-                        mounted && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$CreativeBlob$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 270,
-                            columnNumber: 23
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "horizon-slide-content",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "slide-badge",
-                                    children: "// PLAYGROUND.01"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 272,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                    className: "kinetic-hero-title parallax-slide-layer",
-                                    "data-depth": "0.3",
-                                    children: [
-                                        "CREATIVE",
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
-                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 274,
-                                            columnNumber: 23
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-hollow",
-                                            children: "PLAYGROUND"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 275,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 273,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "slide-description parallax-slide-layer",
-                                    "data-depth": "0.1",
-                                    children: "Scroll horizontally to morph the space, distortion perspectives, and trigger interactive experimental physics."
-                                }, void 0, false, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 277,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 271,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                    lineNumber: 268,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "horizon-slide slide--physics-lab",
-                    onMouseMove: handleCanvasMouseMove,
-                    onMouseLeave: handleCanvasMouseLeave,
-                    "data-cursor-text": "INTERACT",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "slide-background-glow glow--cyan"
-                        }, void 0, false, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 290,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
-                            className: "physics-canvas",
-                            ref: canvasRef
-                        }, void 0, false, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 291,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "horizon-slide-content full-width",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "lab-grid-layout",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "horizon-slide slide--kinetic",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "slide-background-glow glow--violet"
+                    }, void 0, false, {
+                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
+                        lineNumber: 23,
+                        columnNumber: 11
+                    }, this),
+                    mounted && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$CreativeBlob$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
+                        lineNumber: 24,
+                        columnNumber: 23
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "horizon-slide-content",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "slide-badge",
+                                children: "// PLAYGROUND"
+                            }, void 0, false, {
+                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
+                                lineNumber: 27,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: "kinetic-hero-title",
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "lab-info",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "slide-badge",
-                                                children: "// PLAYGROUND.02"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 296,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                className: "slide-title",
-                                                children: "GRAVITY NODE LAB"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 297,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "slide-description",
-                                                children: "Move your cursor to dynamically pull particles, construct holographic cybernetic lines, and morph gravity fields in real-time."
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 298,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                    "CREATIVE",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                        lineNumber: 295,
-                                        columnNumber: 15
+                                        lineNumber: 29,
+                                        columnNumber: 23
                                     }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "lab-terminal glass-card",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "terminal-header",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "terminal-dot"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 306,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "terminal-dot"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 307,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "terminal-dot"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 308,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "terminal-title",
-                                                        children: "// CYBERNETIC.CONTROL"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 309,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 305,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "terminal-readouts",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "readout-row",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "readout-label",
-                                                                children: "SYSTEM STATE:"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                                lineNumber: 314,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "readout-value active",
-                                                                children: "ONLINE"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                                lineNumber: 315,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 313,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "readout-row",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "readout-label",
-                                                                children: "FPS ENGINE:"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                                lineNumber: 318,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "readout-value",
-                                                                children: [
-                                                                    currentFps,
-                                                                    " FPS"
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                                lineNumber: 319,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 317,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "readout-row",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "readout-label",
-                                                                children: "ACTIVE NODES:"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                                lineNumber: 322,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "readout-value",
-                                                                children: nodeCount
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                                lineNumber: 323,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 321,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 312,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "terminal-controls",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        className: `btn-terminal ${gravityActive ? "active" : ""}`,
-                                                        onClick: ()=>setGravityActive(!gravityActive),
-                                                        children: [
-                                                            "GRAVITY: ",
-                                                            gravityActive ? "ON" : "OFF"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 328,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        className: "btn-terminal",
-                                                        onClick: ()=>setParticleSpeed((prev)=>prev === 2 ? 0.5 : prev + 0.5),
-                                                        children: [
-                                                            "SPEED: ",
-                                                            particleSpeed === 0.5 ? "0.5x" : particleSpeed === 1 ? "1.0x" : "2.0x"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 335,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        className: "btn-terminal",
-                                                        onClick: ()=>setNodeCount((prev)=>prev === 120 ? 40 : prev + 40),
-                                                        children: [
-                                                            "NODES: ",
-                                                            nodeCount
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                        lineNumber: 342,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                lineNumber: 327,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-hollow",
+                                        children: "PLAYGROUND"
+                                    }, void 0, false, {
                                         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                        lineNumber: 304,
+                                        lineNumber: 30,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                lineNumber: 294,
+                                lineNumber: 28,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "slide-description",
+                                children: "Tap and drag the volumetric Hoberman sphere to warp gravity, trigger core compression, and explore interactive kinetic aesthetics."
+                            }, void 0, false, {
+                                fileName: "[project]/components/ui/HorizonShowcase.tsx",
+                                lineNumber: 32,
                                 columnNumber: 13
                             }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 293,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                    lineNumber: 284,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "horizon-slide slide--glitch-cards",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "slide-background-glow glow--violet"
-                        }, void 0, false, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 356,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "horizon-slide-content",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "slide-badge",
-                                    children: "// PLAYGROUND.03"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 358,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                    className: "slide-title",
-                                    children: "EXPERIMENTAL CONCEPTS"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 359,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "glitch-cards-wrapper parallax-slide-layer",
-                                    "data-depth": "0.2",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
-                                            className: "glitch-card tilt-card glass-card",
-                                            "data-cursor-text": "MORPH",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "glitch-card-ambient"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 367,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "glitch-card-image-wrap",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "glitch-overlay-noise"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 369,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                                            src: "/images/project-img/experimental.jpg",
-                                                            alt: "Neural Shader Artwork"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 370,
-                                                            columnNumber: 19
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 368,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "glitch-card-info",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "card-num",
-                                                            children: "01 //"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 373,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                                            className: "card-heading",
-                                                            children: "NEURAL SHADER"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 374,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                            className: "card-text",
-                                                            children: "GPU-accelerated vector fields that dynamically generate real-time feedback loops based on sound inputs."
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 375,
-                                                            columnNumber: 19
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 372,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 363,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
-                                            className: "glitch-card tilt-card glass-card",
-                                            "data-cursor-text": "DISCOVER",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "glitch-card-ambient"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 384,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "glitch-card-image-wrap",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "glitch-overlay-noise"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 386,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                                            src: "/images/project-img/infini-loop.jpg",
-                                                            alt: "Synapse Engine Artwork"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 387,
-                                                            columnNumber: 19
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 385,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "glitch-card-info",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "card-num",
-                                                            children: "02 //"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 390,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                                            className: "card-heading",
-                                                            children: "SYNAPSE ENGINE"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 391,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                            className: "card-text",
-                                                            children: "Monolithic data structures rendering physics-backed canvases that coordinate smooth horizontal scrolling triggers."
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                            lineNumber: 392,
-                                                            columnNumber: 19
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                                    lineNumber: 389,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 380,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 361,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 357,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                    lineNumber: 355,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "horizon-slide slide--matrix-outro",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "slide-background-glow glow--cyan"
-                        }, void 0, false, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 401,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "horizon-slide-content",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "slide-badge",
-                                    children: "// PLAYGROUND.04"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 403,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                    className: "outro-title parallax-slide-layer",
-                                    "data-depth": "0.4",
-                                    children: [
-                                        "ENTER THE",
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
-                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 405,
-                                            columnNumber: 24
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-gradient",
-                                            children: "SYSTEM"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                            lineNumber: 406,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 404,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "slide-description",
-                                    children: "You are prepared. Explore complete finished project systems and creative deployments in the dynamic stack below."
-                                }, void 0, false, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 408,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "outro-arrow-wrap parallax-slide-layer",
-                                    "data-depth": "0.1",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "outro-arrow",
-                                        children: "↓"
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                        lineNumber: 412,
-                                        columnNumber: 15
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                                    lineNumber: 411,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                            lineNumber: 402,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/components/ui/HorizonShowcase.tsx",
-                    lineNumber: 400,
-                    columnNumber: 9
-                }, this)
-            ]
-        }, void 0, true, {
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/ui/HorizonShowcase.tsx",
+                        lineNumber: 26,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/ui/HorizonShowcase.tsx",
+                lineNumber: 22,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
             fileName: "[project]/components/ui/HorizonShowcase.tsx",
-            lineNumber: 265,
+            lineNumber: 19,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/ui/HorizonShowcase.tsx",
-        lineNumber: 259,
+        lineNumber: 14,
         columnNumber: 5
     }, this);
 }
-_s(HorizonShowcase, "Iud/ExKmDDgV+vcYs8F9CinPOQ4=");
+_s(HorizonShowcase, "LrrVfNW3d1raFE0BNzCTILYmIfo=");
 _c = HorizonShowcase;
 var _c;
 __turbopack_context__.k.register(_c, "HorizonShowcase");

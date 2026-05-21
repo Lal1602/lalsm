@@ -4,6 +4,22 @@ import { OrbitControls } from "@react-three/drei";
 import { useEffect, useRef, useState, useMemo } from "react";
 import * as THREE from "three";
 
+// Silence THREE.Clock deprecation warning from internal Three.js/R3F library calls
+if (typeof window !== "undefined") {
+  const originalWarn = console.warn;
+  console.warn = (...args) => {
+    if (
+      args[0] &&
+      typeof args[0] === "string" &&
+      args[0].includes("THREE.Clock") &&
+      args[0].includes("deprecated")
+    ) {
+      return;
+    }
+    originalWarn(...args);
+  };
+}
+
 // Glowing Cybernetic Core Sphere built with Points (highly stable, 100% bug-free)
 // Parent-Child Hoberman Sphere with Momentum Throw Mechanics
 function CyberSphere({

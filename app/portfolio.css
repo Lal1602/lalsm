@@ -2986,7 +2986,7 @@
 .horizon-wrapper {
   display: flex;
   height: 100vh;
-  width: 400vw; /* 4 fullscreen slides */
+  width: 100%;
   will-change: transform;
   transform-style: preserve-3d;
 }
@@ -3845,23 +3845,31 @@
     min-height: 85dvh !important;
     padding: 70px 20px 60px !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    overflow: hidden !important; /* Prevent slide content from stretching container width */
   }
 
-  /* Slide 1: Kinetic hero — hide WebGL sphere, keep text readable */
+  /* Slide 1: Kinetic hero — center WebGL sphere, beautiful ambient visibility */
   .slide--kinetic .three-webgl-canvas-wrap {
-    opacity: 0.3;               /* dim but keep for atmosphere */
-    pointer-events: none;
+    opacity: 0.75;              /* visible and extremely premium */
+    pointer-events: none;       /* let touch pass through for vertical scroll safety */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
   }
 
   .slide--kinetic .horizon-slide-content {
     max-width: 100% !important;
-    padding: 0 !important;
+    padding: 0 10px !important;
     pointer-events: auto;
   }
 
   .kinetic-hero-title {
-    font-size: clamp(2.6rem, 11vw, 5rem);
+    font-size: clamp(1.8rem, 8.5vw, 3.2rem) !important;
     letter-spacing: -0.02em;
+    word-wrap: break-word;
+    margin-bottom: 12px;
   }
 
   .text-hollow {
@@ -3869,51 +3877,13 @@
   }
 
   .slide-description {
-    font-size: 0.92rem;
-    max-width: 38ch;
+    font-size: 0.88rem;
+    max-width: 280px !important; /* completely avoid horizontal overflow */
     margin-left: auto;
     margin-right: auto;
   }
 
-  /* Slide 2: Physics lab — stack controls below canvas */
-  .lab-grid-layout {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .physics-canvas {
-    pointer-events: none;   /* on mobile, no hover gravity for perf */
-  }
-
-  .lab-terminal {
-    padding: 20px;
-  }
-
-  .terminal-controls {
-    gap: 8px;
-  }
-
-  .btn-terminal {
-    flex: 1 1 calc(50% - 8px);
-    padding: 10px 12px;
-    font-size: 0.68rem;
-  }
-
-  /* Slide 3: Glitch cards — vertical stack */
-  .glitch-cards-wrapper {
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 24px;
-  }
-
-  .glitch-card-image-wrap {
-    height: 180px;
-  }
-
-  /* Slide 4: Outro */
-  .outro-title {
-    font-size: clamp(2.4rem, 9vw, 4rem);
-  }
+  /* Slide 2, 3, and 4 overrides removed as they are no longer used */
 
   /* ── HUD Status Bar ── */
   .hud-interactive-status {

@@ -2776,7 +2776,7 @@ a.contact-info-row:hover, a.contact-info-row:hover .contact-info-icon {
 
 .horizon-wrapper {
   will-change: transform;
-  width: 400vw;
+  width: 100%;
   height: 100vh;
   transform-style: preserve-3d;
   display: flex;
@@ -3636,22 +3636,30 @@ a.contact-info-row:hover, a.contact-info-row:hover .contact-info-icon {
     height: auto !important;
     min-height: 85dvh !important;
     padding: 70px 20px 60px !important;
+    overflow: hidden !important;
   }
 
   .slide--kinetic .three-webgl-canvas-wrap {
-    opacity: .3;
+    opacity: .75;
     pointer-events: none;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
 
   .slide--kinetic .horizon-slide-content {
     pointer-events: auto;
     max-width: 100% !important;
-    padding: 0 !important;
+    padding: 0 10px !important;
   }
 
   .kinetic-hero-title {
     letter-spacing: -.02em;
-    font-size: clamp(2.6rem, 11vw, 5rem);
+    word-wrap: break-word;
+    margin-bottom: 12px;
+    font-size: clamp(1.8rem, 8.5vw, 3.2rem) !important;
   }
 
   .text-hollow {
@@ -3659,47 +3667,10 @@ a.contact-info-row:hover, a.contact-info-row:hover .contact-info-icon {
   }
 
   .slide-description {
-    max-width: 38ch;
     margin-left: auto;
     margin-right: auto;
-    font-size: .92rem;
-  }
-
-  .lab-grid-layout {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .physics-canvas {
-    pointer-events: none;
-  }
-
-  .lab-terminal {
-    padding: 20px;
-  }
-
-  .terminal-controls {
-    gap: 8px;
-  }
-
-  .btn-terminal {
-    flex: calc(50% - 8px);
-    padding: 10px 12px;
-    font-size: .68rem;
-  }
-
-  .glitch-cards-wrapper {
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 24px;
-  }
-
-  .glitch-card-image-wrap {
-    height: 180px;
-  }
-
-  .outro-title {
-    font-size: clamp(2.4rem, 9vw, 4rem);
+    font-size: .88rem;
+    max-width: 280px !important;
   }
 
   .hud-interactive-status {
