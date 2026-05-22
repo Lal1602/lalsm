@@ -1,6 +1,18 @@
 "use client";
+import { useEffect, useState, useRef } from "react";
+import { Canvas } from "@react-three/fiber";
+import FilmScene from "./FilmScene";
 
-const projects = [
+interface Project {
+  title: string;
+  desc: string;
+  fullDesc: string;
+  tech: string;
+  image: string;
+  link: string;
+}
+
+const projects: Project[] = [
   { title: "Herbal Mart", desc: "A scalable e-commerce platform featuring dynamic cart management and real-time product filtering, built to optimize user engagement.", fullDesc: "An interactive online store for herbal health products. Features a dynamic shopping cart, product filtering, and a responsive design.", tech: "HTML5, CSS3, JavaScript, Netlify", image: "/images/project-img/herbal-mart.jpg", link: "/images/project-img/herbal-mart.jpg" },
   { title: "Bunny Jump Lite", desc: "A fun interactive game where a bunny is controlled via keyboard inputs.", fullDesc: "A lightweight browser game where you control a bunny to jump over obstacles. Features score tracking and progressive difficulty.", tech: "JavaScript, HTML5 Canvas, CSS3", image: "/images/project-img/bunny-jump.jpg", link: "https://bunny-jump-lite.netlify.app/" },
   { title: "Hunting Alien", desc: "Action-packed shooter game developed using the Phaser JavaScript framework.", fullDesc: "A fast-paced space shooter game. Protect your ship from incoming waves of aliens using different power-ups.", tech: "Phaser.js, JavaScript, Game Design", image: "/images/project-img/hunt-alien.jpg", link: "https://hunting-alien-io.netlify.app/" },
@@ -22,47 +34,156 @@ const projects = [
 ];
 
 export default function ProjectsSection() {
+  const [mounted, setMounted] = useState(false);
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+
+  // References to share dynamic, high-performance scroll values across R3F and DOM
+  const scrollRef = useRef({
+    current: 0,
+    target: 0,
+    isDragging: false,
+    lastX: 0,
+    velocity: 0,
+    dragDistance: 0,
+  });
+
+  const progressRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Pointer drag event handlers to rotate the 3D film strip cylinder
+  const handlePointerDown = (e: React.PointerEvent) => {
+    scrollRef.current.isDragging = true;
+    scrollRef.current.lastX = e.clientX;
+    scrollRef.current.dragDistance = 0;
+    scrollRef.current.velocity = 0;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!scrollRef.current.isDragging) return;
+    const deltaX = e.clientX - scrollRef.current.lastX;
+    scrollRef.current.lastX = e.clientX;
+    
+    // Accumulate total drag distance
+    scrollRef.current.dragDistance += Math.abs(deltaX);
+    
+    // Smooth dragging sensitivity scale
+    const sensitivity = 0.003; 
+    scrollRef.current.target -= deltaX * sensitivity;
+    scrollRef.current.velocity = -deltaX * sensitivity;
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (scrollRef.current.isDragging) {
+      scrollRef.current.isDragging = false;
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    // Wheel zoom/scroll rotation support
+    const sensitivity = 0.001;
+    scrollRef.current.target += e.deltaY * sensitivity;
+  };
+
   return (
-    <section className="section" id="projects" aria-label="Projects Section">
+    <section className="section" id="projects" aria-label="Projects Section" style={{ overflow: "visible", position: "relative" }}>
       <div className="parallax-text" style={{ top: "-20px", right: "0" }} data-speed="0.15">WORK</div>
-      <div className="container">
+      
+      <div className="container" style={{ position: "relative", zIndex: 10 }}>
         <h2 className="section-title" data-scroll>Projects</h2>
-        <div className="swiper project-slider" id="project-swiper">
-          <div className="swiper-wrapper">
-            {projects.map((p, i) => (
-              <div className="swiper-slide" key={i}>
-                <div className="project-float-wrapper">
-                  <article
-                    className="project-card"
-                    data-title={p.title}
-                    data-desc={p.fullDesc}
-                    data-tech={p.tech}
-                    data-image={p.image}
-                    data-link={p.link}
-                    data-cursor-text="VIEW"
-                  >
-                    <button className="btn-quick-view" aria-label={`Quick View ${p.title}`}>
-                      {/* @ts-ignore */}
-                      <ion-icon suppressHydrationWarning name="eye-outline" aria-hidden="true"></ion-icon>
-                    </button>
-                    <div className="card-img-wrapper">
-                      <img src={p.image} alt={`${p.title} Project Screenshot`} />
-                    </div>
-                    <div className="card-content">
-                      <div>
-                        <h3 className="project-title">{p.title}</h3>
-                        <p className="project-desc">{p.desc}</p>
-                      </div>
-                      <a href="#" className="btn" onClick={(e) => e.preventDefault()}>Details</a>
-                    </div>
-                  </article>
-                </div>
-              </div>
-            ))}
+        
+        {/* Helper HUD instruction bar */}
+        <div className="project-hud-instruction" data-scroll>
+          <span className="hud-pulse-dot"></span>
+          <p className="hud-text">// GRAB & DRAG OR SCROLL TO SPIN VINTAGE FILM STRIP</p>
+        </div>
+
+        {/* 3D WebGL Canvas Container with pointer-event hooks */}
+        <div 
+          className="project-3d-canvas-wrap"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+          onWheel={handleWheel}
+          style={{ touchAction: "none" }}
+        >
+          {mounted && (
+            <Canvas
+              camera={{ position: [0, 0, 4.0], fov: 50 }}
+              dpr={[1, 1.5]}
+              gl={{ alpha: true, antialias: true, stencil: false }}
+              style={{ background: "transparent" }}
+            >
+              <FilmScene 
+                projects={projects} 
+                onSelectProject={(proj) => setActiveProject(proj)} 
+                scrollRef={scrollRef}
+                progressRef={progressRef}
+              />
+            </Canvas>
+          )}
+        </div>
+
+        {/* Sleek Cinematic Looping Animation Bar */}
+        <div className="project-loop-bar-container" data-scroll>
+          <div className="project-loop-bar-track">
+            <div ref={progressRef} className="project-loop-bar-fill"></div>
           </div>
-          <div className="swiper-pagination" style={{ position: "relative", marginTop: "30px" }}></div>
+          <div className="project-loop-bar-hud">
+            <span className="hud-code">// SYS.LOOP_ACTIVE</span>
+            <span className="hud-code">REEL SPEED: 2.4 RPM</span>
+          </div>
         </div>
       </div>
+
+      {/* Cyberpunk details overlay modal */}
+      {activeProject && (
+        <div className="project-detail-modal" onClick={() => setActiveProject(null)}>
+          <div className="modal-backdrop"></div>
+          <div className="modal-content-card" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setActiveProject(null)}>
+              {/* @ts-ignore */}
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
+            <div className="modal-body">
+              <div className="modal-image-wrap">
+                <img src={activeProject.image} alt={activeProject.title} />
+                <div className="modal-img-gradient"></div>
+              </div>
+              <div className="modal-info">
+                <p className="modal-eyebrow">// PROJECT DATAFRAME</p>
+                <h3 className="modal-title">{activeProject.title}</h3>
+                
+                <div className="modal-tech-tags">
+                  {activeProject.tech.split(",").map((tech, idx) => (
+                    <span className="tech-badge" key={idx}>
+                      {tech.trim()}
+                    </span>
+                  ))}
+                </div>
+                
+                <p className="modal-desc">{activeProject.fullDesc}</p>
+                
+                <div className="modal-actions">
+                  <a 
+                    href={activeProject.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="btn-launch-live"
+                  >
+                    <span>LAUNCH ACTIVE INTERFACE</span>
+                    {/* @ts-ignore */}
+                    <ion-icon name="rocket-outline" style={{ marginLeft: "8px", fontSize: "1.1rem" }}></ion-icon>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

@@ -1,7 +1,7 @@
 // Force Next.js recompilation after fixing syntax errors
 import HeroSection from "@/components/ui/HeroSection";
 import AboutSection from "@/components/ui/AboutSection";
-import WorkflowSection from "@/components/ui/WorkflowSection";
+import ProcessDashboard from "@/components/ui/ProcessDashboard";
 import HorizonShowcase from "@/components/ui/HorizonShowcase";
 import ProjectsSection from "@/components/ui/ProjectsSection";
 import AchievementsSection from "@/components/ui/AchievementsSection";
@@ -34,7 +34,7 @@ export default function Home() {
         </div>
 
         <AboutSection />
-        <WorkflowSection />
+        <ProcessDashboard />
         <HorizonShowcase />
         <ProjectsSection />
         <AchievementsSection />
@@ -42,18 +42,6 @@ export default function Home() {
       </main>
 
       <Footer />
-
-      {/* Floating holographic workflow tooltip */}
-      <div className="floating-workflow-card" aria-hidden="true" role="tooltip">
-        <div className="float-card-glow"></div>
-        <div className="float-icon-wrap">
-          {/* @ts-ignore */}
-          <ion-icon suppressHydrationWarning className="float-icon" name="search-outline"></ion-icon>
-        </div>
-        <p className="float-eyebrow">// PROCESS</p>
-        <h4 className="float-title">Discovery</h4>
-        <p className="float-desc">Hover a step to reveal details.</p>
-      </div>
     </>
   );
 }
