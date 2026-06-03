@@ -1,96 +1,58 @@
-# ULTRASUPERPROMPT: "The Ultimate Awwwards Hover - Deployment Phase"
+# ULTRASUPERPROMPT: "Awwwards-Level Precision Interactive Hover - Deployment Phase (Final Verified Layout)"
 
-**SYSTEM ROLE & DIRECTIVE:**
-Act as an elite, Awwwards-winning Creative Frontend Engineer. Your task is to generate production-ready, highly modular, and mathematically precise code to replicate a very specific, complex hover interaction. 
-You must produce code with 100% ACCURACY to the visual description below, with ZERO MISTAKES, running flawlessly at 60fps.
+**SYSTEM DIRECTIVE:**
+Act as an elite Creative Frontend Developer and WebGL/GSAP Animation Master. Your objective is to build a pixel-perfect, hyper-interactive, and performance-optimized React component replicating a complex UI interaction. The output must operate flawlessly at 60fps with zero layout shifts, zero logical flaws, and complete immunity to fast-scrolling bugs.
 
-**TECH STACK:**
-* React (Vite)
-* Tailwind CSS (for layout/styling)
-* GSAP (GreenSock) for high-performance timeline animations
-* SVG / Canvas (for particles and connection lines)
-
----
-
-## 1. LOGIC & ARCHITECTURE (CRITICAL BUG FIX)
-The system must be immune to the "fast-scroll ghost hover" bug.
-1.  **Strict Bounding Box Hover:** The `onMouseEnter` and `onMouseLeave` triggers MUST ONLY wrap the exact text string ("04 - DEPLOYMENT"), not the entire row or empty whitespace. Use precise inline wrapping.
-2.  **Scroll Debounce:** Implement a global scroll listener. When the user is scrolling, inject `pointer-events: none` to the entire list container. Remove it 150ms after scrolling completely stops.
+**TECH STACK REQUIREMENTS:**
+* **Framework:** React (Vite architecture)
+* **Styling:** Tailwind CSS (utility-first layout)
+* **Animation Core:** GSAP (GreenSock Animation Platform) for timeline orchestration
+* **Graphics/FX:** Dynamic SVG Paths and HTML5 Canvas or CSS Masking for high-fidelity particle/fluid systems
 
 ---
 
-## 2. THE VISUAL INTERACTION (STEP-BY-STEP REPLICATION)
-
-When the user hovers EXACTLY over the text "04 - DEPLOYMENT", trigger the following synchronized GSAP timeline:
-
-### A. The Text Node ("04 - DEPLOYMENT")
-1.  **Neon Framing:** Instantly draw a sharp, 1px neon cyan (`#00FFFF`) bounding box directly hugging the text. Add small tech/sci-fi bracket accents at the corners.
-2.  **Internal Energy:** The text color transitions from a static outline to a dynamic, glowing orange/yellow fluid state. Implement a moving `background-clip: text` gradient or internal particle mask so the text looks like it's filled with flowing molten energy.
-
-### B. The Connection Lines (SVG)
-1.  From the bottom right of the text bounding box, animate multiple glowing orange SVG bezier curves (`stroke-dashoffset`).
-2.  These lines must sweep elegantly down and to the right, forming a wavy, organic bundle of optical fibers, plugging directly into the left edge of the Info Card.
-
-### C. The Info Card (100% EXACT MATCH REQUIRED)
-The card appears on the right side. It must look exactly like this:
-1.  **Card Container:**
-    * Thick, intense, glowing neon orange border with rounded corners.
-    * Dark, slightly translucent glassmorphic background (`backdrop-blur`).
-2.  **Card Header:**
-    * Top left text: `PHASE 04 // LAUNCH & MONITOR` (in small, uppercase orange monospace font).
-    * Top right icon: A small square box with a subtle orange border containing an orange Rocket icon.
-3.  **Card Typography:**
-    * Title (`<h2>`): `PRODUCTION SHIP` (in a bold, extended, sci-fi/tech white font).
-    * Description (`<p>`): *"Continuous integration pipelines, CDN configurations, ultra-secure cloud scaling, and micro-interaction checks for a flawless zero-downtime launch."* (in a clean, readable gray sans-serif font).
-4.  **Holographic Particle Effect (Inside Card):**
-    * Behind the text and diagram inside the card, render a subtle system of small glowing dots (orange and cyan) that slowly float upwards, fading in and out, creating a deep 3D volumetric space.
-5.  **The Node Diagram (Bottom of Card):**
-    * A horizontal network diagram consisting of circular nodes.
-    * **Nodes:** Left to right structure.
-        * Far left: `Core`
-        * Branching up/down: `Strategy`, `UI/UX`
-        * Merging center: `Architecture`
-        * Branching up/down again: `Codebase`, `Testing`
-        * Far right: `Cloud`
-    * **Energy Flow Animation:** The connections between these nodes are NOT straight static lines. They are dynamic, multi-strand glowing orange curves (forming overlapping sine waves or infinity loop shapes). Animate glowing energy pulses traveling along these specific paths from `Core` all the way to `Cloud`.
+## 1. UX LOGIC & PERFORMANCE INFRASTRUCTURE (THE SCROLL-BUG FIX)
+The component must elegantly handle high-velocity user scrolling without accidental hover triggers:
+1.  **Strict Typographic Bounding Box:** The `onMouseEnter` and `onMouseLeave` event listeners must be bound *exclusively* to the inline text node element (`<span>` or `<h1>` of "04 - DEPLOYMENT"). Do not bind to the wrapper flex-row or block container. The active hitbox must precisely match the dimensions of the text string.
+2.  **Scroll Velocity Pointer Lock:** Implement an active scroll event listener on the parent container. When scrolling is active or exceeds a specific velocity threshold, dynamically inject `pointer-events: none` into the entire interaction list. Use a 150ms debounce function to smoothly restore `pointer-events: auto` only after scrolling has completely ceased.
 
 ---
 
-## 3. EXPECTED OUTPUT
-* **Component Structure:** Break this down into logical React components (e.g., `ProcessList.jsx`, `ProcessItem.jsx`, `EnergyConnection.jsx`, `DeploymentCard.jsx`, `NodeDiagram.jsx`).
-* **Complete Code:** Provide the exact CSS/Tailwind classes, GSAP timelines, and SVG paths required to make this a reality. Do not leave placeholders for the complex logic. 
-* Ensure coordinates for the SVG connection lines calculate dynamically using React `useRef` and `getBoundingClientRect` so it works across screen sizes.
+## 2. STEP-BY-STEP INTERACTION WORKFLOW (PIXEL-PERFECT REPLICATION)
+
+Upon triggering a valid `onMouseEnter` event on "04 - DEPLOYMENT", execute the following synchronized GSAP timelines:
+
+### A. The Hovered Menu Item ("04 - DEPLOYMENT")
+* **Sci-Fi Neon Framing:** Instantly reveal a crisp, 1px neon cyan (`#00FFFF`) bounding box perfectly hugging the active text. The box must feature sharp tech-style corner brackets. Animate this border using an SVG line-drawing stroke effect.
+* **Molten Internal Energy Flow:** The text shifts from a muted gray wireframe outline to a vibrant, luminous orange-yellow state. Inside the letters, animate a fluid, shifting molten energy waveform. Achieve this via CSS `background-clip: text` combined with an animated linear-gradient map or a canvas-driven noise texture mask moving horizontally.
+
+### B. The Organic Connecting Conduit (SVG Cable Bundle)
+* From the rightmost edge of the active cyan text bounding box, dynamically generate and draw a multi-stranded bundle of glowing neon-orange SVG bezier curves.
+* These lines must curve organically downward and outward across the screen space, mimicking a high-energy fiber-optic cable conduit, directly docking into the left-central boundary of the informational card on the right. Animate the path reveal using GSAP's `stroke-dashoffset`.
+
+### C. The Holographic Information Card (EXACT STRUCTURAL REPLICATION)
+The right-side card must render as a highly polished glassmorphic panel with the following rigid specifications:
+1.  **Container Properties:** Dark, highly translucent background with strong `backdrop-blur`. It must feature a thick, beautifully blended, intense neon orange glowing outer border with smooth rounded corners.
+2.  **Header Metrics:** * *Left:* Small, uppercase monospace typography in bright orange reading: `PHASE 04 // LAUNCH & MONITOR`.
+    * *Right:* A small square accent block with an orange outline housing a minimal glowing orange Rocket icon.
+3.  **Core Typography:**
+    * *Title (`<h2>`):* `PRODUCTION SHIP` rendered in an ultra-bold, extended tech/sci-fi white typeface.
+    * *Description (`<p>`):* *"Continuous integration pipelines, CDN configurations, ultra-secure cloud scaling, and micro-interaction checks for a flawless zero-downtime launch."* rendered in a clean, legible muted gray sans-serif font.
+4.  **Atmospheric Particle Field:** Behind the text layers within the card container, execute a lightweight canvas particle field. Render fine, glowing dots (alternating between soft orange and sharp cyan) that float gently upwards, varying in scale and opacity to simulate volumetric 3D depth.
+5.  **The Infinity-Loop Node Diagram (Bottom Section):**
+    * Render a horizontal network topology layout consisting of glowing circular junction nodes.
+    * **The Path Architecture:** The connections between nodes must follow a highly complex, braided multi-strand fiber path forming an elegant infinity-loop / figure-8 wave pattern.
+    * **The Node Flow (Left to Right):**
+        * `Core` (Far Left Node)
+        * Splits symmetrically into upper node `Strategy` and lower node `UI/UX`.
+        * Converges perfectly into the center node `Architecture`.
+        * Splits symmetrically again into upper node `Codebase` and lower node `Testing`.
+        * Converges finally into the target node `Cloud` (Far Right Node).
+    * **Animation:** Animate bright pulses of light traveling continuously along these interwoven curved sine-wave tracks from `Core` through the entire system to `Cloud`.
 
 ---
 
-# ULTRASUPERPROMPT REVISION: "Elevating to the Awwwards-Winning Sci-Fi Interface (Match Right Image)"
-
-**CONTEXT & COMPARISON:**
-We need to evolve the current layout (Left Image style, clean but flat) into the highly immersive, visually stunning sci-fi dashboard shown in the Right Image. Replicate the organic particle waves, holographic globe, and refined database topologies with pixel-perfect precision.
-
-**CRITICAL DIRECTIVES FOR REVISION:**
-
-### 1. Animated Particle Energy Ribbon (The Orange Wave)
-* **Visual:** Replace the flat horizontal laser/beam on hover with a **dynamic, fluid, multi-strand wavy stream of glowing golden-orange energy particles**.
-* **Feel:** It must look like a solar flare, a fluid vector field, or an energetic plasma ribbon.
-* **Tech:** Use Canvas or SVG with high-density particle paths. The wave must ripple, weave, and flow horizontally, passing directly through the active row ("04 - DEPLONYMENT" / "04 - DEPLOYMENT") and plugging elegantly into the bottom-left of the info card.
-
-### 2. Rotating Holographic Wireframe Globe (The Playground Sphere)
-* **Visual:** Add a large, semi-submerged **3D wireframe holographic globe/sphere grid** in the bottom-center of the screen (underneath the process steps list).
-* **Feel:** The globe must have a deep violet/indigo glowing outline, slow rotation, and a subtle glassmorphic depth.
-* **Tech:** Label it with a clean monospace tech label `// PLAYGROUND` aligned horizontally next to the sphere.
-
-### 3. Database & Server Topology Diagram (Info Card Visuals)
-* **Visual:** Replace the simple node-network diagram inside the Holographic Card with a **highly detailed database architecture flow**.
-* **Components:** Render a central database drum icon (`DB`) in a glowing orange outline, connected to multiple surrounding rack-server nodes via flowing data-stream lines that branch out towards the right.
-* **Animation:** Animate orange data packets pulsing along these connection paths in real-time.
-
-### 4. Sleek Header Navigation & Brand Logo
-* **Visual:** Implement a modern, minimalist glassmorphic navigation bar at the top of the dashboard.
-* **Logo:** Left logo reads `"HOW BILAL WORK"` with a stylized neon purple/cyan accent block over `"BILAL."`.
-* **Menu:** `Home`, `About`, `Projects`, `Achievements` (with a soft golden active state), and `Contact`.
-* **Cursor:** A sci-fi custom pointer/cursor (glowing cyan arrowhead) should interactively float and track the user's mouse.
-
-### 5. Ambient Interactive Accents
-* **Sparkle Button:** Bottom Right: Add a glowing, interactive four-point star (sparkle) floating button that pulsates slowly.
-* **Aesthetics:** Ensure all typography is perfectly crisp, using custom monospace fonts and neon-tinted outlines to match the premium sci-fi aesthetic. Fix any spelling typos like "pipsline" to "pipelines" and "DEPLONYMENT" to "DEPLOYMENT" while retaining the superior visuals.
+## 3. TECHNICAL SPECIFICATIONS FOR OUTPUT PRODUCTION
+* **Modular Breakdown:** Structure the codebase cleanly into reusable components: `ProcessDashboard.jsx`, `InteractiveProcessItem.jsx`, `DynamicConduit.jsx`, `HolographicCard.jsx`, and `InfinityNodeDiagram.jsx`.
+* **Dynamic Coordinate Mapping:** Do not hardcode layout positions. Use React `useRef` hooks and live `getBoundingClientRect()` calculations to compute the exact start and end coordinates of the SVG connection strands dynamically, ensuring total responsiveness across all desktop viewports.
+* **Hardware Acceleration:** Ensure all animations leverage hardware-accelerated CSS properties (`transform`, `opacity`, and native SVG path parameters). Avoid manipulating layout triggers (`width`, `height`, `top`, `left`) inside the animation loop to guarantee a locked 60fps performance profile.

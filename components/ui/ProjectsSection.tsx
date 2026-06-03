@@ -146,7 +146,7 @@ export default function ProjectsSection() {
           <div className="modal-content-card" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={() => setActiveProject(null)}>
               {/* @ts-ignore */}
-              <ion-icon name="close-outline"></ion-icon>
+              <ion-icon suppressHydrationWarning name="close-outline"></ion-icon>
             </button>
             <div className="modal-body">
               <div className="modal-image-wrap">
@@ -176,7 +176,7 @@ export default function ProjectsSection() {
                   >
                     <span>LAUNCH ACTIVE INTERFACE</span>
                     {/* @ts-ignore */}
-                    <ion-icon name="rocket-outline" style={{ marginLeft: "8px", fontSize: "1.1rem" }}></ion-icon>
+                    <ion-icon suppressHydrationWarning name="rocket-outline" style={{ marginLeft: "8px", fontSize: "1.1rem" }}></ion-icon>
                   </a>
                 </div>
               </div>

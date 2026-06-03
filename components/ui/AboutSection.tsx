@@ -32,8 +32,8 @@ export default function AboutSection() {
                   </p>
                   <div className="tech-stack-wrapper">
                     {/* @ts-ignore */}
-                    {[["logo-javascript","JavaScript"],["logo-react","React.js"],["triangle-outline","Next.js 14"],["code-slash-outline","TypeScript"],["color-wand-outline","Tailwind CSS"],["flash-outline","GSAP"],["cube-outline","Three.js"],["layers-outline","WebGL"]].map(([icon,label])=>(
-                      <span key={label} className={`tech-badge-pill${["GSAP","Three.js"].includes(label as string)?" highlight":""}`}>
+                    {[["logo-javascript", "JavaScript"], ["logo-react", "React.js"], ["triangle-outline", "Next.js 14"], ["code-slash-outline", "TypeScript"], ["color-wand-outline", "Tailwind CSS"], ["flash-outline", "GSAP"], ["cube-outline", "Three.js"], ["layers-outline", "WebGL"]].map(([icon, label]) => (
+                      <span key={label} className={`tech-badge-pill${["GSAP", "Three.js"].includes(label as string) ? " highlight" : ""}`}>
                         {/* @ts-ignore */}
                         <ion-icon suppressHydrationWarning name={icon} aria-hidden="true"></ion-icon>{label}
                       </span>
@@ -64,7 +64,7 @@ export default function AboutSection() {
                     <span className="terminal-dot"></span><span className="terminal-dot"></span><span className="terminal-dot"></span> [ SYS.STACK ]
                   </p>
                   <div className="tech-stack-wrapper">
-                    {[["logo-nodejs","Node.js"],["logo-docker","Docker"],["logo-firebase","Firebase"],["server-outline","PHP 8+"],["server-outline","Laravel"],["database-outline","MySQL"],["database-outline","PostgreSQL"],["logo-github","Git"]].map(([icon,label])=>(
+                    {[["logo-nodejs", "Node.js"], ["logo-docker", "Docker"], ["logo-firebase", "Firebase"], ["server-outline", "PHP 8+"], ["server-outline", "Laravel"], ["database-outline", "MySQL"], ["database-outline", "PostgreSQL"], ["logo-github", "Git"]].map(([icon, label]) => (
                       <span key={label} className="tech-badge-pill">
                         {/* @ts-ignore */}
                         <ion-icon suppressHydrationWarning name={icon} aria-hidden="true"></ion-icon>{label}
@@ -96,8 +96,8 @@ export default function AboutSection() {
                     <span className="terminal-dot"></span><span className="terminal-dot"></span><span className="terminal-dot"></span> [ SYS.STACK ]
                   </p>
                   <div className="tech-stack-wrapper">
-                    {[["logo-react","React Native"],["logo-android","Android Studio"],["logo-figma","Figma"],["phone-portrait-outline","Flutter"],["game-controller-outline","Phaser.js"],["brush-outline","Canvas API"]].map(([icon,label])=>(
-                      <span key={label} className={`tech-badge-pill${label==="Phaser.js"?" highlight":""}`}>
+                    {[["logo-react", "React Native"], ["logo-android", "Android Studio"], ["logo-figma", "Figma"], ["phone-portrait-outline", "Flutter"], ["game-controller-outline", "Phaser.js"], ["brush-outline", "Canvas API"]].map(([icon, label]) => (
+                      <span key={label} className={`tech-badge-pill${label === "Phaser.js" ? " highlight" : ""}`}>
                         {/* @ts-ignore */}
                         <ion-icon suppressHydrationWarning name={icon} aria-hidden="true"></ion-icon>{label}
                       </span>
