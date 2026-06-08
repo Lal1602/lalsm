@@ -24,33 +24,118 @@ const ANIMATIONS = [
     color: "#00f3ff", // Discovery (Cyan)
     enter: (chars: HTMLElement[]) =>
       gsap.timeline({ overwrite: "auto" as const })
-        .to(chars, { backgroundSize: "100% 110%", y: -7, duration: 0.5, stagger: { each: 0.042, from: "start" as const, ease: "power1.inOut" }, ease: "power2.out" })
-        .to(chars, { y: 0, duration: 0.35, stagger: { each: 0.025, from: "start" as const }, ease: "power2.inOut" }, "-=0.28"),
+        .to(chars, { 
+          backgroundSize: "100% 100%", 
+          backgroundPosition: "0% 50%", 
+          y: -7, 
+          duration: 0.45, 
+          stagger: { each: 0.035, from: "start" as const, ease: "power1.inOut" }, 
+          ease: "power2.out" 
+        })
+        .to(chars, { 
+          y: 0, 
+          duration: 0.3, 
+          stagger: { each: 0.025, from: "start" as const }, 
+          ease: "power2.inOut" 
+        }, "-=0.28"),
     leave: (chars: HTMLElement[]) =>
-      gsap.to(chars, { backgroundSize: "100% 0%", y: 0, duration: 0.28, stagger: { each: 0.022, from: "end" as const }, overwrite: "auto" as const }),
+      gsap.to(chars, { 
+        backgroundSize: "0% 100%", 
+        backgroundPosition: "100% 50%", 
+        y: 0, 
+        duration: 0.32, 
+        stagger: { each: 0.02, from: "end" as const }, 
+        ease: "power2.in", 
+        overwrite: "auto" as const 
+      }),
   },
   {
     color: "#ffd700", // Design (Gold)
     enter: (chars: HTMLElement[]) =>
-      gsap.to(chars, { backgroundSize: "100% 110%", duration: 0.48, stagger: { each: 0.05, from: "center" as const }, ease: "power2.out", overwrite: "auto" as const }),
+      gsap.timeline({ overwrite: "auto" as const })
+        .to(chars, { 
+          backgroundSize: "100% 100%", 
+          backgroundPosition: "50% 0%", 
+          rotation: 6, 
+          y: 4, 
+          duration: 0.42, 
+          stagger: { each: 0.045, from: "center" as const }, 
+          ease: "back.out(2)" 
+        })
+        .to(chars, { 
+          rotation: 0, 
+          y: 0, 
+          duration: 0.3, 
+          stagger: { each: 0.03, from: "center" as const }, 
+          ease: "power2.out" 
+        }, "-=0.18"),
     leave: (chars: HTMLElement[]) =>
-      gsap.to(chars, { backgroundSize: "100% 0%", duration: 0.32, stagger: { each: 0.04, from: "center" as const }, overwrite: "auto" as const }),
+      gsap.to(chars, { 
+        backgroundSize: "100% 0%", 
+        backgroundPosition: "50% 0%", 
+        rotation: 0, 
+        y: 0, 
+        duration: 0.28, 
+        stagger: { each: 0.03, from: "center" as const }, 
+        ease: "power2.in", 
+        overwrite: "auto" as const 
+      }),
   },
   {
     color: "#bc13fe", // Development (Purple)
     enter: (chars: HTMLElement[]) =>
-      gsap.to(chars, { backgroundSize: "100% 110%", scaleY: 1.06, duration: 0.32, stagger: { each: 0.028, from: "random" as const }, ease: "power1.out", overwrite: "auto" as const, onComplete: () => gsap.to(chars, { scaleY: 1, duration: 0.2 }) }),
+      gsap.timeline({ overwrite: "auto" as const })
+        .to(chars, { 
+          backgroundSize: "250% 100%", 
+          backgroundPosition: "0% 50%", 
+          scale: 1.15, 
+          duration: 0.55, 
+          stagger: { each: 0.032, from: "random" as const }, 
+          ease: "power2.out" 
+        })
+        .to(chars, { 
+          scale: 1.04, 
+          duration: 0.25, 
+          stagger: { each: 0.02, from: "random" as const }, 
+          ease: "power1.inOut" 
+        }, "-=0.3"),
     leave: (chars: HTMLElement[]) =>
-      gsap.to(chars, { backgroundSize: "100% 0%", scaleY: 1, duration: 0.22, stagger: { each: 0.02, from: "random" as const }, overwrite: "auto" as const }),
+      gsap.to(chars, { 
+        backgroundSize: "250% 0%", 
+        backgroundPosition: "100% 50%", 
+        scale: 1, 
+        duration: 0.28, 
+        stagger: { each: 0.02, from: "random" as const }, 
+        ease: "power2.in", 
+        overwrite: "auto" as const 
+      }),
   },
   {
     color: "#ff5000", // Deployment (Orange)
     enter: (chars: HTMLElement[]) =>
       gsap.timeline({ overwrite: "auto" as const })
-        .to(chars, { y: -14, duration: 0.18, stagger: { each: 0.007, from: "start" as const }, ease: "power3.in" })
-        .to(chars, { backgroundSize: "100% 110%", y: 0, duration: 0.28, stagger: { each: 0.007, from: "start" as const }, ease: "power3.out" }, "-=0.06"),
+        .to(chars, { 
+          backgroundSize: "180% 180%", 
+          y: -14, 
+          duration: 0.25, 
+          stagger: { each: 0.015, from: "end" as const }, 
+          ease: "power3.out" 
+        })
+        .to(chars, { 
+          y: 0, 
+          duration: 0.42, 
+          stagger: { each: 0.012, from: "end" as const }, 
+          ease: "bounce.out" 
+        }, "-=0.12"),
     leave: (chars: HTMLElement[]) =>
-      gsap.to(chars, { backgroundSize: "100% 0%", y: 0, duration: 0.2, stagger: { each: 0.009, from: "end" as const }, ease: "power2.in", overwrite: "auto" as const }),
+      gsap.to(chars, { 
+        backgroundSize: "0% 0%", 
+        y: 0, 
+        duration: 0.22, 
+        stagger: { each: 0.012, from: "start" as const }, 
+        ease: "power2.in", 
+        overwrite: "auto" as const 
+      }),
   },
 ];
 

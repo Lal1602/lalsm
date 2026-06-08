@@ -255,11 +255,21 @@ export default function Creative3DScene() {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const [isIdle, setIsIdle] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
   const lastMoveTime = useRef(Date.now());
 
   // Track mouse coordinates, handle clicks, and reset idle timer
   useEffect(() => {
+    const checkDesktop = () => window.innerWidth >= 1024;
+    setIsDesktop(checkDesktop());
+
+    const handleResize = () => {
+      setIsDesktop(checkDesktop());
+    };
+    window.addEventListener("resize", handleResize);
+
     const handleMouseMove = (e: MouseEvent) => {
+      if (window.innerWidth < 1024) return;
       setMouse({
         x: (e.clientX / window.innerWidth) * 2 - 1,
         y: -(e.clientY / window.innerHeight) * 2 + 1,
@@ -269,17 +279,19 @@ export default function Creative3DScene() {
     };
 
     const handleDown = () => {
+      if (window.innerWidth < 1024) return;
       setIsCollapsed(true);
     };
     const handleUp = () => {
+      if (window.innerWidth < 1024) return;
       setIsCollapsed(false);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mousedown", handleDown);
     window.addEventListener("mouseup", handleUp);
-    window.addEventListener("touchstart", handleDown);
-    window.addEventListener("touchend", handleUp);
+    window.addEventListener("touchstart", handleDown, { passive: true });
+    window.addEventListener("touchend", handleUp, { passive: true });
 
     // Watcher interval to toggle idle status after 2.5 seconds
     const interval = setInterval(() => {
@@ -289,6 +301,7 @@ export default function Creative3DScene() {
     }, 300);
 
     return () => {
+      window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mousedown", handleDown);
       window.removeEventListener("mouseup", handleUp);
@@ -299,7 +312,11 @@ export default function Creative3DScene() {
   }, []);
 
   return (
-    <div className="three-webgl-canvas-wrap" aria-hidden="true">
+    <div 
+      className="three-webgl-canvas-wrap" 
+      aria-hidden="true"
+      style={{ pointerEvents: isDesktop ? "auto" : "none" }}
+    >
       <Canvas
         camera={{ position: [0, 0, 4.2], fov: 60 }}
         dpr={[1, 1.5]}

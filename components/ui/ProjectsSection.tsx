@@ -36,6 +36,7 @@ const projects: Project[] = [
 export default function ProjectsSection() {
   const [mounted, setMounted] = useState(false);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   // References to share dynamic, high-performance scroll values across R3F and DOM
   const scrollRef = useRef({
@@ -51,10 +52,17 @@ export default function ProjectsSection() {
 
   useEffect(() => {
     setMounted(true);
+    setIsDesktop(window.innerWidth >= 1024);
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Pointer drag event handlers to rotate the 3D film strip cylinder
   const handlePointerDown = (e: React.PointerEvent) => {
+    if (!isDesktop) return;
     scrollRef.current.isDragging = true;
     scrollRef.current.lastX = e.clientX;
     scrollRef.current.dragDistance = 0;
@@ -62,7 +70,7 @@ export default function ProjectsSection() {
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!scrollRef.current.isDragging) return;
+    if (!isDesktop || !scrollRef.current.isDragging) return;
     const deltaX = e.clientX - scrollRef.current.lastX;
     scrollRef.current.lastX = e.clientX;
     
@@ -76,12 +84,14 @@ export default function ProjectsSection() {
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDesktop) return;
     if (scrollRef.current.isDragging) {
       scrollRef.current.isDragging = false;
     }
   };
 
   const handleWheel = (e: React.WheelEvent) => {
+    if (!isDesktop) return;
     // Wheel zoom/scroll rotation support
     const sensitivity = 0.001;
     scrollRef.current.target += e.deltaY * sensitivity;
@@ -108,14 +118,14 @@ export default function ProjectsSection() {
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
           onWheel={handleWheel}
-          style={{ touchAction: "none" }}
+          style={{ touchAction: isDesktop ? "none" : "pan-y" }}
         >
           {mounted && (
             <Canvas
               camera={{ position: [0, 0, 4.0], fov: 50 }}
               dpr={[1, 1.5]}
               gl={{ alpha: true, antialias: true, stencil: false }}
-              style={{ background: "transparent" }}
+              style={{ background: "transparent", touchAction: isDesktop ? "none" : "pan-y" }}
             >
               <FilmScene 
                 projects={projects} 
