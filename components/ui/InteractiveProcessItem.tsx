@@ -21,89 +21,135 @@ interface InteractiveProcessItemProps {
 // Recreate the exact, distinct kinetic animations per phase from the original implementation
 const ANIMATIONS = [
   {
-    color: "#00f3ff", // Discovery (Cyan)
-    enter: (chars: HTMLElement[]) =>
-      gsap.timeline({ overwrite: "auto" as const })
-        .to(chars, { 
-          backgroundSize: "100% 100%", 
-          backgroundPosition: "0% 50%", 
-          y: -7, 
-          duration: 0.45, 
-          stagger: { each: 0.035, from: "start" as const, ease: "power1.inOut" }, 
-          ease: "power2.out" 
-        })
-        .to(chars, { 
-          y: 0, 
-          duration: 0.3, 
-          stagger: { each: 0.025, from: "start" as const }, 
-          ease: "power2.inOut" 
-        }, "-=0.28"),
+    color: "#00f3ff", // Discovery (Cyan): Sonar Scan & Wave Wavefront
+    enter: (chars: HTMLElement[]) => {
+      const tl = gsap.timeline({ overwrite: "auto" as const });
+      gsap.set(chars, { transformPerspective: 500 });
+      return tl.to(chars, { 
+        backgroundSize: "100% 100%", 
+        backgroundPosition: "0% 50%", 
+        y: -11, 
+        rotationX: 20,
+        scale: 1.12,
+        textShadow: "0 0 14px rgba(0, 243, 255, 0.95)",
+        duration: 0.38, 
+        stagger: { each: 0.04, from: "start" as const, ease: "power1.inOut" }, 
+        ease: "power2.out" 
+      })
+      .to(chars, { 
+        y: 0, 
+        rotationX: 0,
+        scale: 1.0,
+        textShadow: "0 0 2px rgba(0, 243, 255, 0.25)",
+        duration: 0.28, 
+        stagger: { each: 0.03, from: "start" as const }, 
+        ease: "power2.inOut" 
+      }, "-=0.22");
+    },
     leave: (chars: HTMLElement[]) =>
       gsap.to(chars, { 
         backgroundSize: "0% 100%", 
         backgroundPosition: "100% 50%", 
         y: 0, 
-        duration: 0.32, 
+        rotationX: 0,
+        scale: 1,
+        textShadow: "none",
+        duration: 0.3, 
         stagger: { each: 0.02, from: "end" as const }, 
         ease: "power2.in", 
         overwrite: "auto" as const 
       }),
   },
   {
-    color: "#ffd700", // Design (Gold)
-    enter: (chars: HTMLElement[]) =>
-      gsap.timeline({ overwrite: "auto" as const })
-        .to(chars, { 
-          backgroundSize: "100% 100%", 
-          backgroundPosition: "50% 0%", 
-          rotation: 6, 
-          y: 4, 
-          duration: 0.42, 
-          stagger: { each: 0.045, from: "center" as const }, 
-          ease: "back.out(2)" 
-        })
-        .to(chars, { 
-          rotation: 0, 
-          y: 0, 
-          duration: 0.3, 
-          stagger: { each: 0.03, from: "center" as const }, 
-          ease: "power2.out" 
-        }, "-=0.18"),
+    color: "#ffd700", // Design (Gold): Liquid Elastic Drop & Skew Morphing
+    enter: (chars: HTMLElement[]) => {
+      const tl = gsap.timeline({ overwrite: "auto" as const });
+      return tl.to(chars, { 
+        backgroundSize: "100% 100%", 
+        backgroundPosition: "50% 0%", 
+        y: 14, 
+        scaleY: 0.65,
+        scaleX: 1.3,
+        skewX: -18,
+        textShadow: "0 0 16px rgba(255, 215, 0, 0.85)",
+        duration: 0.18, 
+        stagger: { each: 0.045, from: "center" as const }, 
+        ease: "power1.in" 
+      })
+      .to(chars, { 
+        y: 0, 
+        scaleY: 1,
+        scaleX: 1,
+        skewX: 0,
+        textShadow: "0 0 3px rgba(255, 215, 0, 0.3)",
+        duration: 0.65, 
+        stagger: { each: 0.038, from: "center" as const }, 
+        ease: "elastic.out(1.2, 0.38)" 
+      }, "-=0.08");
+    },
     leave: (chars: HTMLElement[]) =>
       gsap.to(chars, { 
         backgroundSize: "100% 0%", 
         backgroundPosition: "50% 0%", 
-        rotation: 0, 
         y: 0, 
+        scaleY: 1,
+        scaleX: 1,
+        skewX: 0,
+        textShadow: "none",
         duration: 0.28, 
-        stagger: { each: 0.03, from: "center" as const }, 
+        stagger: { each: 0.02, from: "center" as const }, 
         ease: "power2.in", 
         overwrite: "auto" as const 
       }),
   },
   {
-    color: "#bc13fe", // Development (Purple)
-    enter: (chars: HTMLElement[]) =>
-      gsap.timeline({ overwrite: "auto" as const })
-        .to(chars, { 
-          backgroundSize: "250% 100%", 
-          backgroundPosition: "0% 50%", 
-          scale: 1.15, 
-          duration: 0.55, 
-          stagger: { each: 0.032, from: "random" as const }, 
-          ease: "power2.out" 
-        })
-        .to(chars, { 
-          scale: 1.04, 
-          duration: 0.25, 
-          stagger: { each: 0.02, from: "random" as const }, 
-          ease: "power1.inOut" 
-        }, "-=0.3"),
+    color: "#bc13fe", // Development (Purple): Digital Compiler Glitch & Chrome Slide
+    enter: (chars: HTMLElement[]) => {
+      const tl = gsap.timeline({ overwrite: "auto" as const });
+      // Fast jittery code glitch assembly
+      chars.forEach((char) => {
+        tl.to(char, {
+          x: () => (Math.random() - 0.5) * 7,
+          y: () => (Math.random() - 0.5) * 5,
+          scaleY: () => 0.85 + Math.random() * 0.3,
+          duration: 0.07,
+          ease: "none"
+        }, Math.random() * 0.12);
+      });
+      // Chrome sweep stabilizer
+      tl.to(chars, { 
+        backgroundSize: "250% 100%", 
+        backgroundPosition: "0% 50%", 
+        x: 0,
+        y: 0,
+        scaleY: 1.06,
+        scaleX: 1.06,
+        skewY: 6,
+        textShadow: "0 0 12px rgba(188, 19, 254, 0.85)",
+        duration: 0.42, 
+        stagger: { each: 0.032, from: "random" as const }, 
+        ease: "back.out(2.5)" 
+      }, "+=0.04")
+      .to(chars, { 
+        scaleY: 1,
+        scaleX: 1,
+        skewY: 0,
+        duration: 0.22, 
+        stagger: { each: 0.018, from: "random" as const }, 
+        ease: "power2.out" 
+      }, "-=0.16");
+      return tl;
+    },
     leave: (chars: HTMLElement[]) =>
       gsap.to(chars, { 
         backgroundSize: "250% 0%", 
         backgroundPosition: "100% 50%", 
-        scale: 1, 
+        x: 0,
+        y: 0,
+        scaleY: 1,
+        scaleX: 1,
+        skewY: 0,
+        textShadow: "none",
         duration: 0.28, 
         stagger: { each: 0.02, from: "random" as const }, 
         ease: "power2.in", 
@@ -111,27 +157,36 @@ const ANIMATIONS = [
       }),
   },
   {
-    color: "#ff5000", // Deployment (Orange)
-    enter: (chars: HTMLElement[]) =>
-      gsap.timeline({ overwrite: "auto" as const })
-        .to(chars, { 
-          backgroundSize: "180% 180%", 
-          y: -14, 
-          duration: 0.25, 
-          stagger: { each: 0.015, from: "end" as const }, 
-          ease: "power3.out" 
-        })
-        .to(chars, { 
-          y: 0, 
-          duration: 0.42, 
-          stagger: { each: 0.012, from: "end" as const }, 
-          ease: "bounce.out" 
-        }, "-=0.12"),
+    color: "#ff5000", // Deployment (Orange): Rocket Launch ignition & Kinetic Impact Bounce
+    enter: (chars: HTMLElement[]) => {
+      const tl = gsap.timeline({ overwrite: "auto" as const });
+      return tl.to(chars, { 
+        y: -24, 
+        scaleY: 1.45,
+        scaleX: 0.78,
+        backgroundSize: "180% 180%", 
+        textShadow: "0 0 22px rgba(255, 80, 0, 0.98)",
+        duration: 0.22, 
+        stagger: { each: 0.022, from: "end" as const }, 
+        ease: "power3.out" 
+      })
+      .to(chars, { 
+        y: 0, 
+        scaleY: 1,
+        scaleX: 1,
+        duration: 0.48, 
+        stagger: { each: 0.018, from: "end" as const }, 
+        ease: "bounce.out" 
+      }, "-=0.12");
+    },
     leave: (chars: HTMLElement[]) =>
       gsap.to(chars, { 
         backgroundSize: "0% 0%", 
         y: 0, 
-        duration: 0.22, 
+        scaleY: 1,
+        scaleX: 1,
+        textShadow: "none",
+        duration: 0.25, 
         stagger: { each: 0.012, from: "start" as const }, 
         ease: "power2.in", 
         overwrite: "auto" as const 
@@ -209,7 +264,7 @@ export default function InteractiveProcessItem({
           style={{
             fontFamily: "var(--font-code)",
             fontSize: "1rem",
-            color: isActive ? currentTheme.color : "rgba(255, 255, 255, 0.3)",
+            color: isActive ? currentTheme.color : "var(--process-item-num-idle)",
             marginRight: "16px",
             transition: "color 0.3s ease",
             whiteSpace: "nowrap"

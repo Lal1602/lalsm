@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 export interface Message {
   role: 'user' | 'ai';
   text: string;
+  suggestions?: string[];
 }
 
 interface ChatStore {
@@ -16,6 +17,12 @@ interface ChatStore {
 const DEFAULT_WELCOME_MESSAGE: Message = {
   role: 'ai',
   text: 'Halo! Saya asisten virtual Bilal. Ada yang bisa saya bantu untuk menjelaskan proyek, keahlian, atau pengalaman kerja Bilal?',
+  suggestions: [
+    'Tunjukkan galeri proyekmu!',
+    'Apa saja keahlian/skill coding Bilal?',
+    'Bagaimana cara menghubungi Bilal?',
+    'Ceritakan tentang kuliahnya di PENS'
+  ]
 };
 
 export const useChatStore = create<ChatStore>()(
@@ -54,6 +61,7 @@ export const useChatStore = create<ChatStore>()(
 
           const data = await response.json();
           let rawReply = data.reply || 'Maaf, saya tidak dapat memproses jawaban saat ini.';
+          const suggestions = data.suggestions || [];
           
           // Parse action command tags from the AI response
           
@@ -156,6 +164,7 @@ export const useChatStore = create<ChatStore>()(
           const aiMessage: Message = {
             role: 'ai',
             text: rawReply,
+            suggestions: suggestions,
           };
 
           set((state) => ({

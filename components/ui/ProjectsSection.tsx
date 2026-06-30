@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Canvas } from "@react-three/fiber";
 import FilmScene from "./FilmScene";
 
@@ -62,7 +63,6 @@ export default function ProjectsSection() {
 
   // Pointer drag event handlers to rotate the 3D film strip cylinder
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (!isDesktop) return;
     scrollRef.current.isDragging = true;
     scrollRef.current.lastX = e.clientX;
     scrollRef.current.dragDistance = 0;
@@ -70,7 +70,7 @@ export default function ProjectsSection() {
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDesktop || !scrollRef.current.isDragging) return;
+    if (!scrollRef.current.isDragging) return;
     const deltaX = e.clientX - scrollRef.current.lastX;
     scrollRef.current.lastX = e.clientX;
     
@@ -84,7 +84,6 @@ export default function ProjectsSection() {
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
-    if (!isDesktop) return;
     if (scrollRef.current.isDragging) {
       scrollRef.current.isDragging = false;
     }
@@ -107,7 +106,11 @@ export default function ProjectsSection() {
         {/* Helper HUD instruction bar */}
         <div className="project-hud-instruction" data-scroll>
           <span className="hud-pulse-dot"></span>
-          <p className="hud-text">// GRAB & DRAG OR SCROLL TO SPIN VINTAGE FILM STRIP</p>
+          <p className="hud-text">
+            {isDesktop 
+              ? "// GRAB & DRAG OR SCROLL TO SPIN VINTAGE FILM STRIP" 
+              : "// SWIPE LEFT/RIGHT TO SPIN • TAP A CARD TO OPEN DETAILS"}
+          </p>
         </div>
 
         {/* 3D WebGL Canvas Container with pointer-event hooks */}
@@ -117,6 +120,7 @@ export default function ProjectsSection() {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
+          onPointerCancel={handlePointerUp}
           onWheel={handleWheel}
           style={{ touchAction: isDesktop ? "none" : "pan-y" }}
         >
@@ -150,7 +154,7 @@ export default function ProjectsSection() {
       </div>
 
       {/* Cyberpunk details overlay modal */}
-      {activeProject && (
+      {activeProject && mounted && createPortal(
         <div className="project-detail-modal" onClick={() => setActiveProject(null)}>
           <div className="modal-backdrop"></div>
           <div className="modal-content-card" onClick={(e) => e.stopPropagation()}>
@@ -192,7 +196,8 @@ export default function ProjectsSection() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

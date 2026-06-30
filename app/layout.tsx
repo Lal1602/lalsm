@@ -34,6 +34,16 @@ export default function RootLayout({
         />
         <link rel="icon" href="/B-logo.jpg" type="image/jpg" />
         <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var theme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+              })();
+            `,
+          }}
+        />
+        <script
           type="module"
           src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
           async

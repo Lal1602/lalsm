@@ -30,6 +30,14 @@ interface FilmSceneProps {
 // Inner component to access R3F's useFrame loop for camera parallax
 function CameraParallax() {
   useFrame((state) => {
+    // Disable camera parallax on mobile / touch viewports to prevent unstable panning
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, 0, 0.08);
+      state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, 0, 0.08);
+      state.camera.lookAt(0, 0, -3.2);
+      return;
+    }
+
     // Elegant mouse cursor parallax shifting the camera view
     const targetX = state.pointer.x * 1.5;
     const targetY = state.pointer.y * 1.0;

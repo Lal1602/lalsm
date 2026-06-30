@@ -36,15 +36,16 @@ export default function ThreeBackground() {
         "position",
         new THREE.BufferAttribute(posArray, 3)
       );
+      const particlesMaterial = new THREE.PointsMaterial({
+        size: 0.04,
+        color: 0x00f3ff,
+        transparent: true,
+        opacity: 0.5,
+        blending: THREE.AdditiveBlending,
+      });
       const particlesMesh = new THREE.Points(
         particlesGeometry,
-        new THREE.PointsMaterial({
-          size: 0.04,
-          color: 0x00f3ff,
-          transparent: true,
-          opacity: 0.5,
-          blending: THREE.AdditiveBlending,
-        })
+        particlesMaterial
       );
       scene.add(particlesMesh);
 
@@ -99,8 +100,47 @@ export default function ThreeBackground() {
 
       const clock = new THREE.Clock();
 
+      let currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      function updateThemeVisuals(themeStr: string) {
+        if (themeStr === "light") {
+          particlesMaterial.color.setHex(0x8a6ab0);
+          particlesMaterial.opacity = 0.25;
+          particlesMaterial.blending = THREE.NormalBlending;
+
+          shapeMaterial.color.setHex(0x8a6ab0);
+          shapeMaterial.opacity = 0.03;
+          shapeMaterial.blending = THREE.NormalBlending;
+
+          if (scene.fog) {
+            (scene.fog as import("three").FogExp2).color.setHex(0xe8e8ec);
+          }
+        } else {
+          particlesMaterial.color.setHex(0x00f3ff);
+          particlesMaterial.opacity = 0.5;
+          particlesMaterial.blending = THREE.AdditiveBlending;
+
+          shapeMaterial.color.setHex(0xbc13fe);
+          shapeMaterial.opacity = 0.06;
+          shapeMaterial.blending = THREE.AdditiveBlending;
+
+          if (scene.fog) {
+            (scene.fog as import("three").FogExp2).color.setHex(0x050505);
+          }
+        }
+        particlesMaterial.needsUpdate = true;
+        shapeMaterial.needsUpdate = true;
+      }
+      updateThemeVisuals(currentTheme);
+
       function animate() {
         animId = requestAnimationFrame(animate);
+        
+        const activeTheme = document.documentElement.getAttribute("data-theme") || "dark";
+        if (activeTheme !== currentTheme) {
+          currentTheme = activeTheme;
+          updateThemeVisuals(activeTheme);
+        }
+
         const elapsedTime = clock.getElapsedTime();
         camera.position.z = 4 - window.scrollY * 0.0025;
         particlesMesh.rotation.y = elapsedTime * 0.05;

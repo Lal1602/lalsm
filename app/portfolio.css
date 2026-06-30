@@ -6,7 +6,7 @@
   --accent-purple: #bc13fe;
   --accent-gold: #ffd700;
   --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.06);
   --font-display: 'Orbitron', sans-serif;
   --font-body: 'Rajdhani', sans-serif;
   --font-code: 'Roboto Mono', monospace;
@@ -3765,6 +3765,9 @@ a.contact-info-row:hover .contact-info-icon {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
     0 0 40px rgba(0, 243, 255, 0.06),
     inset 0 0 20px rgba(255, 255, 255, 0.02);
@@ -3816,6 +3819,8 @@ a.contact-info-row:hover .contact-info-icon {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   min-height: 400px;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .modal-image-wrap {
@@ -3956,14 +3961,33 @@ a.contact-info-row:hover .contact-info-icon {
     touch-action: pan-y !important;
   }
 
+  .project-detail-modal {
+    padding: 12px;
+  }
+
   .modal-content-card {
-    max-height: 90vh;
-    overflow-y: auto;
+    max-height: 80vh;
+    overflow: hidden;
   }
 
   .modal-body {
     grid-template-columns: 1fr;
     min-height: auto;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .modal-close-btn {
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    font-size: 1.15rem;
+    background: rgba(5, 5, 8, 0.82) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   }
 
   .modal-image-wrap {
@@ -4134,47 +4158,13 @@ a.contact-info-row:hover .contact-info-icon {
     font-size: 1.3rem;
   }
 
-  /* Mobile nav drawer — full screen overlay */
+  /* Mobile navbar overrides */
   .nav-links {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100dvh;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 32px;
-    background: rgba(5, 5, 5, 0.97);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    padding: 80px 40px 40px;
-    transform: translateY(-110%);
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-    z-index: 90;
-    text-align: center;
+    display: none !important;
   }
 
-  .nav-links.active {
-    transform: translateY(0);
-  }
-
-  .nav-link {
-    font-size: 1.2rem;
-    letter-spacing: 0.12em;
-  }
-
-  .menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    z-index: 200;
-    position: relative;
-    color: var(--accent-cyan);
-    font-size: 1.6rem;
-    cursor: pointer;
+  .menu-toggle-btn {
+    display: flex !important;
   }
 
   /* ── HERO ── */
@@ -4530,7 +4520,7 @@ a.contact-info-row:hover .contact-info-icon {
   }
 
   /* ── AI Chat Overlay ── */
-  [class*="ai-chat"] {
+  .ai-chat-container {
     bottom: calc(16px + var(--safe-bottom)) !important;
     right: 16px !important;
   }
@@ -4742,4 +4732,978 @@ a.contact-info-row:hover .contact-info-icon {
   color: var(--text-muted);
   letter-spacing: 0.1em;
   opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM CUSTOM HAMBURGER MENU NAV & OVERLAY STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Toggle Button (Hidden by default on Desktop) */
+.menu-toggle-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  z-index: 200;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  outline: none;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.hamburger-line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--accent-cyan);
+  border-radius: 2px;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+              opacity 0.25s ease,
+              background-color 0.25s ease,
+              box-shadow 0.25s ease;
+  box-shadow: 0 0 6px rgba(0, 243, 255, 0.35);
+}
+
+.menu-toggle-btn:hover .hamburger-line {
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* Open/Close transform mechanics */
+.menu-toggle-btn.active .line-1 {
+  transform: translateY(7px) rotate(45deg);
+  background-color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.menu-toggle-btn.active .line-2 {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.menu-toggle-btn.active .line-3 {
+  transform: translateY(-7px) rotate(-45deg);
+  background-color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+/* Fullscreen Responsive Mobile Drawer Overlay */
+.nav-overlay-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  background: rgba(4, 4, 6, 0.94);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 40px 60px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-30px);
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              pointer-events 0s linear 0.4s;
+  overflow: hidden;
+}
+
+.nav-overlay-panel.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              pointer-events 0s linear 0s;
+}
+
+.overlay-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 25px 25px;
+  pointer-events: none;
+  z-index: 1;
+  mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
+}
+
+.overlay-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.glow-cyan {
+  width: 250px;
+  height: 250px;
+  background-color: var(--accent-cyan);
+  top: -30px;
+  left: -30px;
+  animation: float-glow-1 10s infinite alternate ease-in-out;
+}
+
+.glow-purple {
+  width: 270px;
+  height: 270px;
+  background-color: var(--accent-purple);
+  bottom: -30px;
+  right: -30px;
+  animation: float-glow-2 12s infinite alternate ease-in-out;
+}
+
+.mobile-nav-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  z-index: 5;
+  perspective: 800px;
+}
+
+.mobile-nav-link {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 6.5vw, 2.3rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--text-main);
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  display: inline-block;
+  transition: color 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mobile-nav-link .link-num {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+@media (max-width: 380px) {
+  .mobile-nav-link {
+    font-size: clamp(1.2rem, 5.8vw, 1.6rem);
+  }
+  .mobile-nav-link .link-num {
+    right: calc(100% + 8px);
+    font-size: 0.65rem;
+  }
+}
+
+.mobile-btn-achievements {
+  color: var(--accent-gold) !important;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.15);
+}
+
+.mobile-btn-achievements .link-num {
+  color: rgba(255, 215, 0, 0.3) !important;
+}
+
+.mobile-nav-link:hover {
+  color: var(--accent-cyan);
+  transform: translateX(6px) scale(1.04);
+}
+
+.mobile-nav-link:hover .link-num {
+  color: var(--accent-cyan);
+}
+
+.mobile-btn-achievements:hover {
+  color: var(--accent-gold) !important;
+  text-shadow: 0 0 16px var(--accent-gold);
+}
+
+.overlay-hud-footer {
+  position: absolute;
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.01);
+  z-index: 5;
+}
+
+.overlay-hud-footer .hud-code-label {
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.overlay-hud-footer .hud-pulse-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  animation: neon-pulse 1.4s infinite ease-in-out;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THEME TOGGLE SWITCH & DYNAMIC LIGHT MODE SYSTEM
+   ═══════════════════════════════════════════════════════════ */
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 101;
+}
+
+/* Theme Toggle Capsule Button */
+.theme-toggle-switch {
+  position: relative;
+  width: 58px;
+  height: 28px;
+  background: rgba(15, 15, 20, 0.7); /* Charcoal transparan */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+}
+
+.theme-toggle-switch:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Icons */
+.theme-icon {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  z-index: 2;
+  transition: color 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.theme-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.theme-toggle-switch.dark .moon-icon {
+  color: #00f3ff; /* Active cyan glow for dark mode moon */
+  transform: scale(1.1);
+}
+
+.theme-toggle-switch.light .sun-icon {
+  color: #ffd700; /* Active gold glow for light mode sun */
+  transform: scale(1.1);
+}
+
+/* Slider Knob */
+.theme-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  z-index: 1;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+  box-shadow: 0 0 6px rgba(188, 19, 254, 0.4);
+}
+
+/* Dark mode knob position (left) */
+.theme-toggle-switch.dark .theme-toggle-knob {
+  transform: translateX(0);
+}
+
+/* Light mode knob position (right) */
+.theme-toggle-switch.light .theme-toggle-knob {
+  transform: translateX(30px);
+  background: linear-gradient(135deg, #8A6AB0, #bc13fe); /* Muted purple to purple */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6), 0 0 14px rgba(188, 19, 254, 0.3); /* warm yellow-purple glow */
+}
+
+/* ── SMOOTH THEME TRANSITION SYSTEM ── */
+
+/* Smoothly animate background and text transitions for all component structures */
+html,
+body,
+header,
+footer,
+nav,
+main,
+section,
+h1, h2, h3, h4, h5, h6,
+p,
+a,
+button,
+input,
+textarea,
+span:not(.cursor-text):not(.hamburger-line),
+div:not(.cursor-dot):not(.cursor-outline):not(.burst-particle):not(#canvas-container):not(.three-webgl-canvas-wrap):not(.physics-canvas) {
+  transition: background-color 0.4s ease,
+              color 0.4s ease,
+              border-color 0.4s ease,
+              box-shadow 0.4s ease,
+              text-shadow 0.4s ease,
+              opacity 0.4s ease;
+}
+
+/* Ensure mouse follow outlines, canvases, and special animations are completely isolated from CSS transitions to keep mouse interaction ultra-responsive */
+.cursor-dot,
+.cursor-outline {
+  transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+              height 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+              background-color 0.3s,
+              border-color 0.3s,
+              box-shadow 0.3s !important;
+}
+
+.cursor-text,
+.burst-particle,
+#canvas-container,
+#canvas-container canvas,
+.three-webgl-canvas-wrap,
+.three-webgl-canvas-wrap canvas,
+.physics-canvas,
+.physics-canvas canvas {
+  transition: none !important;
+}
+
+/* Base HTML transition to keep page background shifts smooth */
+html {
+  background-color: #050505;
+  transition: background-color 0.4s ease;
+}
+html[data-theme="light"] {
+  background-color: #EAEAEF;
+}
+
+/* Body dynamic background layers to avoid page transition gaps and flashing */
+body {
+  position: relative;
+  background-color: #050505;
+}
+
+/* Pseudo element hosts light gradient layer, fading in smoothly */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, #F5F5F0 0%, #EAEAEF 100%) no-repeat fixed;
+  background-color: #EAEAEF;
+  z-index: -2; /* Sits behind Three.js canvas and content */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* Make light background layer fully visible in light mode */
+html[data-theme="light"] body::before {
+  opacity: 1;
+}
+
+/* ── LIGHT MODE STYLING SYSTEM ── */
+html[data-theme="light"] {
+  --bg-color: #eaeaef;
+  --text-main: #2c2c2c; /* Abu-abu arang sangat gelap */
+  --text-muted: #555555; /* Abu-abu medium */
+  --accent-cyan: #608080; /* Slate teal */
+  --accent-purple: #8a6ab0; /* Dusty purple */
+  --glass-bg: rgba(0, 0, 0, 0.02);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] body {
+  background-color: #eaeaef !important;
+  color: #2c2c2c !important;
+}
+
+/* Specific Light Mode Overrides */
+
+/* Preloader */
+html[data-theme="light"] .preloader {
+  background-color: #fbfbf9 !important;
+  color: #8a6ab0 !important;
+}
+html[data-theme="light"] .preloader .loading-bar-fill {
+  background: linear-gradient(90deg, #608080, #8a6ab0) !important;
+}
+
+/* Navbar styles */
+html[data-theme="light"] .navbar {
+  background: rgba(245, 245, 240, 0.82) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+html[data-theme="light"] .logo {
+  color: #2c2c2c !important;
+  text-shadow: none !important;
+}
+html[data-theme="light"] .nav-link {
+  color: #555555 !important;
+}
+html[data-theme="light"] .nav-link:hover {
+  color: #8a6ab0 !important;
+}
+html[data-theme="light"] .btn-achievements {
+  border-color: rgba(212, 175, 55, 0.4) !important;
+  color: #b58900 !important; /* readable amber gold */
+  background: rgba(212, 175, 55, 0.06) !important;
+  animation: pulse-gold-light 2.5s infinite !important;
+}
+
+@keyframes pulse-gold-light {
+  0% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.2);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+}
+
+/* Glitch typography */
+html[data-theme="light"] .glitch-text {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .glitch-text::before {
+  text-shadow: -1px 0 rgba(138, 106, 176, 0.55) !important;
+}
+html[data-theme="light"] .glitch-text::after {
+  text-shadow: -1px 0 rgba(96, 128, 128, 0.55) !important;
+}
+
+/* Sections & Title */
+html[data-theme="light"] .section-title {
+  background: linear-gradient(90deg, #2c2c2c, #555555) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+html[data-theme="light"] .section-title::after {
+  background: #608080 !important;
+  box-shadow: 0 0 10px rgba(96, 128, 128, 0.4) !important;
+}
+
+/* Hero elements styling */
+html[data-theme="light"] .image-blob {
+  border-color: rgba(150, 220, 230, 0.8) !important;
+  box-shadow: 0 0 35px rgba(150, 220, 230, 0.5) !important;
+}
+html[data-theme="light"] .stats-badge {
+  background: #4A3A4A !important; /* Aubrey/dark eggplant focal point */
+  border-color: #8A6AB0 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 25px rgba(74, 58, 74, 0.35) !important;
+}
+html[data-theme="light"] .stats-badge * {
+  color: #FFFFFF !important;
+}
+
+/* General Button Styles */
+html[data-theme="light"] .btn {
+  color: #2c2c2c !important;
+  border-color: #608080 !important;
+  background: rgba(96, 128, 128, 0.08) !important;
+}
+html[data-theme="light"] .btn:hover {
+  background: #608080 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(96, 128, 128, 0.4) !important;
+}
+html[data-theme="light"] .btn-group a[href="#projects"] {
+  background: #8a6ab0 !important;
+  border-color: #8a6ab0 !important;
+  color: #ffffff !important;
+}
+html[data-theme="light"] .btn-group a[href="#projects"]:hover {
+  background: #735496 !important;
+  border-color: #735496 !important;
+  box-shadow: 0 0 20px rgba(138, 106, 176, 0.4) !important;
+}
+html[data-theme="light"] .scroll-indicator {
+  color: #8a6ab0 !important;
+}
+
+/* About Section cards stack */
+html[data-theme="light"] .about-layer-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+}
+html[data-theme="light"] .card-title {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .card-desc {
+  color: #555555 !important;
+}
+html[data-theme="light"] .card-eyebrow {
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+html[data-theme="light"] .card-watermark {
+  color: rgba(0, 0, 0, 0.02) !important;
+}
+html[data-theme="light"] .tech-terminal-box {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+html[data-theme="light"] .tech-badge-pill {
+  background: rgba(0, 0, 0, 0.04) !important;
+  color: #2c2c2c !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+html[data-theme="light"] .tech-badge-pill.highlight {
+  background: rgba(138, 106, 176, 0.15) !important;
+  color: #8a6ab0 !important;
+  border-color: rgba(138, 106, 176, 0.3) !important;
+}
+html[data-theme="light"] .terminal-header {
+  color: rgba(0, 0, 0, 0.4) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Process Dashboard & physics lab */
+html[data-theme="light"] .lab-terminal {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.04) !important;
+}
+html[data-theme="light"] .terminal-title,
+html[data-theme="light"] .readout-label {
+  color: #555555 !important;
+}
+html[data-theme="light"] .readout-value {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .readout-value.active {
+  color: #608080 !important;
+  text-shadow: 0 0 10px rgba(96, 128, 128, 0.2) !important;
+}
+html[data-theme="light"] .btn-terminal {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .btn-terminal:hover {
+  background: rgba(96, 128, 128, 0.06) !important;
+  border-color: #608080 !important;
+  color: #608080 !important;
+}
+html[data-theme="light"] .btn-terminal.active {
+  background: rgba(138, 106, 176, 0.1) !important;
+  border-color: #8a6ab0 !important;
+  color: #8a6ab0 !important;
+}
+
+/* Glitch cards showcase */
+html[data-theme="light"] .glitch-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+}
+html[data-theme="light"] .glitch-card:hover {
+  box-shadow: 0 30px 60px rgba(96, 128, 128, 0.08) !important;
+}
+html[data-theme="light"] .card-num {
+  color: #8a6ab0 !important;
+}
+html[data-theme="light"] .card-heading {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .card-text {
+  color: #555555 !important;
+}
+html[data-theme="light"] .outro-title {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .outro-arrow-wrap {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+html[data-theme="light"] .outro-arrow {
+  color: #608080 !important;
+  text-shadow: none !important;
+}
+
+/* Projects Cylindrical details modal */
+html[data-theme="light"] .modal-backdrop {
+  background: rgba(230, 230, 235, 0.8) !important;
+}
+html[data-theme="light"] .modal-content-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
+html[data-theme="light"] .modal-close-btn {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .modal-close-btn:hover {
+  background: rgba(96, 128, 128, 0.08) !important;
+  color: #608080 !important;
+  border-color: #608080 !important;
+}
+html[data-theme="light"] .modal-title {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .modal-desc {
+  color: #555555 !important;
+}
+html[data-theme="light"] .modal-img-gradient {
+  background: linear-gradient(to right, transparent 50%, rgba(255, 255, 255, 1) 100%) !important;
+}
+@media (max-width: 968px) {
+  html[data-theme="light"] .modal-img-gradient {
+    background: linear-gradient(to top, rgba(255, 255, 255, 1) 15%, transparent 100%) !important;
+  }
+}
+html[data-theme="light"] .tech-badge {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  color: #555555 !important;
+}
+html[data-theme="light"] .project-hud-instruction {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+html[data-theme="light"] .project-hud-instruction .hud-text {
+  color: #555555 !important;
+}
+html[data-theme="light"] .project-loop-bar-track {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.02) !important;
+}
+html[data-theme="light"] .project-loop-bar-fill {
+  background: linear-gradient(90deg, #608080, #8a6ab0) !important;
+  box-shadow: 0 0 6px rgba(96, 128, 128, 0.4) !important;
+}
+
+/* Achievements section marquees */
+html[data-theme="light"] .marquee-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+}
+html[data-theme="light"] .marquee-card-title {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .marquee-card-desc {
+  color: #555555 !important;
+}
+
+/* HUD Interactive Status bar */
+html[data-theme="light"] .hud-interactive-status {
+  background: rgba(255, 255, 255, 0.75) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+}
+html[data-theme="light"] .hud-interactive-status:has(.hud-pulse-dot.active) {
+  border-color: rgba(96, 128, 128, 0.15) !important;
+  box-shadow: 0 10px 30px rgba(96, 128, 128, 0.04) !important;
+}
+html[data-theme="light"] .hud-interactive-status:has(.hud-pulse-dot.active) .hud-status-text {
+  color: #2c2c2c !important;
+}
+
+/* Contact Section & Form */
+html[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04) !important;
+}
+html[data-theme="light"] .contact-info-row {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] a.contact-info-row:hover {
+  color: #8a6ab0 !important;
+}
+html[data-theme="light"] .contact-info-icon {
+  color: #555555 !important;
+}
+html[data-theme="light"] .hud-divider span:first-child,
+html[data-theme="light"] .hud-divider span:last-child {
+  background: linear-gradient(90deg, transparent, rgba(96, 128, 128, 0.25), transparent) !important;
+}
+html[data-theme="light"] .hud-corner::before,
+html[data-theme="light"] .hud-corner::after {
+  background: #608080 !important;
+}
+html[data-theme="light"] .hud-form-tag {
+  color: #608080 !important;
+}
+html[data-theme="light"] .hud-input-group input,
+html[data-theme="light"] .hud-input-group textarea {
+  border-bottom-color: rgba(0, 0, 0, 0.15) !important;
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .hud-input-group input:-webkit-autofill,
+html[data-theme="light"] .hud-input-group input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #eaeaea inset !important;
+  -webkit-text-fill-color: #2c2c2c !important;
+}
+html[data-theme="light"] .hud-input-group label {
+  color: #555555 !important;
+}
+html[data-theme="light"] .hud-input-group input:focus~label,
+html[data-theme="light"] .hud-input-group input:valid~label,
+html[data-theme="light"] .hud-input-group input:not(:placeholder-shown)~label,
+html[data-theme="light"] .hud-input-group textarea:focus~label,
+html[data-theme="light"] .hud-input-group textarea:valid~label,
+html[data-theme="light"] .hud-input-group textarea:not(:placeholder-shown)~label {
+  color: #608080 !important;
+}
+html[data-theme="light"] .focus-border {
+  background: #608080 !important;
+  box-shadow: 0 0 12px #608080, 0 0 24px rgba(96, 128, 128, 0.3) !important;
+}
+
+/* Mega Footer */
+html[data-theme="light"] .mega-footer {
+  background: #eaeaea !important;
+  border-top-color: #608080 !important;
+}
+html[data-theme="light"] .footer-grid-bg {
+  background-image:
+    linear-gradient(rgba(96, 128, 128, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 128, 128, 0.025) 1px, transparent 1px) !important;
+}
+html[data-theme="light"] .mega-link {
+  -webkit-text-stroke-color: #555555 !important;
+}
+html[data-theme="light"] .mega-link:hover,
+html[data-theme="light"] .mega-link.active {
+  color: #608080 !important;
+  -webkit-text-stroke-color: #608080 !important;
+  text-shadow: 0 0 50px rgba(96, 128, 128, 0.3) !important;
+}
+html[data-theme="light"] .footer-link {
+  color: #555555 !important;
+}
+html[data-theme="light"] .footer-link:hover {
+  color: #608080 !important;
+  text-shadow: none !important;
+}
+html[data-theme="light"] .time-display {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #608080 !important;
+}
+
+/* Custom Cursor in Light Mode */
+html[data-theme="light"] .cursor-dot {
+  background-color: #608080 !important;
+}
+html[data-theme="light"] .cursor-outline {
+  border-color: #608080 !important;
+}
+html[data-theme="light"] .cursor-outline.cursor-active-hover {
+  background-color: rgba(96, 128, 128, 0.12) !important;
+  border-color: #608080 !important;
+  box-shadow: 0 0 15px rgba(96, 128, 128, 0.3) !important;
+}
+
+/* Scroll progress bar */
+html[data-theme="light"] .scroll-progress-bar {
+  background: linear-gradient(90deg, #608080, #8a6ab0) !important;
+  box-shadow: 0 0 10px rgba(96, 128, 128, 0.4) !important;
+}
+
+/* ── REVISI MODE TERANG & MODE GELAP KONTRAST ── */
+
+/* 1. Mencegah background watermark parallax teks (giant text) tidak kelihatan di mode terang */
+html[data-theme="light"] .parallax-text {
+  color: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* 2. Text hollow / stroke outline di Slide Hero horizontal scroller */
+html[data-theme="light"] .text-hollow {
+  -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.2) !important;
+}
+html[data-theme="light"] .horizon-slide:hover .text-hollow {
+  -webkit-text-stroke-color: #608080 !important;
+}
+html[data-theme="light"] .kinetic-hero-title {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .slide-title {
+  background: linear-gradient(90deg, #2c2c2c, #555555) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* 3. Perbaikan Workflow / Process section di mode terang */
+html[data-theme="light"] :root {
+  --process-item-num-idle: rgba(0, 0, 0, 0.35);
+}
+:root {
+  --process-item-num-idle: rgba(255, 255, 255, 0.3);
+}
+html[data-theme="light"] .process-item-container {
+  border-bottom-color: rgba(0, 0, 0, 0.09) !important;
+}
+html[data-theme="light"] .process-item-container.active-row {
+  border-color: rgba(0, 0, 0, 0.18) !important;
+}
+html[data-theme="light"] .process-item-text .char {
+  -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.25) !important;
+}
+/* Active row-3 shimmers with charcoal highlights instead of white on light cream */
+html[data-theme="light"] .process-item-container:nth-child(3) .process-item-text .char {
+  background-image: linear-gradient(120deg, var(--accent-purple) 0%, var(--accent-purple) 35%, #2c2c2c 50%, var(--accent-purple) 65%, var(--accent-purple) 100%) !important;
+}
+
+/* 4. Holographic Card / Interactive Info Card di mode terang */
+html[data-theme="light"] .interactive-info-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.09) !important;
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.04),
+    0 0 20px rgba(0, 0, 0, 0.01) inset !important;
+}
+html[data-theme="light"] .card-header-area {
+  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+html[data-theme="light"] .node-network-box {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+/* Softer active accent borders in light mode for proper contrast */
+html[data-theme="light"] .interactive-info-card.accent-0 {
+  border-color: rgba(0, 168, 204, 0.5) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 0 20px rgba(0, 168, 204, 0.04) inset !important;
+}
+html[data-theme="light"] .interactive-info-card.accent-1 {
+  border-color: rgba(212, 175, 55, 0.5) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 0 20px rgba(212, 175, 55, 0.04) inset !important;
+}
+html[data-theme="light"] .interactive-info-card.accent-2 {
+  border-color: rgba(138, 106, 176, 0.5) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 0 20px rgba(138, 106, 176, 0.04) inset !important;
+}
+html[data-theme="light"] .interactive-info-card.accent-3 {
+  border-color: rgba(212, 80, 16, 0.5) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 0 20px rgba(212, 80, 16, 0.04) inset !important;
+}
+
+/* 5. Achievements marquee cards di mode terang */
+html[data-theme="light"] .marquee-card {
+  border-color: rgba(0, 0, 0, 0.09) !important;
+}
+html[data-theme="light"] .marquee-card:hover .marquee-card-title {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .marquee-card:hover .marquee-card-title em {
+  color: #8a6ab0 !important;
+}
+html[data-theme="light"] .marquee-card:nth-child(even):hover .marquee-card-title em {
+  color: #b58900 !important;
+}
+html[data-theme="light"] .marquee-card-btn {
+  border-color: rgba(96, 128, 128, 0.3) !important;
+  background: rgba(96, 128, 128, 0.06) !important;
+  color: #608080 !important;
+}
+html[data-theme="light"] .marquee-card:nth-child(even) .marquee-card-btn {
+  border-color: rgba(212, 175, 55, 0.35) !important;
+  background: rgba(212, 175, 55, 0.06) !important;
+  color: #b58900 !important;
+}
+html[data-theme="light"] .marquee-card-btn:hover {
+  background: rgba(96, 128, 128, 0.12) !important;
+  border-color: rgba(96, 128, 128, 0.6) !important;
+}
+html[data-theme="light"] .marquee-card:nth-child(even) .marquee-card-btn:hover {
+  background: rgba(212, 175, 55, 0.15) !important;
+  border-color: rgba(212, 175, 55, 0.6) !important;
+}
+
+/* 6. Soften glowing connections in light mode */
+html[data-theme="light"] .connector-line-glowing {
+  filter: drop-shadow(0 0 4px var(--line-color)) !important;
+  opacity: 0.6 !important;
+}
+
+/* 7. Modal detail project eyebrow shadow removal */
+html[data-theme="light"] .modal-eyebrow {
+  text-shadow: none !important;
+}
+
+/* 8. Contact form tag-right green contrast improvement */
+html[data-theme="light"] .hud-form-tag-right {
+  color: #008f58 !important;
+  opacity: 0.75 !important;
+}
+
+/* ── DARK MODE BORDER SOFTENING (PERGELAP AGAR TIDAK TERLALU TERANG) ── */
+.about-layer-card {
+  border-color: rgba(255, 255, 255, 0.05); /* softened from 0.07 */
+}
+.lab-terminal {
+  border-color: rgba(255, 255, 255, 0.05); /* softened from 0.06 */
+}
+.glitch-card {
+  border-color: rgba(255, 255, 255, 0.05); /* softened from 0.06 */
+}
+.interactive-info-card {
+  border-color: rgba(255, 255, 255, 0.05); /* softened from 0.06 */
+}
+.modal-content-card {
+  border-color: rgba(255, 255, 255, 0.06); /* softened from 0.08 */
+}
+.marquee-card {
+  border-color: rgba(255, 255, 255, 0.06); /* softened from 0.08 */
+}
+/* Soften card active accents in dark mode */
+.interactive-info-card.accent-0 {
+  border-color: rgba(0, 243, 255, 0.28);
+}
+.interactive-info-card.accent-1 {
+  border-color: rgba(255, 215, 0, 0.28);
+}
+.interactive-info-card.accent-2 {
+  border-color: rgba(188, 19, 254, 0.28);
+}
+.interactive-info-card.accent-3 {
+  border-color: rgba(255, 80, 0, 0.28);
 }
