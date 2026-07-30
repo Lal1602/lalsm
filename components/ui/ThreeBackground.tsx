@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import horizonScrollState from "@/lib/horizonScrollState";
 
 export default function ThreeBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -142,9 +143,27 @@ export default function ThreeBackground() {
         }
 
         const elapsedTime = clock.getElapsedTime();
-        camera.position.z = 4 - window.scrollY * 0.0025;
+        // Calculate the effective scroll Y position for Three.js camera/particles mathematically.
+        // This is stateless and perfectly handles scrolling down, scrolling up, and resizing.
+        let effectiveScrollY = window.scrollY;
+        const start = horizonScrollState.start;
+        const end = horizonScrollState.end;
+
+        if (start > 0 && end > 0) {
+          if (window.scrollY < start) {
+            // Above the horizontal showcase: normal scroll
+            effectiveScrollY = window.scrollY;
+          } else if (window.scrollY >= start && window.scrollY <= end) {
+            // Pinned inside the showcase: freeze exactly at the entry point
+            effectiveScrollY = start;
+          } else {
+            // Below the showcase: resume scrolling but offset the virtual horizontal scroll duration
+            effectiveScrollY = window.scrollY - (end - start);
+          }
+        }
+        camera.position.z = 4 - effectiveScrollY * 0.0025;
         particlesMesh.rotation.y = elapsedTime * 0.05;
-        particlesMesh.rotation.z = window.scrollY * 0.0002;
+        particlesMesh.rotation.z = effectiveScrollY * 0.0002;
 
         for (let i = 0; i < shapesCount; i++) {
           const data = shapeData[i];

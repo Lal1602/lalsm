@@ -55,8 +55,10 @@ export default function RootLayout({
         ></script>
       </head>
       <body>
-        <div className="grain-overlay" aria-hidden="true"></div>
-        {children}
+        <div id="main-content-wrapper">
+          <div className="grain-overlay" aria-hidden="true"></div>
+          {children}
+        </div>
       </body>
     </html>
   );

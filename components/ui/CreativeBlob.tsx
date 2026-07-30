@@ -92,11 +92,11 @@ function CyberSphere({
     }
 
     // 3. Determine target scale and base rotation speed
-    // Pressed scale: 0.55 (not too small, looks very clear)
-    // Expanded scale: 1.30 + breathing sine pulse (larger, extremely volumetric!)
+    // Pressed scale: 0.85 (subtle compression, not dramatic)
+    // Normal scale: 1.0 + subtle breathing sine pulse (fits container perfectly)
     const targetScale = isCollapsedRef.current
-      ? 0.55
-      : 1.30 + Math.sin(time * 1.2) * 0.08;
+      ? 0.85
+      : 1.0 + Math.sin(time * 1.2) * 0.03;
 
     const targetSpeed = isCollapsedRef.current
       ? 4.5  // Vortex rotation when compressed
@@ -268,29 +268,54 @@ export default function Creative3DScene() {
     };
     window.addEventListener("resize", handleResize);
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const dragStartRef = { x: 0, y: 0 };
+    const isDraggingRef = { current: false };
+
+    const handleMove = (e: MouseEvent | TouchEvent) => {
       if (window.innerWidth < 1024) return;
-      setMouse({
-        x: (e.clientX / window.innerWidth) * 2 - 1,
-        y: -(e.clientY / window.innerHeight) * 2 + 1,
-      });
-      lastMoveTime.current = Date.now();
-      setIsIdle(false);
+      
+      const clientX = "touches" in e ? (e.touches[0] ? e.touches[0].clientX : dragStartRef.x) : e.clientX;
+      const clientY = "touches" in e ? (e.touches[0] ? e.touches[0].clientY : dragStartRef.y) : e.clientY;
+      
+      if (Math.hypot(clientX - dragStartRef.x, clientY - dragStartRef.y) > 10) {
+        if (!isDraggingRef.current) {
+          isDraggingRef.current = true;
+          setIsCollapsed(false);
+        }
+      }
+
+      if ("clientX" in e) {
+        setMouse({
+          x: (e.clientX / window.innerWidth) * 2 - 1,
+          y: -(e.clientY / window.innerHeight) * 2 + 1,
+        });
+        lastMoveTime.current = Date.now();
+        setIsIdle(false);
+      }
     };
 
-    const handleDown = () => {
+    const handleDown = (e: MouseEvent | TouchEvent) => {
       if (window.innerWidth < 1024) return;
+      if (!(e.target as HTMLElement)?.closest?.(".slide--kinetic")) return;
+      
+      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+      dragStartRef.x = clientX;
+      dragStartRef.y = clientY;
+      isDraggingRef.current = false;
       setIsCollapsed(true);
     };
+
     const handleUp = () => {
       if (window.innerWidth < 1024) return;
       setIsCollapsed(false);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mousedown", handleDown);
+    window.addEventListener("mousemove", handleMove as EventListener);
+    window.addEventListener("mousedown", handleDown as EventListener);
     window.addEventListener("mouseup", handleUp);
-    window.addEventListener("touchstart", handleDown, { passive: true });
+    window.addEventListener("touchmove", handleMove as EventListener, { passive: true });
+    window.addEventListener("touchstart", handleDown as EventListener, { passive: true });
     window.addEventListener("touchend", handleUp, { passive: true });
 
     // Watcher interval to toggle idle status after 2.5 seconds
@@ -302,10 +327,11 @@ export default function Creative3DScene() {
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mousedown", handleDown);
+      window.removeEventListener("mousemove", handleMove as EventListener);
+      window.removeEventListener("mousedown", handleDown as EventListener);
       window.removeEventListener("mouseup", handleUp);
-      window.removeEventListener("touchstart", handleDown);
+      window.removeEventListener("touchmove", handleMove as EventListener);
+      window.removeEventListener("touchstart", handleDown as EventListener);
       window.removeEventListener("touchend", handleUp);
       clearInterval(interval);
     };

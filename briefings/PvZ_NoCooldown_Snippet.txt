@@ -1,0 +1,63 @@
+Berikut adalah script Auto Assembler untuk "No Cooldown(Plants)" dengan address/AOB yang sudah dikoreksi dari tabel ppougj_Gaming's_PVZ_Fusion_Tables.CT. 
+
+Kamu bisa copy paste script ini ke dalam Cheat Engine kamu (Double click bagian "Script" di tabel, lalu timpa dengan ini):
+
+================================================
+1. Untuk ID: 54 (Multi-lang Mod v3.6.1 & Base Game)
+================================================
+[ENABLE]
+aobscanmodule(PlantCoolDown,GameAssembly.dll,F3 0F 11 04 08 48 8B 57 58) // should be unique
+alloc(newmem,$1000,PlantCoolDown)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //movss [rax+rcx],xmm0
+  jmp return
+
+PlantCoolDown:
+  jmp newmem
+return:
+registersymbol(PlantCoolDown)
+
+[DISABLE]
+PlantCoolDown:
+  db F3 0F 11 04 08
+
+unregistersymbol(PlantCoolDown)
+dealloc(newmem)
+
+
+================================================
+2. Untuk ID: 99 (PVZ Fusion Modded v3.0.1 - Legacy)
+================================================
+define(address,"GameAssembly.dll"+5EBADE)
+define(bytes,F3 0F 11 04 08)
+
+[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+5EBADE)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //movss [rax+rcx],xmm0
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+address:
+  db bytes
+  // movss [rax+rcx],xmm0

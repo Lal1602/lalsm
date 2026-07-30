@@ -1,7 +1,6 @@
 "use client";
 
 import { useChatStore } from "@/stores";
-import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 
 export default function AiChatOverlay() {
@@ -9,8 +8,6 @@ export default function AiChatOverlay() {
   const { messages, isLoading, sendMessage, clearHistory } = useChatStore();
   const [input, setInput] = useState("");
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const toggleBtnRef = useRef<HTMLButtonElement>(null);
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -23,15 +20,16 @@ export default function AiChatOverlay() {
     scrollToBottom();
   }, [messages, isOpen, isLoading]);
 
-  // Entrance and exit animations using GSAP
+  // Toggle body class for layout shifting (desktop content push)
   useEffect(() => {
     if (isOpen) {
-      gsap.fromTo(
-        containerRef.current,
-        { opacity: 0, scale: 0.8, y: 40 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(1.5)" }
-      );
+      document.body.classList.add("ai-chat-sidebar-open");
+    } else {
+      document.body.classList.remove("ai-chat-sidebar-open");
     }
+    return () => {
+      document.body.classList.remove("ai-chat-sidebar-open");
+    };
   }, [isOpen]);
 
   const handleSend = async () => {
@@ -42,162 +40,187 @@ export default function AiChatOverlay() {
   };
 
   return (
-    <div className="ai-chat-container">
-      {isOpen && (
-        <div ref={containerRef} className="ai-chat-panel">
-          {/* Holographic background gradient elements */}
-          <div className="ai-chat-glow-1"></div>
-          <div className="ai-chat-glow-2"></div>
+    <>
+      {/* Docked Sidebar Panel — always rendered, visibility via CSS transform */}
+      <div className={`ai-chat-sidebar ${isOpen ? "open" : ""}`}>
+        {/* Holographic background gradient elements */}
+        <div className="ai-chat-glow-1"></div>
+        <div className="ai-chat-glow-2"></div>
 
-          {/* Header */}
-          <div className="ai-chat-header">
-            <div className="ai-chat-header-info">
-              <div className="ai-chat-status-dot">
-                <span className="ai-chat-status-ping"></span>
-              </div>
-              <div>
-                <h3 className="ai-chat-title">Bilal's Assistant</h3>
-                <p className="ai-chat-eyebrow">// ONLINE • AI POWERED</p>
-              </div>
+        {/* Header */}
+        <div className="ai-chat-header">
+          <div className="ai-chat-header-info">
+            <div className="ai-chat-status-dot">
+              <span className="ai-chat-status-ping"></span>
             </div>
-            
-            <div className="ai-chat-header-actions">
-              <button 
-                onClick={clearHistory}
-                title="Reset Chat"
-                className="ai-chat-btn-reset"
-              >
-                Reset
-              </button>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="ai-chat-btn-close"
-              >
-                &times;
-              </button>
+            <div>
+              <h3 className="ai-chat-title">Bilal&apos;s Assistant</h3>
+              <p className="ai-chat-eyebrow">// ONLINE • AI POWERED</p>
             </div>
           </div>
-
-          {/* Messages Area */}
-          <div ref={messagesContainerRef} className="ai-chat-messages custom-scrollbar" data-lenis-prevent>
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`ai-chat-msg-row ${msg.role === "user" ? "user" : "ai"}`}
-              >
-                {/* Avatar / Eyebrow label */}
-                <span className="ai-chat-msg-label">
-                  {msg.role === "user" ? "You" : "Assistant"}
-                </span>
-
-                {/* Message Bubble */}
-                <div className={`ai-chat-bubble ${msg.role === "user" ? "user" : "ai"}`}>
-                  {msg.text}
-                </div>
-              </div>
-            ))}
-
-            {/* Loading Indicator */}
-            {isLoading && (
-              <div className="ai-chat-msg-row ai">
-                <span className="ai-chat-msg-label">Assistant</span>
-                <div className="ai-chat-typing-bubble">
-                  <span className="ai-chat-typing-dot"></span>
-                  <span className="ai-chat-typing-dot"></span>
-                  <span className="ai-chat-typing-dot"></span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Suggestions Area */}
-          {!isLoading && messages.length > 0 && messages[messages.length - 1].role === "ai" && messages[messages.length - 1].suggestions && messages[messages.length - 1].suggestions!.length > 0 && (
-            <div className="ai-chat-suggestions">
-              {messages[messages.length - 1].suggestions!.map((sug, i) => (
-                <button
-                  key={i}
-                  onClick={async () => {
-                    setInput("");
-                    await sendMessage(sug);
-                  }}
-                  className="ai-chat-suggestion-pill"
-                >
-                  {sug}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Input Area */}
-          <div className="ai-chat-input-area">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder="Ask me something about Bilal..."
-              disabled={isLoading}
-              className="ai-chat-input"
-            />
-            <button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="ai-chat-btn-send"
+          
+          <div className="ai-chat-header-actions">
+            <button 
+              onClick={clearHistory}
+              title="Reset Chat"
+              className="ai-chat-btn-reset"
             >
-              Send
+              Reset
+            </button>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="ai-chat-btn-close"
+            >
+              &times;
             </button>
           </div>
         </div>
-      )}
 
-      {/* Floating Toggle Button */}
+        {/* Messages Area */}
+        <div ref={messagesContainerRef} className="ai-chat-messages custom-scrollbar" data-lenis-prevent>
+          {messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`ai-chat-msg-row ${msg.role === "user" ? "user" : "ai"}`}
+            >
+              {/* Avatar / Eyebrow label */}
+              <span className="ai-chat-msg-label">
+                {msg.role === "user" ? "You" : "Assistant"}
+              </span>
+
+              {/* Message Bubble */}
+              <div className={`ai-chat-bubble ${msg.role === "user" ? "user" : "ai"}`}>
+                {msg.text}
+              </div>
+            </div>
+          ))}
+
+          {/* Loading Indicator */}
+          {isLoading && (
+            <div className="ai-chat-msg-row ai">
+              <span className="ai-chat-msg-label">Assistant</span>
+              <div className="ai-chat-typing-bubble">
+                <span className="ai-chat-typing-dot"></span>
+                <span className="ai-chat-typing-dot"></span>
+                <span className="ai-chat-typing-dot"></span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Suggestions Area */}
+        {!isLoading && messages.length > 0 && messages[messages.length - 1].role === "ai" && messages[messages.length - 1].suggestions && messages[messages.length - 1].suggestions!.length > 0 && (
+          <div className="ai-chat-suggestions">
+            {messages[messages.length - 1].suggestions!.map((sug, i) => (
+              <button
+                key={i}
+                onClick={async () => {
+                  setInput("");
+                  await sendMessage(sug);
+                }}
+                className="ai-chat-suggestion-pill"
+              >
+                {sug}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Input Area */}
+        <div className="ai-chat-input-area">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Ask me something about Bilal..."
+            disabled={isLoading}
+            className="ai-chat-input"
+          />
+          <button
+            onClick={handleSend}
+            disabled={isLoading || !input.trim()}
+            className="ai-chat-btn-send"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Floating Toggle Button — Custom "AI" SVG Icon */}
       <button
-        ref={toggleBtnRef}
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle AI Assistant"
-        className="ai-chat-toggle-btn"
-        onMouseEnter={() => {
-          gsap.to(toggleBtnRef.current, { boxShadow: "0 0 25px rgba(99, 102, 241, 0.4)", duration: 0.3 });
-        }}
-        onMouseLeave={() => {
-          gsap.to(toggleBtnRef.current, { boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)", duration: 0.3 });
-        }}
+        className={`ai-chat-toggle-btn ${isOpen ? "active" : ""}`}
       >
         <span className="ai-chat-toggle-btn-glow"></span>
-        <span className="ai-chat-toggle-btn-icon">✨</span>
+        <span className="ai-chat-toggle-btn-icon">
+          {/* Neural chat icon — circuit-inspired chat bubble */}
+          <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Chat bubble outline */}
+            <path d="M6 8C6 6.34315 7.34315 5 9 5H23C24.6569 5 26 6.34315 26 8V18C26 19.6569 24.6569 21 23 21H18L13 26V21H9C7.34315 21 6 19.6569 6 18V8Z" stroke="currentColor" strokeWidth="1.8" fill="none"/>
+            {/* Neural circuit nodes inside bubble */}
+            <circle cx="12" cy="13" r="1.5" fill="rgba(139, 92, 246, 1)"/>
+            <circle cx="16" cy="10" r="1.5" fill="rgba(99, 102, 241, 1)"/>
+            <circle cx="20" cy="13" r="1.5" fill="rgba(139, 92, 246, 1)"/>
+            <circle cx="16" cy="16" r="1.5" fill="rgba(99, 102, 241, 1)"/>
+            {/* Neural connections */}
+            <line x1="12" y1="13" x2="16" y2="10" stroke="rgba(139, 92, 246, 0.6)" strokeWidth="1"/>
+            <line x1="16" y1="10" x2="20" y2="13" stroke="rgba(99, 102, 241, 0.6)" strokeWidth="1"/>
+            <line x1="12" y1="13" x2="16" y2="16" stroke="rgba(99, 102, 241, 0.6)" strokeWidth="1"/>
+            <line x1="20" y1="13" x2="16" y2="16" stroke="rgba(139, 92, 246, 0.6)" strokeWidth="1"/>
+            {/* Animated pulse ring */}
+            <circle cx="16" cy="13" r="6" stroke="rgba(99, 102, 241, 0.3)" strokeWidth="0.8" fill="none" className="ai-toggle-pulse-ring"/>
+          </svg>
+        </span>
       </button>
 
-      {/* Embedded CSS Self-Contained Styles */}
+      {/* Backdrop overlay for mobile */}
+      {isOpen && (
+        <div 
+          className="ai-chat-backdrop" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* ── Self-Contained Embedded Styles ── */}
       <style dangerouslySetInnerHTML={{ __html: `
-        .ai-chat-container {
+        /* ═══════════════════════════════════════
+           SIDEBAR PANEL — Docked Vertical Layout
+           ═══════════════════════════════════════ */
+        .ai-chat-sidebar {
           position: fixed;
-          bottom: 24px;
-          right: 24px;
-          z-index: 9999;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          pointer-events: none;
-          font-family: 'Rajdhani', 'sans-serif';
-        }
-        .ai-chat-panel {
-          margin-bottom: 16px;
+          top: 0;
+          right: 0;
           width: 380px;
-          height: 480px;
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(10, 10, 10, 0.65);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          padding: 16px;
+          height: 100vh;
+          height: 100dvh;
+          z-index: 9998;
+          border-left: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(10, 10, 10, 0.85);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          padding: 20px;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
           color: white;
           pointer-events: auto;
           overflow: hidden;
-          position: relative;
+          font-family: 'Rajdhani', sans-serif;
+
+          /* Slide animation — hardware accelerated */
+          transform: translateX(100%);
+          transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+          will-change: transform;
         }
+        .ai-chat-sidebar.open {
+          transform: translateX(0);
+        }
+
+        /* ── Holographic glow accents ── */
         .ai-chat-glow-1 {
           position: absolute;
           top: -96px;
@@ -222,13 +245,15 @@ export default function AiChatOverlay() {
           pointer-events: none;
           z-index: 0;
         }
+
+        /* ── Header ── */
         .ai-chat-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          padding-bottom: 12px;
-          margin-bottom: 12px;
+          padding-bottom: 14px;
+          margin-bottom: 14px;
           z-index: 10;
           position: relative;
           flex-shrink: 0;
@@ -315,6 +340,8 @@ export default function AiChatOverlay() {
           color: white;
           background: rgba(255, 255, 255, 0.05);
         }
+
+        /* ── Messages ── */
         .ai-chat-messages {
           flex: 1;
           min-height: 0;
@@ -366,6 +393,8 @@ export default function AiChatOverlay() {
           color: rgba(255, 255, 255, 0.9);
           border-top-left-radius: 0;
         }
+
+        /* ── Typing indicator ── */
         .ai-chat-typing-bubble {
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.05);
@@ -396,6 +425,8 @@ export default function AiChatOverlay() {
             transform: scale(1.0);
           }
         }
+
+        /* ── Input area ── */
         .ai-chat-input-area {
           margin-top: 12px;
           display: flex;
@@ -429,7 +460,7 @@ export default function AiChatOverlay() {
           background: linear-gradient(135deg, #2563eb, #4f46e5);
           border: none;
           border-radius: 10px;
-          padding: 10px 16px;
+          padding: 10px 14px;
           color: white;
           font-weight: 600;
           font-size: 13px;
@@ -438,7 +469,9 @@ export default function AiChatOverlay() {
           font-family: inherit;
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 6px;
+          flex-shrink: 0;
         }
         .ai-chat-btn-send:hover {
           filter: brightness(1.1);
@@ -447,9 +480,15 @@ export default function AiChatOverlay() {
           opacity: 0.4;
           cursor: not-allowed;
         }
+
+        /* ═══════════════════════════════════
+           TOGGLE BUTTON — Custom "AI" SVG
+           ═══════════════════════════════════ */
         .ai-chat-toggle-btn {
-          align-self: flex-end;
-          pointer-events: auto;
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          z-index: 10000;
           width: 56px;
           height: 56px;
           border-radius: 50%;
@@ -461,17 +500,24 @@ export default function AiChatOverlay() {
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: all 0.2s;
-          position: relative;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          position: fixed;
           overflow: hidden;
           padding: 0;
           margin: 0;
+          pointer-events: auto;
         }
         .ai-chat-toggle-btn:hover {
-          transform: scale(1.05);
+          transform: scale(1.08);
+          box-shadow: 0 0 25px rgba(99, 102, 241, 0.4);
         }
         .ai-chat-toggle-btn:active {
           transform: scale(0.95);
+        }
+        .ai-chat-toggle-btn.active {
+          opacity: 0;
+          pointer-events: none;
+          transform: scale(0.6);
         }
         .ai-chat-toggle-btn-glow {
           position: absolute;
@@ -487,15 +533,33 @@ export default function AiChatOverlay() {
         }
         .ai-chat-toggle-btn-icon {
           color: white;
-          font-size: 24px;
-          transition: transform 0.3s;
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          z-index: 1;
+          position: relative;
         }
         .ai-chat-toggle-btn:hover .ai-chat-toggle-btn-icon {
-          transform: rotate(12deg) scale(1.1);
+          transform: scale(1.05);
         }
+
+        /* Pulse ring animation on toggle icon */
+        .ai-toggle-pulse-ring {
+          animation: ai-toggle-pulse 2.5s ease-in-out infinite;
+          transform-origin: center;
+        }
+        @keyframes ai-toggle-pulse {
+          0%, 100% { r: 6; opacity: 0.3; }
+          50% { r: 8; opacity: 0.6; }
+        }
+
+        /* ── Mobile backdrop ── */
+        .ai-chat-backdrop {
+          display: none;
+        }
+
+        /* ── Scrollbar ── */
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
@@ -511,7 +575,7 @@ export default function AiChatOverlay() {
           background: rgba(255, 255, 255, 0.2);
         }
         
-        /* Temporal section highlighting triggered by the AI navigation */
+        /* ── AI Section highlight (navigation) ── */
         @keyframes ai-section-pulse {
           0% {
             box-shadow: 0 0 0 0px rgba(99, 102, 241, 0);
@@ -539,40 +603,102 @@ export default function AiChatOverlay() {
           z-index: 50;
         }
 
-        /* Mobile Adjustments for Chat Overlay */
-        @media (max-width: 480px) {
-          .ai-chat-container {
+        /* ═══════════════════════════════════
+           LAYOUT SHIFTING — Desktop
+           ═══════════════════════════════════ */
+        #main-content-wrapper {
+          transition: margin-right 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+          will-change: margin-right;
+          min-height: 100vh;
+        }
+        body.ai-chat-sidebar-open #main-content-wrapper {
+          margin-right: 380px;
+        }
+
+        /* ═══════════════════════════════
+           SUGGESTIONS SYSTEM
+           ═══════════════════════════════ */
+        .ai-chat-suggestions {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 6px;
+          padding: 4px 0;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          margin-top: auto;
+          pointer-events: auto;
+          z-index: 10;
+        }
+        .ai-chat-suggestion-pill {
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 20px;
+          padding: 4px 10px;
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 0.72rem;
+          font-family: inherit;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-align: center;
+          line-height: 1.2;
+          pointer-events: auto;
+        }
+        .ai-chat-suggestion-pill:hover {
+          background: rgba(139, 92, 246, 0.15);
+          border-color: rgba(139, 92, 246, 0.35);
+          color: white;
+          transform: translateY(-1px);
+        }
+
+        /* ═════════════════════════════════════
+           MOBILE FULL-SCREEN — ≤768px
+           ═════════════════════════════════════ */
+        @media (max-width: 768px) {
+          .ai-chat-sidebar {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            border-left: none;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+          }
+
+          /* No layout shifting on mobile — overlay covers all */
+          body.ai-chat-sidebar-open #main-content-wrapper {
+            margin-right: 0;
+          }
+
+          /* Backdrop for mobile */
+          .ai-chat-backdrop {
+            display: block;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9997;
+            animation: ai-backdrop-in 0.3s ease forwards;
+          }
+          @keyframes ai-backdrop-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+
+          .ai-chat-toggle-btn {
             bottom: 16px;
             right: 16px;
-            left: 16px;
-            width: auto;
-            align-items: stretch;
+            width: 50px;
+            height: 50px;
           }
-          .ai-chat-panel {
-            width: 100%;
-            height: 65vh;
-            max-height: 500px;
-            margin-bottom: 12px;
-          }
+
           .ai-chat-bubble {
-            font-size: 12px;
-            padding: 8px 12px;
-          }
-          .ai-chat-input {
-            font-size: 12px;
-            padding: 8px 12px;
-          }
-          .ai-chat-btn-send {
-            font-size: 12px;
-            padding: 8px 12px;
+            font-size: 13px;
           }
         }
 
-        /* ── LIGHT MODE CHAT OVERRIDES ── */
-        html[data-theme="light"] .ai-chat-panel {
-          border: 1px solid rgba(0, 0, 0, 0.08) !important;
-          background: rgba(255, 255, 255, 0.85) !important;
-          box-shadow: 0 8px 32px 0 rgba(74, 58, 74, 0.12) !important;
+        /* ═══════════════════════════════════════
+           LIGHT MODE OVERRIDES
+           ═══════════════════════════════════════ */
+        html[data-theme="light"] .ai-chat-sidebar {
+          border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
+          background: rgba(255, 255, 255, 0.92) !important;
           color: #2c2c2c !important;
         }
         html[data-theme="light"] .ai-chat-title {
@@ -629,41 +755,9 @@ export default function AiChatOverlay() {
         html[data-theme="light"] .ai-chat-toggle-btn-icon {
           color: #4a3a4a !important;
         }
-
-        /* ── CHAT SUGGESTIONS SYSTEM ── */
-        .ai-chat-suggestions {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 6px;
-          padding: 4px 0;
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
-          margin-top: auto;
-          pointer-events: auto;
-          z-index: 10;
+        html[data-theme="light"] .ai-chat-toggle-btn.active {
+          background: linear-gradient(135deg, #e0dce8, #d5d0e3) !important;
         }
-        .ai-chat-suggestion-pill {
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 20px;
-          padding: 4px 10px;
-          color: rgba(255, 255, 255, 0.8);
-          font-size: 0.72rem;
-          font-family: inherit;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          text-align: center;
-          line-height: 1.2;
-          pointer-events: auto;
-        }
-        .ai-chat-suggestion-pill:hover {
-          background: rgba(139, 92, 246, 0.15);
-          border-color: rgba(139, 92, 246, 0.35);
-          color: white;
-          transform: translateY(-1px);
-        }
-
-        /* Light Mode Chat Suggestions Overrides */
         html[data-theme="light"] .ai-chat-suggestions {
           border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
         }
@@ -677,7 +771,10 @@ export default function AiChatOverlay() {
           border-color: rgba(138, 106, 176, 0.3) !important;
           color: #8a6ab0 !important;
         }
+        html[data-theme="light"] .ai-chat-backdrop {
+          background: rgba(0, 0, 0, 0.25) !important;
+        }
       ` }} />
-    </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import horizonScrollState from "@/lib/horizonScrollState";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -125,6 +126,90 @@ export default function GSAPEffects() {
       // Direct instant display on mobile
       gsap.set(".achievements-marquee-wrapper", { scale: 1, y: 0, rotationX: 0, opacity: 1 });
     }
+
+    // Horizon Showcase Horizontal Scroll Pinning & 3D Concave Track
+    const horizonWrapper = document.querySelector<HTMLElement>(".horizon-wrapper");
+    const isHorizonMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 968px)").matches;
+    if (horizonWrapper && !isHorizonMobile) {
+      const slides = Array.from(horizonWrapper.querySelectorAll<HTMLElement>(".horizon-slide"));
+      const totalSlides = slides.length;
+      const getSlideWidth = () => slides[0]?.offsetWidth || window.innerWidth;
+      const totalScrollWidth = () => (totalSlides - 1) * getSlideWidth();
+
+      // 3D Concave Track calculation:
+      // Computes distance of each slide from viewport center and applies 3D rotation (rotateY)
+      // and Z depth (translateZ) so slides glide along an inward-curving cylinder.
+      const updateConcaveTrack = () => {
+        const wrapperX = (gsap.getProperty(horizonWrapper, "x") as number) || 0;
+        const viewportWidth = getSlideWidth();
+        const viewportCenter = viewportWidth / 2;
+
+        slides.forEach((slide, i) => {
+          const slideLeft = wrapperX + i * viewportWidth;
+          const slideCenter = slideLeft + viewportWidth / 2;
+          const distanceFromCenter = slideCenter - viewportCenter;
+          const normDist = distanceFromCenter / viewportWidth;
+
+          // Clamp normalized distance between -1.5 and 1.5 to keep offscreen rotation clean
+          const clampedNormDist = gsap.utils.clamp(-1.5, 1.5, normDist);
+
+          // 3D concave cylinder illusion with minimal perspective foreshortening
+          // rotateY: 18deg max (was 35) + transformPerspective: 5000 (was 1500)
+          // Near-edge enlargement: ~6% at max rotation vs ~58% before — virtually imperceptible
+          const rotateY = -clampedNormDist * 18; // degrees
+          const translateZ = 0; // px
+
+          gsap.set(slide, {
+            rotationY: rotateY,
+            z: translateZ,
+            transformPerspective: 5000,
+            transformOrigin: "50% 50%",
+            overwrite: "auto",
+          });
+        });
+      };
+
+      // Set initial 3D concave positions before scroll begins
+      updateConcaveTrack();
+
+      gsap.to(horizonWrapper, {
+        x: () => -totalScrollWidth(),
+        ease: "none",
+        onUpdate: updateConcaveTrack,
+        scrollTrigger: {
+          trigger: ".horizon-container",
+          pin: true,
+          scrub: 1.2,
+          start: "top top",
+          end: () => `+=${totalScrollWidth()}`,
+          invalidateOnRefresh: true,
+          snap: {
+            snapTo: (value) => {
+              // Calculate which slide is physically dominant on screen right now
+              const step = 1 / (totalSlides - 1);
+              // Use the actual visual position of the wrapper to determine dominant section
+              const currentX = Math.abs((gsap.getProperty(horizonWrapper, "x") as number) || 0);
+              const totalW = totalScrollWidth();
+              const visualProgress = totalW > 0 ? currentX / totalW : value;
+
+              // Find nearest slide index based on dominant visible area (left vs right)
+              const targetIndex = Math.round(visualProgress / step);
+              return targetIndex * step;
+            },
+            duration: { min: 0.3, max: 0.6 },
+            ease: "power2.out",
+            inertia: false,
+            directional: false,
+          },
+          onRefresh: (self) => {
+            horizonScrollState.start = self.start;
+            horizonScrollState.end = self.end;
+            updateConcaveTrack();
+          },
+        },
+      });
+    }
+
 
     // Footer auto-glow
     ScrollTrigger.create({ trigger: ".mega-link", start: "top 65%", toggleClass: "active" });

@@ -22,11 +22,14 @@ Dokumen ini berisi spesifikasi kebutuhan untuk perbaikan UI/UX, tata letak (layo
 ---
 
 ## 3. Penyesuaian Responsif Konten Utama (Layout Shifting)
-* **Kebutuhan:** Mencegah chatbot menutupi konten penting di halaman website saat aktif.
+* **Kebutuhan:** Mencegah chatbot menutupi konten penting di halaman website saat aktif di desktop dan mengoptimalkan tampilan pada mobile.
 * **Spesifikasi:**
-  * Ketika chatbot dalam posisi terbuka (*opened state*), area konten website utama di sebelah kanan/tengah harus secara otomatis menyesuaikan ukurannya (ter-minimize / menyusut secara proporsional).
-  * Chatbot akan mengambil ruang di sisinya sendiri (misal sebagai *docked sidebar*), sementara konten web utama bergeser dan mengecil tanpa ada elemen teks atau gambar yang terpotong (*no clipping*).
-  * Ketika chatbot ditutup (*closed state*), konten website utama akan kembali melebar penuh (*full-screen expansion*).
+  * **Pada Desktop (*Docked Sidebar*):**
+    * Ketika chatbot dalam posisi terbuka (*opened state*), area konten website utama di sebelah kanan/tengah harus secara otomatis menyesuaikan ukurannya (ter-minimize / menyusut secara proporsional).
+    * Chatbot akan mengambil ruang di sisinya sendiri, sementara konten web utama bergeser dan mengecil tanpa ada elemen teks atau gambar yang terpotong (*no clipping*).
+    * Ketika chatbot ditutup (*closed state*), konten website utama akan kembali melebar penuh (*full-screen expansion*).
+  * **Pada Mobile (*Responsive Full-Screen*):**
+    * Ketika tampilan menjadi responsif ke mobile, tata letak tampilan chatbot menjadi layar penuh seolah seperti tampilan berukuran layar penuh agar *chat* dengan AI-nya lebih nyaman dan leluasa.
 
 ---
 
@@ -36,3 +39,11 @@ Dokumen ini berisi spesifikasi kebutuhan untuk perbaikan UI/UX, tata letak (layo
   * Gunakan animasi berbasis *hardware acceleration* (memanfaatkan `transform: translateX()` dan `width/flex-basis` dengan transisi CSS yang teroptimasi) untuk mencegah *lagging* atau *stuttering*.
   * Terapkan kurva *easing* yang halus seperti `cubic-bezier(0.4, 0, 0.2, 1)` (jalur standar *fluid design*) pada animasi masuknya sidebar chatbot dan pergeseran layout website.
   * Pastikan *frame rate* animasi stabil di 60fps baik pada perangkat desktop maupun mobile.
+
+---
+
+## 5. Responsivitas Tampilan Mobile (Full-Screen Mobile Chat)
+* **Kebutuhan:** Mengoptimalkan kenyamanan interaksi dan visualisasi *chat window* pada perangkat berlayar kecil (smartphone/tablet kecil).
+* **Spesifikasi:**
+  * Ketika tampilan menjadi responsif ke mobile (*mobile breakpoint*), tata letak tampilan chatbot harus otomatis beralih menjadi **layar penuh (*full-screen overlay*)** seolah seperti tampilan aplikasi berukuran layar penuh.
+  * Hal ini bertujuan agar sesi *chat* dengan AI menjadi jauh lebih nyaman, memberi ruang maksimal untuk riwayat percakapan (*chat log*) serta area input teks tanpa terganggu oleh elemen layout web di latar belakang.

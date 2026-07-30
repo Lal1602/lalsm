@@ -10,6 +10,9 @@
   --font-display: 'Orbitron', sans-serif;
   --font-body: 'Rajdhani', sans-serif;
   --font-code: 'Roboto Mono', monospace;
+  --concave-center: rgba(15, 12, 30, 0.25);
+  --concave-edge: rgba(5, 5, 5, 0.95);
+  --concave-shadow: rgba(0, 0, 0, 0.95);
 }
 
 * {
@@ -3276,6 +3279,34 @@ a.contact-info-row:hover .contact-info-icon {
   background-color: transparent !important;
   z-index: 50;
   display: block;
+  perspective: 1500px;
+}
+
+.horizon-concave-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  background: transparent;
+  box-shadow: inset 0 140px 140px -70px var(--concave-shadow), inset 0 -140px 140px -70px var(--concave-shadow);
+  transition: box-shadow 0.4s ease;
+}
+
+.horizon-grid-backdrop {
+  position: absolute;
+  top: 0;
+  left: -500vw;
+  height: 100%;
+  width: 2000vw;
+  background-color: rgba(5, 5, 5, 0.9);
+  background-image:
+    linear-gradient(rgba(0, 243, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+  pointer-events: none;
+  transform: translateZ(-800px) scale(2.5);
+  transform-origin: 25% 50%;
 }
 
 .horizon-wrapper {
@@ -3284,6 +3315,8 @@ a.contact-info-row:hover .contact-info-icon {
   width: 100%;
   will-change: transform;
   transform-style: preserve-3d;
+  position: relative;
+  z-index: 10;
 }
 
 .horizon-slide {
@@ -3297,18 +3330,12 @@ a.contact-info-row:hover .contact-info-icon {
   padding: 0 8%;
   box-sizing: border-box;
   background-color: transparent !important;
+  will-change: transform;
 }
 
-/* Slide Ambient Glows */
+/* Slide Ambient Glows — Disabled so ONLY the horizontal section grid background is used */
 .slide-background-glow {
-  position: absolute;
-  width: 50vw;
-  height: 50vw;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.08;
-  pointer-events: none;
-  z-index: 1;
+  display: none !important;
 }
 
 .glow--violet {
@@ -4013,6 +4040,9 @@ a.contact-info-row:hover .contact-info-icon {
   height: 100%;
   z-index: 1;
   pointer-events: auto;
+  overflow: hidden;
+  /* Flatten 3D context so parent slide rotateY + perspective never distorts the sphere size */
+  transform-style: flat;
   /* Allow direct mouse drag interaction */
 }
 
@@ -5148,6 +5178,9 @@ html[data-theme="light"] {
   --accent-purple: #8a6ab0; /* Dusty purple */
   --glass-bg: rgba(0, 0, 0, 0.02);
   --glass-border: rgba(0, 0, 0, 0.08);
+  --concave-center: rgba(255, 255, 255, 0.6);
+  --concave-edge: rgba(220, 220, 225, 0.95);
+  --concave-shadow: rgba(180, 180, 190, 0.4);
 }
 
 html[data-theme="light"] body {
@@ -5495,6 +5528,14 @@ html[data-theme="light"] .hud-input-group textarea:not(:placeholder-shown)~label
 html[data-theme="light"] .focus-border {
   background: #608080 !important;
   box-shadow: 0 0 12px #608080, 0 0 24px rgba(96, 128, 128, 0.3) !important;
+}
+
+/* Horizon Showcase Grid Backdrop */
+html[data-theme="light"] .horizon-grid-backdrop {
+  background-color: rgba(234, 234, 239, 0.9) !important;
+  background-image:
+    linear-gradient(rgba(96, 128, 128, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 128, 128, 0.05) 1px, transparent 1px) !important;
 }
 
 /* Mega Footer */

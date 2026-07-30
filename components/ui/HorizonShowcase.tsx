@@ -1,6 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Creative3DScene from "./CreativeBlob";
+
+const CvTimelineSlide = dynamic(() => import("./CvTimelineSlide"), { ssr: false });
+const ProjectEstimatorSlide = dynamic(() => import("./ProjectEstimatorSlide"), { ssr: false });
+const TechGraphSlide = dynamic(() => import("./TechGraphSlide"), { ssr: false });
 
 export default function HorizonShowcase() {
   // Client WebGL mounting states to prevent SSR mismatches
@@ -14,11 +19,16 @@ export default function HorizonShowcase() {
     <section 
       className="horizon-container" 
       id="playground" 
-      aria-label="Horizon Playground Section"
+      aria-label="Horizon Showcase Section"
     >
+      {/* 3D Concave optical depth backdrop */}
+      <div className="horizon-concave-backdrop" />
+
       <div className="horizon-wrapper">
+        {/* Continuous moving grid backdrop (0.8 opacity) spanning all slides */}
+        <div className="horizon-grid-backdrop" />
         
-        {/* SINGLE PLAYGROUND SLIDE: THE IMMERSIVE HOBERMAN SPHERE */}
+        {/* SLIDE 1: THE IMMERSIVE HOBERMAN SPHERE PLAYGROUND */}
         <div className="horizon-slide slide--kinetic">
           <div className="slide-background-glow glow--violet"></div>
           {mounted && <Creative3DScene />}
@@ -34,6 +44,15 @@ export default function HorizonShowcase() {
             </p>
           </div>
         </div>
+
+        {/* SLIDE 2: INTERACTIVE CV / TIMELINE */}
+        {mounted && <CvTimelineSlide />}
+
+        {/* SLIDE 3: PROJECT CALCULATOR / ESTIMATOR */}
+        {mounted && <ProjectEstimatorSlide />}
+
+        {/* SLIDE 4: TECH CONNECTIVITY MAP */}
+        {mounted && <TechGraphSlide />}
 
       </div>
     </section>
