@@ -179,24 +179,29 @@ export default function GSAPEffects() {
         scrollTrigger: {
           trigger: ".horizon-container",
           pin: true,
-          scrub: 1.2,
+          scrub: 0.8,
           start: "top top",
           end: () => `+=${totalScrollWidth()}`,
           invalidateOnRefresh: true,
+          fastScrollEnd: true,
+          preventOverlaps: true,
+          onUpdate: (self) => {
+            // Pipe progress to shared state so CvTimelineSlide can subscribe
+            horizonScrollState.progress = self.progress;
+            if (horizonScrollState.onProgressUpdate) {
+              horizonScrollState.onProgressUpdate(self.progress);
+            }
+          },
           snap: {
             snapTo: (value) => {
-              // Calculate which slide is physically dominant on screen right now
               const step = 1 / (totalSlides - 1);
-              // Use the actual visual position of the wrapper to determine dominant section
               const currentX = Math.abs((gsap.getProperty(horizonWrapper, "x") as number) || 0);
               const totalW = totalScrollWidth();
               const visualProgress = totalW > 0 ? currentX / totalW : value;
-
-              // Find nearest slide index based on dominant visible area (left vs right)
               const targetIndex = Math.round(visualProgress / step);
               return targetIndex * step;
             },
-            duration: { min: 0.3, max: 0.6 },
+            duration: { min: 0.2, max: 0.5 },
             ease: "power2.out",
             inertia: false,
             directional: false,

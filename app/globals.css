@@ -1,9 +1,7 @@
 @import "tailwindcss";
-@import "./portfolio.css";
 
 @layer base {
   html {
     scroll-behavior: smooth;
   }
 }
-

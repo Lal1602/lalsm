@@ -39,6 +39,8 @@ export default function ProcessDashboard() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [interactionDisabled, setInteractionDisabled] = useState<boolean>(false);
   const [isDesktop, setIsDesktop] = useState<boolean>(false);
+  // Once user hovers any process item, quietly fade the hint away
+  const [hintDismissed, setHintDismissed] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Check viewport width for responsive rendering (client-side only)
@@ -92,7 +94,7 @@ export default function ProcessDashboard() {
   return (
     <section 
       ref={containerRef}
-      className="section process-section-container" 
+      className={`section process-section-container${hintDismissed ? " hint-dismissed" : ""}`}
       id="workflow" 
       aria-label="Workflow Section"
     >
@@ -102,6 +104,12 @@ export default function ProcessDashboard() {
 
       <div className="container">
         <h2 className="section-title" data-scroll>How I Work</h2>
+
+        {/* Subtle interaction hint — whisper-level, CSS-only, no layout disruption */}
+        <p className="process-hover-hint" aria-hidden="true">
+          <span className="hint-cursor" />
+          hover each phase to reveal
+        </p>
 
         <div className="process-grid">
           {/* Dynamic Conduit overlay for desktop rendering */}
@@ -121,6 +129,8 @@ export default function ProcessDashboard() {
                 onHoverStart={() => {
                   if (!interactionDisabled) {
                     setActiveIndex(idx);
+                    // Dismiss hint on first interaction
+                    if (!hintDismissed) setHintDismissed(true);
                   }
                 }}
                 onHoverEnd={() => {

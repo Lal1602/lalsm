@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import "./portfolio.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "BILAL | Creative Developer",
   description:
     "Bilal - Creative Developer & Full Stack Engineer Portfolio. Showcasing immersive web experiences and modern tech stacks.",
-  themeColor: "#050505",
 };
 
 export const viewport: Viewport = {
