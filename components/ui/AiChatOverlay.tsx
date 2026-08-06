@@ -77,6 +77,73 @@ export default function AiChatOverlay() {
     <>
       {/* Docked Sidebar Panel — always rendered, visibility via CSS transform */}
       <div className={`ai-chat-sidebar ${isOpen ? "open" : ""}`}>
+        {/* ── CREATIVE BACKGROUND LAYERS (ENHANCED & INTRICATE) ── */}
+        <div className="ai-chat-bg-pattern"></div>
+        
+        {/* Abstract Assymetric SVG Overlay */}
+        <div className="ai-chat-bg-shapes">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bg-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(139, 92, 246, 0.08)" />
+                <stop offset="50%" stopColor="rgba(0, 243, 255, 0.03)" />
+                <stop offset="100%" stopColor="rgba(37, 99, 235, 0.08)" />
+              </linearGradient>
+              <pattern id="tech-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.2" className="ai-chat-svg-stroke" opacity="0.15" />
+                <circle cx="10" cy="10" r="0.8" fill="currentColor" className="ai-chat-svg-fill" opacity="0.3" />
+              </pattern>
+              <pattern id="dots" width="4" height="4" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="0.5" fill="currentColor" className="ai-chat-svg-fill" opacity="0.15" />
+              </pattern>
+            </defs>
+
+            {/* Base gradients and grids */}
+            <path d="M0,0 L100,0 L100,100 L0,100 Z" fill="url(#bg-grad-1)" opacity="0.8" />
+            <rect width="100" height="100" fill="url(#tech-grid)" />
+            
+            {/* Absurd & Complex Geometric Shapes */}
+            {/* Massive asymmetric curve */}
+            <path d="M-20,30 Q 40,-10 120,40 T 120,110" fill="none" stroke="rgba(139, 92, 246, 0.15)" strokeWidth="0.8" />
+            <path d="M-20,32 Q 40,-8 120,42 T 120,112" fill="none" stroke="rgba(0, 243, 255, 0.1)" strokeWidth="0.3" />
+            
+            {/* Wavy DNA-like helix crossing the screen */}
+            <path d="M10,-10 C 30,20 -10,50 40,80 S 10,120 50,150" fill="none" stroke="rgba(37, 99, 235, 0.2)" strokeWidth="0.6" strokeDasharray="2, 1" />
+            <path d="M15,-10 C 35,20 -5,50 45,80 S 15,120 55,150" fill="none" stroke="rgba(0, 243, 255, 0.15)" strokeWidth="0.4" />
+
+            {/* Geometric Nodes & Data Points */}
+            <g opacity="0.6">
+              <circle cx="85" cy="25" r="4" fill="rgba(139, 92, 246, 0.1)" stroke="rgba(139, 92, 246, 0.4)" strokeWidth="0.3" />
+              <circle cx="85" cy="25" r="1.5" fill="rgba(139, 92, 246, 0.6)" />
+              <line x1="85" y1="25" x2="65" y2="15" stroke="rgba(139, 92, 246, 0.3)" strokeWidth="0.4" />
+              
+              <circle cx="20" cy="75" r="6" fill="rgba(0, 243, 255, 0.05)" stroke="rgba(0, 243, 255, 0.3)" strokeWidth="0.2" strokeDasharray="1,1" />
+              <circle cx="20" cy="75" r="2" fill="rgba(0, 243, 255, 0.5)" />
+              <line x1="20" y1="75" x2="40" y2="85" stroke="rgba(0, 243, 255, 0.3)" strokeWidth="0.4" />
+              <line x1="40" y1="85" x2="50" y2="70" stroke="rgba(0, 243, 255, 0.2)" strokeWidth="0.3" />
+              <circle cx="50" cy="70" r="1" fill="rgba(0, 243, 255, 0.4)" />
+              
+              {/* Floating Polygons */}
+              <polygon points="10,40 18,35 22,45 15,50" fill="rgba(139, 92, 246, 0.15)" stroke="rgba(139, 92, 246, 0.3)" strokeWidth="0.2" />
+              <polygon points="70,70 85,60 95,75 80,85" fill="url(#dots)" stroke="rgba(37, 99, 235, 0.3)" strokeWidth="0.4" />
+              <polygon points="40,15 45,10 50,18" fill="rgba(0, 243, 255, 0.2)" />
+            </g>
+
+            {/* Tech UI Elements (Crosshairs, brackets) */}
+            <path d="M 5,5 L 15,5 M 5,5 L 5,15" fill="none" stroke="currentColor" className="ai-chat-svg-stroke" strokeWidth="0.5" opacity="0.3" />
+            <path d="M 95,5 L 85,5 M 95,5 L 95,15" fill="none" stroke="currentColor" className="ai-chat-svg-stroke" strokeWidth="0.5" opacity="0.3" />
+            <path d="M 5,95 L 15,95 M 5,95 L 5,85" fill="none" stroke="currentColor" className="ai-chat-svg-stroke" strokeWidth="0.5" opacity="0.3" />
+            <path d="M 95,95 L 85,95 M 95,95 L 95,85" fill="none" stroke="currentColor" className="ai-chat-svg-stroke" strokeWidth="0.5" opacity="0.3" />
+            
+            {/* Circuit traces */}
+            <path d="M 30,100 L 30,90 L 45,75 L 45,65" fill="none" stroke="currentColor" className="ai-chat-svg-stroke" strokeWidth="0.3" opacity="0.2" />
+            <circle cx="45" cy="65" r="0.8" fill="currentColor" className="ai-chat-svg-fill" opacity="0.4" />
+            
+            <path d="M 100,50 L 90,50 L 80,40 L 70,40" fill="none" stroke="currentColor" className="ai-chat-svg-stroke" strokeWidth="0.3" opacity="0.2" />
+            <circle cx="70" cy="40" r="0.8" fill="currentColor" className="ai-chat-svg-fill" opacity="0.4" />
+          </svg>
+        </div>
+
         {/* Holographic background gradient elements */}
         <div className="ai-chat-glow-1"></div>
         <div className="ai-chat-glow-2"></div>
@@ -258,6 +325,55 @@ export default function AiChatOverlay() {
         }
         .ai-chat-sidebar.open {
           transform: translateX(0);
+        }
+
+        /* ── Creative Background Layers ── */
+        .ai-chat-bg-pattern {
+          position: absolute;
+          inset: 0;
+          background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+          background-size: 20px 20px;
+          background-position: center;
+          opacity: 0.25; /* Reduced from 0.5 to be extremely subtle */
+          z-index: -2;
+          pointer-events: none;
+        }
+
+        .ai-chat-bg-shapes {
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          pointer-events: none;
+          overflow: hidden;
+        }
+
+        .ai-chat-bg-shapes svg {
+          width: 100%;
+          height: 100%;
+          opacity: 0.35; /* Reduced from 1 to make it subtle and less distracting */
+          /* Slowly drift the SVG to make it feel alive */
+          animation: shape-drift 40s infinite alternate ease-in-out;
+        }
+        
+        .ai-chat-svg-stroke {
+          color: rgba(255, 255, 255, 0.3); /* dimmed */
+        }
+        .ai-chat-svg-fill {
+          color: rgba(255, 255, 255, 0.2); /* dimmed */
+        }
+
+        /* ── Light Mode SVG Overrides ── */
+        [data-theme="light"] .ai-chat-svg-stroke {
+          color: rgba(0, 0, 0, 0.3);
+        }
+        [data-theme="light"] .ai-chat-svg-fill {
+          color: rgba(0, 0, 0, 0.25);
+        }
+
+        @keyframes shape-drift {
+          0% { transform: scale(1.05) translate(0, 0) rotate(0deg); }
+          50% { transform: scale(1.1) translate(-2%, 2%) rotate(0.5deg); }
+          100% { transform: scale(1.08) translate(2%, -1%) rotate(-0.5deg); }
         }
 
         /* ── Holographic glow accents ── */
