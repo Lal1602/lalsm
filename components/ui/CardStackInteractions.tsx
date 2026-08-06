@@ -1,107 +1,91 @@
 "use client";
 import { useEffect } from "react";
 
+/**
+ * CardStackInteractions — Spatial Hologram Blueprint
+ *
+ * Replaces the old drag-stack mechanic with a pure CSS-class-toggle
+ * 3D hover reveal system.
+ *
+ * Export name kept as `CardStackInteractions` so ClientShell.tsx
+ * does NOT need to be changed.
+ *
+ * Responsibilities:
+ * 1. mouseenter/mouseleave → toggle .is-active on hovered card,
+ *    add .has-hover to wrapper (triggers CSS dimmed state on others)
+ * 2. mousemove → update --spot-x, --spot-y CSS vars for cursor spotlight
+ * 3. focus/blur → keyboard accessibility (same behaviour as hover)
+ * 4. Mobile (≤968px) → classList.add('is-active') on all cards immediately,
+ *    no 3D — everything visible flat
+ */
 export default function CardStackInteractions() {
   useEffect(() => {
-    const stack = document.querySelector<HTMLElement>(".about-card-stack");
-    if (!stack) return;
+    const wrapper = document.getElementById("about-cards-wrapper");
+    if (!wrapper) return;
 
-    const cards = Array.from(stack.querySelectorAll<HTMLElement>(".about-layer-card"));
-    const dots = Array.from(stack.querySelectorAll<HTMLButtonElement>(".stack-dot"));
-    const THROW_THRESHOLD = 80;
-    const TILT_FACTOR = 0.06;
-    let order = [0, 1, 2];
-    let busy = false;
+    const cards = Array.from(
+      wrapper.querySelectorAll<HTMLElement>(".about-spatial-card")
+    );
+    if (cards.length === 0) return;
 
-    function front() { return cards[order[0]]; }
-    function mid() { return cards[order[1]]; }
-    function back() { return cards[order[2]]; }
+    const isMobile = window.matchMedia("(max-width: 968px)").matches;
 
-    function updateDots() {
-      dots.forEach((dot) => {
-        const active = parseInt(dot.dataset.index!) === order[0];
-        dot.classList.toggle("is-active", active);
-        dot.setAttribute("aria-selected", String(active));
+    // ── Mobile: skip all 3D logic, show all cards flat ─────────────────────
+    if (isMobile) {
+      cards.forEach((card) => card.classList.add("is-active"));
+      return;
+    }
+
+    // ── Activate a single card ──────────────────────────────────────────────
+    function activateCard(target: HTMLElement) {
+      wrapper!.classList.add("has-hover");
+      cards.forEach((card) => {
+        card.classList.toggle("is-active", card === target);
       });
     }
 
-    dots.forEach((dot) => {
-      dot.addEventListener("click", () => {
-        if (busy) return;
-        const target = parseInt(dot.dataset.index!);
-        const steps = order.indexOf(target);
-        if (steps === 0) return;
-        let thrown = 0;
-        function doThrow() {
-          throwCard("left");
-          thrown++;
-          if (thrown < steps) setTimeout(doThrow, 460);
-        }
-        doThrow();
+    // ── Deactivate all ──────────────────────────────────────────────────────
+    function deactivateAll() {
+      wrapper!.classList.remove("has-hover");
+      cards.forEach((card) => card.classList.remove("is-active"));
+    }
+
+    // ── Track cursor spotlight position inside each card ────────────────────
+    function trackSpotlight(e: MouseEvent, card: HTMLElement) {
+      const rect = card.getBoundingClientRect();
+      const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+      const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty("--spot-x", `${xPct}%`);
+      card.style.setProperty("--spot-y", `${yPct}%`);
+    }
+
+    // ── Attach events + collect cleanups ───────────────────────────────────
+    const cleanups: (() => void)[] = [];
+
+    cards.forEach((card) => {
+      const onEnter = () => activateCard(card);
+      const onLeave = () => deactivateAll();
+      const onMove  = (e: Event) => trackSpotlight(e as MouseEvent, card);
+      const onFocus = () => activateCard(card);
+      const onBlur  = () => deactivateAll();
+
+      card.addEventListener("mouseenter", onEnter);
+      card.addEventListener("mouseleave", onLeave);
+      card.addEventListener("mousemove",  onMove);
+      card.addEventListener("focus",      onFocus);
+      card.addEventListener("blur",       onBlur);
+
+      cleanups.push(() => {
+        card.removeEventListener("mouseenter", onEnter);
+        card.removeEventListener("mouseleave", onLeave);
+        card.removeEventListener("mousemove",  onMove);
+        card.removeEventListener("focus",      onFocus);
+        card.removeEventListener("blur",       onBlur);
       });
     });
 
-    function applyDrag(dx: number) {
-      const tilt = dx * TILT_FACTOR;
-      const prog = Math.min(Math.abs(dx) / THROW_THRESHOLD, 1);
-      const ease = prog * prog;
-      front().style.transform = `translateX(${dx}px) rotateY(${tilt}deg)`;
-      mid().style.transform = `translateX(0px) translateY(${8 - ease * 8}px) translateZ(${-50 + ease * 50}px) rotateY(-2.5deg) scale(${0.97 + ease * 0.03})`;
-      back().style.transform = `translateX(0px) translateY(${16 - ease * 8}px) translateZ(${-100 + ease * 50}px) rotateY(-5deg) scale(${0.94 + ease * 0.03})`;
-    }
-
-    function clearDragStyles() { cards.forEach((c) => (c.style.transform = "")); }
-
-    function throwCard(direction: "left" | "right") {
-      if (busy) return;
-      busy = true;
-      stack!.classList.add("interacted");
-      const f = front();
-      clearDragStyles();
-      f.classList.remove("is-front");
-      f.classList.add(direction === "right" ? "is-flying-right" : "is-flying-left");
-      mid().classList.replace("is-mid", "is-front");
-      back().classList.replace("is-back", "is-mid");
-      setTimeout(() => {
-        f.classList.remove("is-flying-left", "is-flying-right");
-        f.classList.add("is-back");
-        order = [order[1], order[2], order[0]];
-        updateDots();
-        busy = false;
-      }, 450);
-    }
-
-    stack.addEventListener("pointerdown", (e: PointerEvent) => {
-      if (busy || e.pointerType === "touch") return;
-      const startX = e.clientX;
-      let moved = false;
-
-      function onMove(e: PointerEvent) {
-        const dx = e.clientX - startX;
-        if (Math.abs(dx) > 4) {
-          if (!moved) { moved = true; front().classList.add("is-dragging"); }
-          applyDrag(dx);
-        }
-      }
-      function onUp(e: PointerEvent) {
-        document.removeEventListener("pointermove", onMove as EventListener);
-        document.removeEventListener("pointerup", onUp as EventListener);
-        front().classList.remove("is-dragging");
-        const dx = e.clientX - startX;
-        if (Math.abs(dx) >= THROW_THRESHOLD) throwCard(dx > 0 ? "right" : "left");
-        else clearDragStyles();
-      }
-      document.addEventListener("pointermove", onMove as EventListener);
-      document.addEventListener("pointerup", onUp as EventListener);
-    });
-
-    let t0 = 0;
-    stack.addEventListener("touchstart", (e: TouchEvent) => { t0 = e.touches[0].clientX; }, { passive: true });
-    stack.addEventListener("touchend", (e: TouchEvent) => {
-      if (busy) return;
-      const dx = e.changedTouches[0].clientX - t0;
-      if (Math.abs(dx) >= THROW_THRESHOLD) throwCard(dx > 0 ? "right" : "left");
-    }, { passive: true });
+    // ── Cleanup on unmount ─────────────────────────────────────────────────
+    return () => cleanups.forEach((fn) => fn());
   }, []);
 
   return null;

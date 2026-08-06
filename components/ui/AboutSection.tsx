@@ -1,126 +1,165 @@
 "use client";
+import React from "react";
+
+interface TechItem {
+  icon: string;
+  label: string;
+  highlight?: boolean;
+}
+
+interface CardData {
+  number: string;
+  accent: "cyan" | "purple" | "green";
+  icon: string;
+  eyebrow: string;
+  title: [string, string];
+  desc: string;
+  tech: TechItem[];
+}
+
+const CARDS: CardData[] = [
+  {
+    number: "01",
+    accent: "cyan",
+    icon: "code-slash-outline",
+    eyebrow: "// DISCIPLINE_01",
+    title: ["Frontend", "Engineering"],
+    desc: "Architecting pixel-perfect, immersive web experiences with modern frameworks and WebGL interactions.",
+    tech: [
+      { icon: "logo-javascript",    label: "JavaScript"   },
+      { icon: "logo-react",         label: "React.js"     },
+      { icon: "triangle-outline",   label: "Next.js 14"   },
+      { icon: "code-slash-outline", label: "TypeScript"   },
+      { icon: "color-wand-outline", label: "Tailwind CSS" },
+      { icon: "flash-outline",      label: "GSAP",        highlight: true },
+      { icon: "cube-outline",       label: "Three.js",    highlight: true },
+      { icon: "layers-outline",     label: "WebGL",       highlight: true },
+    ],
+  },
+  {
+    number: "02",
+    accent: "purple",
+    icon: "server-outline",
+    eyebrow: "// DISCIPLINE_02",
+    title: ["Backend &", "DevOps"],
+    desc: "Building robust server-side logic, scalable APIs, and managing cloud infrastructure end-to-end.",
+    tech: [
+      { icon: "logo-nodejs",      label: "Node.js"    },
+      { icon: "logo-docker",      label: "Docker"     },
+      { icon: "logo-firebase",    label: "Firebase"   },
+      { icon: "server-outline",   label: "PHP 8+"     },
+      { icon: "server-outline",   label: "Laravel"    },
+      { icon: "database-outline", label: "MySQL"      },
+      { icon: "database-outline", label: "PostgreSQL" },
+      { icon: "logo-github",      label: "Git"        },
+    ],
+  },
+  {
+    number: "03",
+    accent: "green",
+    icon: "layers-outline",
+    eyebrow: "// DISCIPLINE_03",
+    title: ["Mobile &", "Game Dev"],
+    desc: "Expanding digital horizons through cross-platform apps and interactive game mechanics.",
+    tech: [
+      { icon: "logo-react",              label: "React Native"   },
+      { icon: "logo-android",            label: "Android Studio" },
+      { icon: "logo-figma",              label: "Figma"          },
+      { icon: "phone-portrait-outline",  label: "Flutter"        },
+      { icon: "game-controller-outline", label: "Phaser.js", highlight: true },
+      { icon: "brush-outline",           label: "Canvas API"     },
+    ],
+  },
+];
 
 export default function AboutSection() {
   return (
-    <section className="section" id="about" aria-label="About Section">
-      <div className="parallax-text" style={{ top: "50px", left: "-50px" }} data-speed="-0.1">ABOUT</div>
-      <div className="container">
-        <h2 className="section-title" data-scroll>About Me</h2>
+    <section className="section about-spatial-section" id="about" aria-label="About Section">
+      <div
+        className="parallax-text"
+        style={{ top: "50px", left: "-50px" }}
+        data-speed="-0.1"
+      >
+        ABOUT
+      </div>
 
-        <div className="about-card-stack" data-cursor-text="DRAG">
-
-          {/* Card 1 - Frontend */}
-          <article className="about-layer-card card--cyan is-front" aria-label="Frontend Engineering">
-            <div className="card-watermark" aria-hidden="true">01</div>
-            <div className="card-ambient-glow glow--cyan" aria-hidden="true"></div>
-            <div className="card-content-grid">
-              <div className="card-col-info">
-                <div className="card-icon-wrap">
-                  {/* @ts-ignore */}
-                  <ion-icon suppressHydrationWarning name="code-slash-outline" aria-hidden="true"></ion-icon>
-                </div>
-                <p className="card-eyebrow">// DISCIPLINE_01</p>
-                <h3 className="card-title">Frontend<br /><em>Engineering</em></h3>
-                <p className="card-desc">Architecting pixel-perfect, immersive web experiences with modern frameworks and WebGL interactions.</p>
-              </div>
-              <div className="card-col-tech">
-                <div className="tech-terminal-box terminal--cyan">
-                  <p className="terminal-header">
-                    <span className="terminal-dot"></span>
-                    <span className="terminal-dot"></span>
-                    <span className="terminal-dot"></span> [ SYS.STACK ]
-                  </p>
-                  <div className="tech-stack-wrapper">
-                    {/* @ts-ignore */}
-                    {[["logo-javascript", "JavaScript"], ["logo-react", "React.js"], ["triangle-outline", "Next.js 14"], ["code-slash-outline", "TypeScript"], ["color-wand-outline", "Tailwind CSS"], ["flash-outline", "GSAP"], ["cube-outline", "Three.js"], ["layers-outline", "WebGL"]].map(([icon, label]) => (
-                      <span key={label} className={`tech-badge-pill${["GSAP", "Three.js"].includes(label as string) ? " highlight" : ""}`}>
-                        {/* @ts-ignore */}
-                        <ion-icon suppressHydrationWarning name={icon} aria-hidden="true"></ion-icon>{label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* Card 2 - Backend */}
-          <article className="about-layer-card card--purple is-mid" aria-label="Backend and DevOps">
-            <div className="card-watermark" aria-hidden="true">02</div>
-            <div className="card-ambient-glow glow--purple" aria-hidden="true"></div>
-            <div className="card-content-grid">
-              <div className="card-col-info">
-                <div className="card-icon-wrap">
-                  {/* @ts-ignore */}
-                  <ion-icon suppressHydrationWarning name="server-outline" aria-hidden="true"></ion-icon>
-                </div>
-                <p className="card-eyebrow">// DISCIPLINE_02</p>
-                <h3 className="card-title">Backend &amp;<br /><em>DevOps</em></h3>
-                <p className="card-desc">Building robust server-side logic, scalable APIs, and managing cloud infrastructure end-to-end.</p>
-              </div>
-              <div className="card-col-tech">
-                <div className="tech-terminal-box terminal--purple">
-                  <p className="terminal-header">
-                    <span className="terminal-dot"></span><span className="terminal-dot"></span><span className="terminal-dot"></span> [ SYS.STACK ]
-                  </p>
-                  <div className="tech-stack-wrapper">
-                    {[["logo-nodejs", "Node.js"], ["logo-docker", "Docker"], ["logo-firebase", "Firebase"], ["server-outline", "PHP 8+"], ["server-outline", "Laravel"], ["database-outline", "MySQL"], ["database-outline", "PostgreSQL"], ["logo-github", "Git"]].map(([icon, label]) => (
-                      <span key={label} className="tech-badge-pill">
-                        {/* @ts-ignore */}
-                        <ion-icon suppressHydrationWarning name={icon} aria-hidden="true"></ion-icon>{label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* Card 3 - Mobile & Game */}
-          <article className="about-layer-card card--green is-back" aria-label="Mobile and Game Development">
-            <div className="card-watermark" aria-hidden="true">03</div>
-            <div className="card-ambient-glow glow--green" aria-hidden="true"></div>
-            <div className="card-content-grid">
-              <div className="card-col-info">
-                <div className="card-icon-wrap">
-                  {/* @ts-ignore */}
-                  <ion-icon suppressHydrationWarning name="layers-outline" aria-hidden="true"></ion-icon>
-                </div>
-                <p className="card-eyebrow">// DISCIPLINE_03</p>
-                <h3 className="card-title">Mobile &amp;<br /><em>Game Dev</em></h3>
-                <p className="card-desc">Expanding digital horizons through cross-platform apps and interactive game mechanics.</p>
-              </div>
-              <div className="card-col-tech">
-                <div className="tech-terminal-box terminal--green">
-                  <p className="terminal-header">
-                    <span className="terminal-dot"></span><span className="terminal-dot"></span><span className="terminal-dot"></span> [ SYS.STACK ]
-                  </p>
-                  <div className="tech-stack-wrapper">
-                    {[["logo-react", "React Native"], ["logo-android", "Android Studio"], ["logo-figma", "Figma"], ["phone-portrait-outline", "Flutter"], ["game-controller-outline", "Phaser.js"], ["brush-outline", "Canvas API"]].map(([icon, label]) => (
-                      <span key={label} className={`tech-badge-pill${label === "Phaser.js" ? " highlight" : ""}`}>
-                        {/* @ts-ignore */}
-                        <ion-icon suppressHydrationWarning name={icon} aria-hidden="true"></ion-icon>{label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* Drag hint */}
-          <div className="stack-drag-hint" aria-hidden="true">
-            {/* @ts-ignore */}
-            <ion-icon suppressHydrationWarning name="swap-horizontal-outline"></ion-icon>drag to cycle
-          </div>
-
-          {/* Dot Pagination */}
-          <div className="stack-pagination" role="tablist" aria-label="About card navigation">
-            <button className="stack-dot stack-dot--cyan is-active" data-index="0" role="tab" aria-selected="true" aria-label="Frontend Engineering"></button>
-            <button className="stack-dot stack-dot--purple" data-index="1" role="tab" aria-selected="false" aria-label="Backend and DevOps"></button>
-            <button className="stack-dot stack-dot--green" data-index="2" role="tab" aria-selected="false" aria-label="Mobile and Game Dev"></button>
-          </div>
+      {/* ── Left heading ──────────────────────────────────────────────────── */}
+      <div className="about-spatial-label">
+        <p className="about-spatial-eyebrow">// ABOUT ME</p>
+        <h2 className="section-title about-spatial-heading" data-scroll>
+          What I <em>Build.</em>
+        </h2>
+        <div className="about-spatial-cue" aria-hidden="true">
+          <span className="about-spatial-cue-arrow" />
+          <span className="about-spatial-cue-text">hover to reveal</span>
         </div>
+      </div>
+
+      {/* ── Cards ─────────────────────────────────────────────────────────── */}
+      <div className="about-cards-wrapper" id="about-cards-wrapper">
+        {CARDS.map((card) => (
+          <article
+            key={card.number}
+            className={`about-spatial-card about-spatial-card--${card.accent}`}
+            aria-label={`${card.title[0]} ${card.title[1]}`}
+            tabIndex={0}
+            id={`about-card-${card.number}`}
+          >
+            {/* Cursor spotlight overlay */}
+            <div className="about-spatial-card-spotlight" aria-hidden="true" />
+
+            {/* Ambient glow orb */}
+            <div className="about-spatial-glow" aria-hidden="true" />
+
+            {/* Watermark number */}
+            <div className="about-spatial-watermark" aria-hidden="true">
+              {card.number}
+            </div>
+
+            {/* Card content */}
+            <div className="about-spatial-content">
+              <div className="about-spatial-icon-wrap">
+                {/* @ts-ignore */}
+                <ion-icon
+                  suppressHydrationWarning
+                  name={card.icon}
+                  aria-hidden="true"
+                />
+              </div>
+              <p className="about-spatial-eyebrow-card">{card.eyebrow}</p>
+              <h3 className="about-spatial-card-title">
+                {card.title[0]}<em>{card.title[1]}</em>
+              </h3>
+              <p className="about-spatial-card-desc">{card.desc}</p>
+
+              {/* Terminal tech box */}
+              <div className="about-spatial-terminal">
+                <p className="about-spatial-terminal-header">
+                  <span className="about-spatial-terminal-dot" />
+                  <span className="about-spatial-terminal-dot" />
+                  <span className="about-spatial-terminal-dot" />
+                  {" "}[ SYS.STACK ]
+                </p>
+                <div className="about-spatial-badges">
+                  {card.tech.map(({ icon, label, highlight }) => (
+                    <span
+                      key={label}
+                      className={`about-spatial-badge${highlight ? " highlight" : ""}`}
+                    >
+                      {/* @ts-ignore */}
+                      <ion-icon
+                        suppressHydrationWarning
+                        name={icon}
+                        aria-hidden="true"
+                      />
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );

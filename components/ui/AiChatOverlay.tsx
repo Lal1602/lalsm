@@ -3,6 +3,40 @@
 import { useChatStore } from "@/stores";
 import { useEffect, useRef, useState } from "react";
 
+const TypingBubble = ({ text }: { text: string }) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    let i = 0;
+    setDisplayedText("");
+    const interval = setInterval(() => {
+      i += 1;
+      setDisplayedText(text.slice(0, i));
+      
+      if (spanRef.current) {
+        const scrollContainer = spanRef.current.closest('.ai-chat-messages');
+        if (scrollContainer) {
+          scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        }
+      }
+
+      if (i >= text.length) {
+        clearInterval(interval);
+      }
+    }, 15);
+
+    return () => clearInterval(interval); 
+  }, [text]);
+
+  return (
+    <span ref={spanRef}>
+      {displayedText}
+      {displayedText.length < text.length && <span className="ai-chat-typing-cursor" />}
+    </span>
+  );
+};
+
 export default function AiChatOverlay() {
   const [isOpen, setIsOpen] = useState(false);
   const { messages, isLoading, sendMessage, clearHistory } = useChatStore();
@@ -54,7 +88,9 @@ export default function AiChatOverlay() {
               <span className="ai-chat-status-ping"></span>
             </div>
             <div>
-              <h3 className="ai-chat-title">Bilal&apos;s Assistant</h3>
+              <h3 className="ai-chat-title">
+                B.I.L.A.L. <span style={{ fontSize: '0.65em', opacity: 0.7, fontWeight: 'normal', fontFamily: 'var(--font-code)' }}>(Model: BIL-01)</span>
+              </h3>
               <p className="ai-chat-eyebrow">// ONLINE • AI POWERED</p>
             </div>
           </div>
@@ -85,12 +121,16 @@ export default function AiChatOverlay() {
             >
               {/* Avatar / Eyebrow label */}
               <span className="ai-chat-msg-label">
-                {msg.role === "user" ? "You" : "Assistant"}
+                {msg.role === "user" ? "You" : "B.I.L.A.L."}
               </span>
 
               {/* Message Bubble */}
               <div className={`ai-chat-bubble ${msg.role === "user" ? "user" : "ai"}`}>
-                {msg.text}
+                {msg.role === "ai" && idx === messages.length - 1 ? (
+                  <TypingBubble text={msg.text} />
+                ) : (
+                  msg.text
+                )}
               </div>
             </div>
           ))}
@@ -98,7 +138,7 @@ export default function AiChatOverlay() {
           {/* Loading Indicator */}
           {isLoading && (
             <div className="ai-chat-msg-row ai">
-              <span className="ai-chat-msg-label">Assistant</span>
+              <span className="ai-chat-msg-label">B.I.L.A.L.</span>
               <div className="ai-chat-typing-bubble">
                 <span className="ai-chat-typing-dot"></span>
                 <span className="ai-chat-typing-dot"></span>
@@ -380,6 +420,19 @@ export default function AiChatOverlay() {
           border-radius: 16px;
           line-height: 1.5;
           font-size: 13px;
+          white-space: pre-wrap;
+        }
+        .ai-chat-typing-cursor {
+          display: inline-block;
+          width: 6px;
+          height: 13px;
+          background-color: rgba(255,255,255,0.7);
+          margin-left: 2px;
+          vertical-align: middle;
+          animation: ai-blink 1s step-end infinite;
+        }
+        @keyframes ai-blink {
+          50% { opacity: 0; }
         }
         .ai-chat-bubble.user {
           background: linear-gradient(135deg, #2563eb, #4f46e5);
@@ -727,6 +780,9 @@ export default function AiChatOverlay() {
           background: rgba(0, 0, 0, 0.03) !important;
           border: 1px solid rgba(0, 0, 0, 0.04) !important;
           color: #2c2c2c !important;
+        }
+        html[data-theme="light"] .ai-chat-typing-cursor {
+          background-color: rgba(0, 0, 0, 0.5) !important;
         }
         html[data-theme="light"] .ai-chat-typing-bubble {
           background: rgba(0, 0, 0, 0.03) !important;

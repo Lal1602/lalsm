@@ -14,6 +14,7 @@ export default function HorizonShowcase() {
   const sectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -124,10 +125,10 @@ export default function HorizonShowcase() {
       {/* Slides wrapper — GSAP translates this horizontally for scroll */}
       <div className="horizon-wrapper">
 
-        {/* SLIDE 1: CREATIVE PLAYGROUND */}
-        <div className="horizon-slide slide--kinetic">
+        {/* SLIDE 1: CREATIVE PLAYGROUND (Hidden on mobile) */}
+        <div className="horizon-slide slide--kinetic hide-on-mobile">
           <div className="horizon-slide-content">
-            <p className="slide-badge">// PLAYGROUND</p>
+            <p className="slide-badge">{"// PLAYGROUND"}</p>
             <h2 className="kinetic-hero-title">
               CREATIVE<br />
               <span className="text-hollow">PLAYGROUND</span>

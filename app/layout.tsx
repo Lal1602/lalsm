@@ -32,7 +32,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Roboto+Mono:wght@300;500&family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" href="/B-logo.jpg" type="image/jpg" />
+        <link rel="icon" href="/b-logo.jpg" type="image/jpg" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

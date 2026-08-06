@@ -130,8 +130,16 @@ export default function CvTimelineSlide() {
 
     // ── Core update function (called every frame via onProgressUpdate) ────────
     function updateByProgress(globalProgress: number) {
-      // Career slide = second of 2 slides → sub-progress range: 0.5 → 1.0
-      const p = gsap.utils.clamp(0, 1, (globalProgress - 0.5) / 0.5);
+      // Career slide = second of 2 slides on desktop, but ONLY slide on mobile.
+      const isMobile = window.matchMedia("(max-width: 968px)").matches;
+      
+      let p;
+      if (isMobile) {
+        p = gsap.utils.clamp(0, 1, globalProgress);
+      } else {
+        // sub-progress range: 0.5 → 1.0 on desktop
+        p = gsap.utils.clamp(0, 1, (globalProgress - 0.5) / 0.5);
+      }
 
       // Cards: make them visible as soon as the career slide begins (p > 0)
       // This also means they're invisible when p === 0 (still on previous slide)
@@ -245,35 +253,7 @@ export default function CvTimelineSlide() {
       updateByProgress(horizonScrollState.progress);
     }
 
-    // Mobile fallback — IntersectionObserver (horizontal scroll is off on mobile)
-    const isMobile = window.matchMedia("(max-width: 968px)").matches;
-    if (isMobile) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.intersectionRatio >= 0.35) {
-              // Simple stagger reveal for mobile
-              gsap.to(headers, { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power3.out" });
-              cards.forEach((card, i) => {
-                gsap.to(card, {
-                  x: 0, y: 0, scale: 1, rotationY: 0, rotationZ: 0, opacity: 1,
-                  duration: 0.55,
-                  delay: 0.2 + i * 0.18,
-                  ease: "power3.out",
-                  onComplete: () => card.classList.add("is-landed"),
-                });
-              });
-              if (cvCard) gsap.to(cvCard, { opacity: 1, x: 0, duration: 0.5, delay: 0.9, ease: "power3.out" });
-              observer.disconnect();
-            }
-          });
-        },
-        { threshold: [0.35] }
-      );
-      observer.observe(slide);
-      return () => { observer.disconnect(); };
-    }
-
+    // Mobile fallback — IntersectionObserver is no longer needed because GSAP scroll-pinning now runs on mobile.
     return () => {
       horizonScrollState.onProgressUpdate = null;
     };
@@ -302,9 +282,76 @@ export default function CvTimelineSlide() {
         }}
       />
 
+      {/* ════════════════════════════════════════════════════════════════════
+          MOBILE LAYOUT (≤ 968px)
+          – Sticky header with "Career Pathway" text
+          – Horizontal swipe-able cards rail
+          – Hidden on desktop via CSS (.cv-mobile-sticky-header { display: none })
+          ════════════════════════════════════════════════════════════════════ */}
+      <div className="cv-mobile-sticky-header">
+        <p className="slide-badge">{`// EXPERIENCE & TIMELINE`}</p>
+        <h2
+          className="slide-title"
+          style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
+        >
+          CAREER{" "}
+          <span style={{ color: "transparent", WebkitTextStroke: "1px rgba(255,255,255,0.7)" }}>
+            PATHWAY
+          </span>
+        </h2>
+        <p className="slide-description">
+          A brief overview of my academic background at PENS, official certification records, and student competency achievements.
+        </p>
+      </div>
+
+      <div className="cv-mobile-cards-rail">
+        {TIMELINE_DATA.map((item, idx) => (
+          <div className="cv-mobile-card" key={idx}>
+            <div
+              className="cv-mobile-card-glow"
+              style={{ background: CARD_COLORS[idx] }}
+            />
+            <p className="cv-mobile-card-year">{item.year}</p>
+            <span className="cv-mobile-card-badge">{item.badge}</span>
+            <div className="cv-mobile-card-divider" />
+            <h3 className="cv-mobile-card-role">{item.role}</h3>
+            <p className="cv-mobile-card-institution">{item.institution}</p>
+            <p className="cv-mobile-card-desc">{item.desc}</p>
+          </div>
+        ))}
+        {/* CV download card */}
+        <div className="cv-mobile-download-card">
+          <div>
+            <p style={{ fontFamily: "var(--font-code)", fontSize: "0.6rem", color: "rgba(255,255,255,0.28)", margin: "0 0 6px" }}>
+              {`// FILE_DOCUMENT`}
+            </p>
+            <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", fontWeight: 700, color: "white", margin: "0 0 6px" }}>
+              CURRICULUM VITAE
+            </h4>
+            <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>
+              Download professional resume summary (PDF, ~180 KB).
+            </p>
+          </div>
+          <a
+            href="https://drive.google.com/file/d/16mvFW569lf6yUzMRpEQUMY-NVJ4t41kZ/view?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn"
+            style={{ fontSize: "0.72rem", padding: "8px 12px", textAlign: "center", display: "block" }}
+          >
+            Get Resume PDF
+          </a>
+        </div>
+      </div>
+
+      {/* ════════════════════════════════════════════════════════════════════
+          DESKTOP LAYOUT (> 968px)
+          – Full GSAP animated horizontal card stack
+          – Hidden on mobile via CSS (.cv-timeline-area { display: none })
+          ════════════════════════════════════════════════════════════════════ */}
       <div className="horizon-slide-content" style={{ zIndex: 2, width: "100%" }}>
         {/* ── Headers ───────────────────────────────────────────────────────── */}
-        <p className="slide-badge cv-header-anim">// EXPERIENCE &amp; TIMELINE</p>
+        <p className="slide-badge cv-header-anim">{`// EXPERIENCE & TIMELINE`}</p>
         <h2
           className="slide-title cv-header-anim"
           style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
@@ -379,14 +426,13 @@ export default function CvTimelineSlide() {
               </div>
             ))}
 
-            {/* Timeline connector lines — from center of card N to center of card N+1 */}
-            {/* Card centers: idx0=110px, idx1=370px, idx2=630px, idx3=890px           */}
+            {/* Timeline connector lines */}
             <div ref={lineRef01} className="cv-line-seg" style={{ left: "110px" }} />
             <div ref={lineRef12} className="cv-line-seg" style={{ left: "370px" }} />
             <div ref={lineRef23} className="cv-line-seg" style={{ left: "630px" }} />
           </div>
 
-          {/* CV Download card — muncul paling akhir */}
+          {/* CV Download card */}
           <div
             className="glass-card cv-download-card"
             ref={cvCardRef}
@@ -406,7 +452,7 @@ export default function CvTimelineSlide() {
           >
             <div>
               <p style={{ fontFamily: "var(--font-code)", fontSize: "0.62rem", color: "rgba(255,255,255,0.28)", margin: 0 }}>
-                // FILE_DOCUMENT
+                {`// FILE_DOCUMENT`}
               </p>
               <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", fontWeight: 700, color: "white", margin: "8px 0 4px" }}>
                 CURRICULUM VITAE

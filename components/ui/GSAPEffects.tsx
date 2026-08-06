@@ -103,12 +103,12 @@ export default function GSAPEffects() {
 
     // Marquee
     gsap.to(".marquee-wrapper", { xPercent: -50, repeat: -1, duration: 15, ease: "linear" });
-    let marqueeProxy = { skew: 0 };
+    const marqueeProxy = { skew: 0 };
     const marqueeSkewSetter = gsap.quickSetter(".marquee-text", "skewX", "deg");
     const marqueeClamp = gsap.utils.clamp(-20, 20);
     ScrollTrigger.create({
       onUpdate: (self) => {
-        let skew = marqueeClamp(self.getVelocity() / -300);
+        const skew = marqueeClamp(self.getVelocity() / -300);
         if (Math.abs(skew) > Math.abs(marqueeProxy.skew)) {
           marqueeProxy.skew = skew;
           gsap.to(marqueeProxy, { skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => marqueeSkewSetter(marqueeProxy.skew) });
@@ -127,9 +127,11 @@ export default function GSAPEffects() {
       gsap.set(".achievements-marquee-wrapper", { scale: 1, y: 0, rotationX: 0, opacity: 1 });
     }
 
-    // Horizon Showcase Horizontal Scroll Pinning & 3D Concave Track
+    // Horizon Showcase — Desktop only: horizontal scroll pinning + 3D concave track
+    // On mobile we skip ALL GSAP pinning; the slide is plain document flow with CSS swipe.
     const horizonWrapper = document.querySelector<HTMLElement>(".horizon-wrapper");
-    const isHorizonMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 968px)").matches;
+    const isHorizonMobile = window.matchMedia("(max-width: 968px)").matches;
+
     if (horizonWrapper && !isHorizonMobile) {
       const slides = Array.from(horizonWrapper.querySelectorAll<HTMLElement>(".horizon-slide"));
       const totalSlides = slides.length;
@@ -154,14 +156,11 @@ export default function GSAPEffects() {
           const clampedNormDist = gsap.utils.clamp(-1.5, 1.5, normDist);
 
           // 3D concave cylinder illusion with minimal perspective foreshortening
-          // rotateY: 18deg max (was 35) + transformPerspective: 5000 (was 1500)
-          // Near-edge enlargement: ~6% at max rotation vs ~58% before — virtually imperceptible
           const rotateY = -clampedNormDist * 18; // degrees
-          const translateZ = 0; // px
 
           gsap.set(slide, {
             rotationY: rotateY,
-            z: translateZ,
+            z: 0,
             transformPerspective: 5000,
             transformOrigin: "50% 50%",
             overwrite: "auto",
@@ -214,6 +213,7 @@ export default function GSAPEffects() {
         },
       });
     }
+
 
 
     // Footer auto-glow

@@ -14,21 +14,32 @@ interface ChatStore {
   clearHistory: () => void;
 }
 
-const DEFAULT_WELCOME_MESSAGE: Message = {
+const getRandomGreeting = () => {
+  const greetings = [
+    "Halo! Saya B.I.L.A.L., asisten virtual cerdas Bilal. Ada yang bisa saya bantu terkait proyek, skill, atau pengalaman kerja Bilal?",
+    "System Online. Saya B.I.L.A.L., asisten pribadi Bilal. Ingin tahu lebih dalam tentang teknologi yang Bilal kuasai atau proyek terbarunya?",
+    "Selamat datang! B.I.L.A.L. siap melayani. Silakan jelajahi portofolio ini, atau tanyakan apa pun tentang perjalanan karir dan karya Bilal.",
+    "B.I.L.A.L. stands by. Mari kita bedah portofolio ini bersama! Kamu ingin melihat galeri proyek atau mengetahui skill coding utama Bilal?",
+    "Halo, penjelajah digital! Saya B.I.L.A.L., asisten cerdas Bilal. Ada hal spesifik yang ingin kamu ketahui tentang sang kreator hari ini?"
+  ];
+  return greetings[Math.floor(Math.random() * greetings.length)];
+};
+
+const createWelcomeMessage = (): Message => ({
   role: 'ai',
-  text: 'Halo! Saya asisten virtual Bilal. Ada yang bisa saya bantu untuk menjelaskan proyek, keahlian, atau pengalaman kerja Bilal?',
+  text: getRandomGreeting(),
   suggestions: [
     'Tunjukkan galeri proyekmu!',
     'Apa saja keahlian/skill coding Bilal?',
     'Bagaimana cara menghubungi Bilal?',
     'Ceritakan tentang kuliahnya di PENS'
   ]
-};
+});
 
 export const useChatStore = create<ChatStore>()(
   persist(
     (set, get) => ({
-      messages: [DEFAULT_WELCOME_MESSAGE],
+      messages: [createWelcomeMessage()],
       isLoading: false,
 
       sendMessage: async (text: string) => {
@@ -188,7 +199,7 @@ export const useChatStore = create<ChatStore>()(
       },
 
       clearHistory: () => {
-        set({ messages: [DEFAULT_WELCOME_MESSAGE] });
+        set({ messages: [createWelcomeMessage()] });
       },
     }),
     {

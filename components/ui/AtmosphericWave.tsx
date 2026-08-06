@@ -33,7 +33,7 @@ export default function AtmosphericWave() {
       mouse.ty = e.clientY - rect.top;
     };
     
-    const card = canvas.closest(".about-layer-card");
+    const card = canvas.closest(".about-spatial-card");
     if (card) {
       card.addEventListener("mousemove", handleMouseMove as EventListener);
     }

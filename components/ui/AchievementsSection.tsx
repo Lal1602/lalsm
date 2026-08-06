@@ -43,7 +43,7 @@ function MarqueeCard({ c, hidden }: { c: CertCard; hidden?: boolean }) {
         <p className="marquee-card-meta">{c.meta}</p>
         <button className="btn-quick-view marquee-card-btn" tabIndex={hidden ? -1 : 0} aria-label={`View ${c.heading} Certificate`}>
           {/* @ts-ignore */}
-          <ion-icon suppressHydrationWarning name="eye-outline" aria-hidden="true"></ion-icon> View Cert
+          <ion-icon suppressHydrationWarning name="eye-outline" aria-hidden="true"></ion-icon>
         </button>
       </div>
     </article>

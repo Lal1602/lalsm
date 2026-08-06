@@ -814,9 +814,11 @@ h3 {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-           ABOUT — Bento Box / Cyberpunk Terminal Layered Stack
-           ═══════════════════════════════════════════════════════════ */
+/* =========================================================================
+   ABOUT — Spatial Hologram Blueprint Cards
+   3D perspective hover reveal — no glassmorphism, no drag mechanic
+   Cards start "lying down" in 3D (rotateX 55deg) and rise on hover.
+   ========================================================================= */
 
 /* Keep .glass-card for contact + other sections that still use it */
 .glass-card {
@@ -835,11 +837,11 @@ h3 {
   box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
 }
 
-/* --- Premium Dynamic Spotlight Borders for Awwwards-Tier Cards --- */
+/* Dynamic Spotlight Border — only for project-card, achievement-card, workflow-step-card */
+/* about-layer-card removed — no longer used */
 .glass-card,
 .project-card,
 .achievement-card,
-.about-layer-card,
 .workflow-step-card {
   position: relative;
 }
@@ -847,25 +849,20 @@ h3 {
 .glass-card::before,
 .project-card::before,
 .achievement-card::before,
-.about-layer-card::before,
 .workflow-step-card::before {
   content: '';
   position: absolute;
   inset: -1px;
-  /* Extend slightly to perfectly cover the original borders */
   border-radius: inherit;
   padding: 1px;
-  /* border thickness */
-  background: radial-gradient(300px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
-      rgba(0, 243, 255, 0.45) 0%,
-      rgba(188, 19, 254, 0.25) 50%,
-      transparent 80%);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+  background: radial-gradient(
+    300px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+    rgba(0, 243, 255, 0.45) 0%,
+    rgba(188, 19, 254, 0.25) 50%,
+    transparent 80%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
@@ -877,517 +874,534 @@ h3 {
 .glass-card:hover::before,
 .project-card:hover::before,
 .achievement-card:hover::before,
-.about-layer-card:hover::before,
 .workflow-step-card:hover::before {
   opacity: 1;
 }
 
-/* ── Stack container: provides height budget for absolute cards ── */
-/* ── Swiper container for the card stack effect ── */
-/* ══ 3-CARD 3D STACK ══════════════════════════════════════════════════ */
+/* ── About Spatial Section ────────────────────────────────────────────────── */
 
-.about-card-stack {
+.about-spatial-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 80px 8% 100px;
+  min-height: 100vh;
   position: relative;
-  max-width: 1000px;
-  /* Extra bottom padding lets the back cards peek below without overflow */
-  height: 530px;
-  margin: 20px auto 0;
-  /* Single perspective on the parent — cards share same vanishing point */
-  perspective: 1400px;
-  perspective-origin: 50% 38%;
+  overflow: hidden;
 }
 
-/* ── Every card is absolutely stacked at the same origin ── */
-.about-layer-card {
+/* ── Top heading label ───────────────────────────────────────────────────── */
+
+.about-spatial-label {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.about-spatial-eyebrow {
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  color: var(--accent-cyan);
+  opacity: 0.65;
+  text-transform: uppercase;
+}
+
+.about-spatial-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1.05;
+  color: #fff;
+}
+
+.about-spatial-heading em {
+  font-style: normal;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
+  display: inline-block;
+}
+
+.about-spatial-subtext {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  max-width: 24ch;
+}
+
+/* Hover cue — animated sweep arrow */
+.about-spatial-cue {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  opacity: 0;
+  animation: spatialCueFadeIn 0.6s 1.2s ease forwards;
+}
+
+@keyframes spatialCueFadeIn {
+  to { opacity: 1; }
+}
+
+.about-spatial-cue-arrow {
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: rgba(0, 243, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.about-spatial-cue-arrow::after {
+  content: '';
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: calc(100% - 70px);
-  min-height: 400px;
-  border-radius: 24px;
-  overflow: hidden;
-  background: rgba(10, 10, 14, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  /* CSS owns all transforms — JS only sets inline style during active drag */
-  transition:
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.4s ease;
-  will-change: transform, opacity;
-  cursor: grab;
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-/* Prevent background bleeding of text on stacked cards */
-.about-layer-card .card-content-grid {
-  transition: opacity 0.45s ease;
-}
-
-.about-layer-card:not(.is-front) .card-content-grid {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-.about-layer-card:not(.is-front) .card-watermark {
-  opacity: 0 !important;
-}
-
-/* Disable transition while finger is down so transform tracks 1:1 */
-.about-layer-card.is-dragging {
-  transition: none;
-  cursor: grabbing;
-}
-
-/* ── Resting positions ──────────────────────────────────────────── */
-
-.about-layer-card.is-front {
-  transform: translateX(0px) translateY(0px) translateZ(0px) rotateY(0deg);
-  z-index: 3;
-  opacity: 1;
-  box-shadow:
-    0 2px 0 rgba(255, 255, 255, 0.05) inset,
-    0 30px 60px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.04);
-}
-
-/* Mid: 8px down, 50px back in Z, 2.5° Y-tilt — gives real 3D depth */
-.about-layer-card.is-mid {
-  transform: translateX(0px) translateY(8px) translateZ(-50px) rotateY(-2.5deg) scale(0.97);
-  z-index: 2;
-  opacity: 0.68;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-/* Back: 16px down, 100px back, 5° tilt */
-.about-layer-card.is-back {
-  transform: translateX(0px) translateY(16px) translateZ(-100px) rotateY(-5deg) scale(0.94);
-  z-index: 1;
-  opacity: 0.38;
-}
-
-/* ── Throw animations — direction matches swipe ──────────────── */
-
-/* Flung to the LEFT (swipe-left gesture) */
-.about-layer-card.is-flying-left {
-  transform: translateX(-130%) translateY(-16px) rotateY(-28deg) scale(0.82) !important;
-  opacity: 0 !important;
-  transition:
-    transform 0.42s cubic-bezier(0.55, 0, 1, 0.45),
-    opacity 0.26s ease !important;
-  z-index: 10;
-  pointer-events: none;
-}
-
-/* Flung to the RIGHT (swipe-right gesture) */
-.about-layer-card.is-flying-right {
-  transform: translateX(130%) translateY(-16px) rotateY(28deg) scale(0.82) !important;
-  opacity: 0 !important;
-  transition:
-    transform 0.42s cubic-bezier(0.55, 0, 1, 0.45),
-    opacity 0.26s ease !important;
-  z-index: 10;
-  pointer-events: none;
-}
-
-/* ── Drag hint ───────────────────────────────────────────────── */
-.stack-drag-hint {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-code);
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-  opacity: 0.4;
-  pointer-events: none;
-  transition: opacity 0.5s ease;
-  white-space: nowrap;
-}
-
-.hint-arrow {
-  font-size: 0.9rem;
-  opacity: 0.6;
-  animation: hintPulse 2s ease-in-out infinite alternate;
-}
-
-.hint-arrow:last-child {
-  animation-delay: 0.3s;
-}
-
-@keyframes hintPulse {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(3px);
-  }
-}
-
-.hint-arrow:first-child {
-  animation-direction: alternate-reverse;
-}
-
-.about-card-stack.interacted .stack-drag-hint {
-  opacity: 0;
-}
-
-/* ── Stack Dot Pagination ─────────────────────────────────── */
-.stack-pagination {
-  position: absolute;
-  bottom: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 20;
-}
-
-.stack-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: none;
-  transition: width 0.35s cubic-bezier(.34, 1.56, .64, 1),
-    background 0.3s ease,
-    box-shadow 0.3s ease,
-    opacity 0.3s ease;
-  opacity: 0.45;
-}
-
-.stack-dot:hover {
-  opacity: 0.75;
-  transform: scale(1.15);
-}
-
-.stack-dot.is-active {
-  width: 28px;
-  border-radius: 4px;
-  opacity: 1;
-}
-
-/* Per-dot accent colors matching each card */
-.stack-dot--cyan.is-active {
   background: var(--accent-cyan);
-  box-shadow: 0 0 10px var(--accent-cyan), 0 0 20px rgba(0, 243, 255, 0.35);
+  transform: translateX(-100%);
+  animation: spatialArrowPulse 2s ease-in-out infinite;
 }
 
-.stack-dot--purple.is-active {
-  background: var(--accent-purple);
-  box-shadow: 0 0 10px var(--accent-purple), 0 0 20px rgba(188, 19, 254, 0.35);
+@keyframes spatialArrowPulse {
+  0%, 100% { transform: translateX(-100%); }
+  50%       { transform: translateX(100%); }
 }
 
-.stack-dot--green.is-active {
-  background: #00ff88;
-  box-shadow: 0 0 10px #00ff88, 0 0 20px rgba(0, 255, 136, 0.35);
+.about-spatial-cue-text {
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.2);
 }
 
+/* ── Cards wrapper ────────────────────────────────────────────────────────── */
 
-/* Per-card accent border on top edge */
-.card--cyan {
-  border-top: 2px solid var(--accent-cyan);
+.about-cards-wrapper {
+  width: 100%;
+  display: flex;
+  gap: 28px;
+  align-items: stretch;
 }
 
-.card--purple {
-  border-top: 2px solid var(--accent-purple);
+/* ── Individual card shell ───────────────────────────────────────────────── */
+
+.about-spatial-card {
+  flex: 1;
+  min-height: 480px;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  will-change: transform, opacity, filter;
+
+  /* Idle: card flat 2D */
+  transform: translateY(0);
+  opacity: 0.6;
+  filter: grayscale(40%);
+
+  /* Solid dark background */
+  background: #0b0b12;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+  transition:
+    transform  0.5s cubic-bezier(0.165, 0.84, 0.44, 1),
+    opacity    0.5s ease,
+    filter     0.5s ease,
+    box-shadow 0.5s ease;
 }
 
-.card--green {
-  border-top: 2px solid #00ff88;
+/* Per-card accent borders (always visible at top) */
+.about-spatial-card--cyan {
+  border-top: 2px solid rgba(0, 243, 255, 0.5);
 }
 
-/* ── Giant background watermark number ── */
-.card-watermark {
+.about-spatial-card--purple {
+  border-top: 2px solid rgba(188, 19, 254, 0.5);
+}
+
+.about-spatial-card--green {
+  border-top: 2px solid rgba(0, 255, 136, 0.5);
+}
+
+/* ── Active state — card lifts up elegantly ──────────────────────────────── */
+
+.about-spatial-card.is-active {
+  transform: translateY(-12px);
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+.about-spatial-card--cyan.is-active {
+  box-shadow:
+    0 40px 80px rgba(0, 243, 255, 0.18),
+    0 0 0 1px rgba(0, 243, 255, 0.15),
+    inset 0 1px 0 rgba(0, 243, 255, 0.08);
+}
+
+.about-spatial-card--purple.is-active {
+  box-shadow:
+    0 40px 80px rgba(188, 19, 254, 0.18),
+    0 0 0 1px rgba(188, 19, 254, 0.15),
+    inset 0 1px 0 rgba(188, 19, 254, 0.08);
+}
+
+.about-spatial-card--green.is-active {
+  box-shadow:
+    0 40px 80px rgba(0, 255, 136, 0.15),
+    0 0 0 1px rgba(0, 255, 136, 0.12),
+    inset 0 1px 0 rgba(0, 255, 136, 0.07);
+}
+
+/* ── Dimmed state — non-hovered cards when one is active ─────────────────── */
+
+.about-cards-wrapper.has-hover .about-spatial-card:not(.is-active) {
+  transform: translateY(4px) scale(0.98);
+  opacity: 0.3;
+  filter: grayscale(60%) blur(2px);
+}
+
+/* ── Cursor spotlight overlay ─────────────────────────────────────────────── */
+
+.about-spatial-card-spotlight {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(
+    280px circle at var(--spot-x, 50%) var(--spot-y, -20%),
+    rgba(255, 255, 255, 0.045) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.about-spatial-card.is-active .about-spatial-card-spotlight {
+  opacity: 1;
+}
+
+/* ── Ambient glow orb ─────────────────────────────────────────────────────── */
+
+.about-spatial-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  top: -80px;
+  left: -60px;
+  filter: blur(70px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.about-spatial-card.is-active .about-spatial-glow { opacity: 0.1; }
+.about-spatial-card--cyan   .about-spatial-glow { background: var(--accent-cyan); }
+.about-spatial-card--purple .about-spatial-glow { background: var(--accent-purple); }
+.about-spatial-card--green  .about-spatial-glow { background: #00ff88; }
+
+/* ── Watermark number ─────────────────────────────────────────────────────── */
+
+.about-spatial-watermark {
   position: absolute;
   bottom: -30px;
   right: -10px;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 250px;
+  font-size: clamp(120px, 15vw, 200px);
   line-height: 1;
   color: transparent;
-  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.05);
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.04);
   pointer-events: none;
   user-select: none;
   z-index: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-/* ── Ambient glowing orb in background ── */
-.card-ambient-glow {
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  top: -100px;
-  left: -80px;
-  filter: blur(80px);
-  opacity: 0.12;
-}
+.about-spatial-card.is-active .about-spatial-watermark { opacity: 1; }
 
-.glow--cyan {
-  background: radial-gradient(circle, var(--accent-cyan) 60%, transparent 100%);
-}
+/* ── Content area ─────────────────────────────────────────────────────────── */
 
-.glow--purple {
-  background: radial-gradient(circle, var(--accent-purple) 60%, transparent 100%);
-}
-
-.glow--green {
-  background: radial-gradient(circle, #00ff88 60%, transparent 100%);
-}
-
-/* ── 2-Column content grid ── */
-.card-content-grid {
+.about-spatial-content {
   position: relative;
   z-index: 1;
-  /* sits above watermark + glow */
-  display: grid;
-  grid-template-columns: 45% 55%;
-  height: 100%;
-  align-items: center;
-  padding: 0 50px;
-  gap: 40px;
-}
-
-/* ── Left column: icon, eyebrow, title, description ── */
-.card-col-info {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  height: 100%;
+  padding: 32px 28px 28px;
+  gap: 20px;
 }
 
-.card-icon-wrap {
+/* ── Icon wrap ────────────────────────────────────────────────────────────── */
+
+.about-spatial-icon-wrap {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  margin-bottom: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  margin-bottom: 2px;
+  transition: background 0.4s ease, border-color 0.4s ease;
 }
 
-.card--cyan .card-icon-wrap ion-icon {
-  font-size: 1.8rem;
-  color: var(--accent-cyan);
+.about-spatial-card--cyan.is-active   .about-spatial-icon-wrap {
+  background: rgba(0, 243, 255, 0.08);
+  border-color: rgba(0, 243, 255, 0.25);
 }
 
-.card--purple .card-icon-wrap ion-icon {
-  font-size: 1.8rem;
-  color: var(--accent-purple);
+.about-spatial-card--purple.is-active .about-spatial-icon-wrap {
+  background: rgba(188, 19, 254, 0.08);
+  border-color: rgba(188, 19, 254, 0.25);
 }
 
-.card--green .card-icon-wrap ion-icon {
-  font-size: 1.8rem;
-  color: #00ff88;
+.about-spatial-card--green.is-active  .about-spatial-icon-wrap {
+  background: rgba(0, 255, 136, 0.08);
+  border-color: rgba(0, 255, 136, 0.22);
 }
 
-.card-eyebrow {
+.about-spatial-card--cyan   .about-spatial-icon-wrap ion-icon { color: var(--accent-cyan);   font-size: 1.6rem; }
+.about-spatial-card--purple .about-spatial-icon-wrap ion-icon { color: var(--accent-purple); font-size: 1.6rem; }
+.about-spatial-card--green  .about-spatial-icon-wrap ion-icon { color: #00ff88;              font-size: 1.6rem; }
+
+/* ── Eyebrow ──────────────────────────────────────────────────────────────── */
+
+.about-spatial-eyebrow-card {
   font-family: var(--font-code);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--text-muted);
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-.card-title {
+/* ── Card title ───────────────────────────────────────────────────────────── */
+
+.about-spatial-card-title {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(1.6rem, 2.5vw, 2.4rem);
+  font-size: clamp(1.4rem, 2vw, 2rem);
   line-height: 1.1;
-  color: var(--text-main);
+  color: #fff;
   margin: 0;
 }
 
-.card-title em {
+.about-spatial-card-title em {
   font-style: normal;
   display: block;
+  transition: color 0.4s ease;
 }
 
-.card--cyan .card-title em {
-  color: var(--accent-cyan);
-}
+.about-spatial-card--cyan.is-active   .about-spatial-card-title em { color: var(--accent-cyan); }
+.about-spatial-card--purple.is-active .about-spatial-card-title em { color: var(--accent-purple); }
+.about-spatial-card--green.is-active  .about-spatial-card-title em { color: #00ff88; }
 
-.card--purple .card-title em {
-  color: var(--accent-purple);
-}
+/* ── Description ──────────────────────────────────────────────────────────── */
 
-.card--green .card-title em {
-  color: #00ff88;
-}
-
-.card-desc {
-  font-size: 0.88rem;
+.about-spatial-card-desc {
+  font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.7;
-  max-width: 32ch;
+  /* Hidden when idle — reveals on hover */
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s 0.12s ease, transform 0.4s 0.12s ease;
 }
 
-/* ── Right column: tech terminal box ── */
-.card-col-tech {
-  height: 100%;
-  display: flex;
-  align-items: center;
+.about-spatial-card.is-active .about-spatial-card-desc {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.tech-terminal-box {
+/* ── Terminal tech box ────────────────────────────────────────────────────── */
+
+.about-spatial-terminal {
   width: 100%;
-  background: rgba(5, 5, 5, 0.8);
+  background: rgba(3, 3, 8, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 25px;
-  /* Top accent line — overridden per variant */
-  border-top: 2px solid var(--accent-cyan);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-top: auto;
+  /* Hidden when idle — reveals on hover with slight delay */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.45s 0.18s ease, transform 0.45s 0.18s ease;
 }
 
-.terminal--cyan {
-  border-top-color: var(--accent-cyan);
+.about-spatial-card.is-active .about-spatial-terminal {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.terminal--purple {
-  border-top-color: var(--accent-purple);
-}
+/* Top accent line per card */
+.about-spatial-card--cyan   .about-spatial-terminal { border-top: 1.5px solid rgba(0, 243, 255, 0.35); }
+.about-spatial-card--purple .about-spatial-terminal { border-top: 1.5px solid rgba(188, 19, 254, 0.35); }
+.about-spatial-card--green  .about-spatial-terminal { border-top: 1.5px solid rgba(0, 255, 136, 0.3); }
 
-.terminal--green {
-  border-top-color: #00ff88;
-}
-
-/* Fake window-chrome header bar */
-.terminal-header {
+.about-spatial-terminal-header {
   font-family: var(--font-code);
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
-  opacity: 0.6;
-  margin-bottom: 18px;
+  opacity: 0.5;
+  margin-bottom: 14px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
-.terminal-dot {
+.about-spatial-terminal-dot {
   display: inline-block;
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* ── Tech pills (used inside terminal box) ── */
-.tech-stack-wrapper {
+.about-spatial-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 0;
+  gap: 7px;
 }
 
-.tech-badge-pill {
+/* ── Tech badge pills ─────────────────────────────────────────────────────── */
+
+.about-spatial-badge {
   font-family: var(--font-code);
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 6px 14px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 5px 12px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50px;
-  color: var(--text-muted);
-  transition: all 0.3s ease;
-  cursor: default;
-  position: relative;
-  overflow: hidden;
+  color: rgba(255, 255, 255, 0.4);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
 }
 
-/* Front card pills illuminate; mid/back stay dim */
-.about-layer-card.is-front .tech-badge-pill {
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.85);
-  border-color: rgba(255, 255, 255, 0.2);
+.about-spatial-card--cyan.is-active .about-spatial-badge {
+  color: rgba(0, 243, 255, 0.75);
+  border-color: rgba(0, 243, 255, 0.22);
+  background: rgba(0, 243, 255, 0.04);
 }
 
-.about-layer-card.is-front.card--cyan .tech-badge-pill {
-  border-color: rgba(0, 243, 255, 0.4);
-  color: var(--accent-cyan);
+.about-spatial-card--purple.is-active .about-spatial-badge {
+  color: rgba(188, 19, 254, 0.75);
+  border-color: rgba(188, 19, 254, 0.22);
+  background: rgba(188, 19, 254, 0.04);
 }
 
-.about-layer-card.is-front.card--purple .tech-badge-pill {
-  border-color: rgba(188, 19, 254, 0.4);
-  color: var(--accent-purple);
+.about-spatial-card--green.is-active .about-spatial-badge {
+  color: rgba(0, 255, 136, 0.75);
+  border-color: rgba(0, 255, 136, 0.2);
+  background: rgba(0, 255, 136, 0.04);
 }
 
-.about-layer-card.is-front.card--green .tech-badge-pill {
-  border-color: rgba(0, 255, 136, 0.4);
-  color: #00ff88;
+.about-spatial-badge.highlight {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.75);
 }
 
-/* Pill icons inherit the pill text colour */
-.tech-badge-pill ion-icon {
-  font-size: 0.85rem;
+.about-spatial-badge ion-icon {
+  font-size: 0.8rem;
   flex-shrink: 0;
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
-.tech-badge-pill.highlight {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.25);
-}
+/* ── Mobile fallback — flat vertical layout, no 3D ───────────────────────── */
 
-/* ── Mobile: flat column, no 3D stacking ── */
-@media (max-width: 768px) {
-
-  /* ── 3D stack preserved on mobile — only internal layout adapts ── */
-  .about-card-stack {
-    height: 600px;
-    /* fixed height gives the 3D stack room */
-    perspective: 1200px;
-    /* keep depth illusion */
-    display: block;
-    /* position:absolute children need block */
+@media (max-width: 968px) {
+  .about-spatial-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+    padding: 60px 5% 80px;
+    min-height: auto;
   }
 
-  /* .about-layer-card keeps position:absolute + all 3D resting/fly
-             transforms from the base rules — nothing overridden here.        */
+  .about-spatial-heading {
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
 
-  .stack-drag-hint {
+  .about-spatial-label { flex: none; }
+  .about-spatial-cue   { display: none; }
+
+  /* ── About cards: horizontal swipe rail on mobile ── */
+  .about-cards-wrapper {
+    /* Horizontal scroll container */
+    flex-direction: row !important;
+    perspective: none;
+    gap: 16px;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    /* Padding so first/last cards peek nicely */
+    padding: 8px 20px 24px;
+    /* Negative margin to extend to edges past section padding */
+    margin-left: -5%;
+    margin-right: -5%;
+    width: calc(100% + 10%);
+    /* Hide scrollbar */
+    scrollbar-width: none;
+  }
+  .about-cards-wrapper::-webkit-scrollbar {
     display: none;
   }
 
-  /* Internal grid → single column to fit narrow screens */
-  .card-content-grid {
-    display: flex;
-    flex-direction: column;
-    padding: 25px 20px;
-    gap: 20px;
-    justify-content: center;
+  /* Mobile/Tablet: all cards flat, everything visible, fixed width for swipe */
+  .about-spatial-card {
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    min-height: 360px;
+    /* Fixed width so cards peek on the sides */
+    flex: 0 0 78vw !important;
+    width: 78vw !important;
+    scroll-snap-align: center;
+    transition: box-shadow 0.3s ease;
   }
 
-  /* Watermark scaled down so it doesn't bleed off narrow cards */
-  .card-watermark {
-    font-size: 100px;
-    bottom: 10px;
-    right: 10px;
+  .about-spatial-card.is-active {
+    transform: translateY(0) !important;
   }
 
-  .card-desc {
-    max-width: 100%;
+  .about-cards-wrapper.has-hover .about-spatial-card:not(.is-active) {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    filter: none !important;
   }
+
+  .about-spatial-card-desc,
+  .about-spatial-terminal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .about-spatial-watermark {
+    opacity: 1 !important;
+    font-size: 80px;
+    bottom: -5px;
+    right: 5px;
+  }
+
+  .about-spatial-card-spotlight { display: none; }
 }
+
 
 .skill-bar-container {
   margin-top: 20px;
@@ -1436,17 +1450,64 @@ h3 {
   }
 
   .process-item-text {
-    font-size: clamp(1.6rem, 5vw, 2.8rem) !important;
+    font-size: clamp(1.8rem, 5vw, 3rem) !important;
+  }
+  
+  .process-item-container {
+    padding: 20px 0;
+  }
+
+  .process-item-pop-badge {
+    top: -50px;
+    right: 0;
+  }
+
+  /* Contact overrides */
+  .contact-wrapper {
+    flex-direction: column;
+    gap: 32px;
+  }
+  .contact-glass-card {
+    padding: 28px 24px;
+  }
+
+  /* Footer overrides */
+  .footer-content {
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+  .footer-nav ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 20px;
+  }
+  .footer-socials {
+    justify-content: center;
   }
 }
 
 @media (max-width: 768px) {
+  .process-section-container {
+    padding: 60px 5% 80px;
+  }
+
   .process-item-text {
-    font-size: clamp(1.3rem, 6.5vw, 2rem) !important;
+    font-size: clamp(1.5rem, 7vw, 2.5rem) !important;
   }
 
   .process-item-num {
-    font-size: 0.85rem !important;
+    font-size: 0.75rem !important;
+    width: 36px;
+  }
+
+  .process-hover-hint,
+  .process-item-pop-badge {
+    display: none !important;
+  }
+
+  .process-item-trigger {
+    padding: 16px 0;
   }
 }
 
@@ -1617,6 +1678,11 @@ h3 {
   50% { opacity: 0; }
 }
 
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.35; transform: none; }
+  50%       { opacity: 0.65; transform: none; }
+}
+
 /* Fade hint out once user has hovered at least one item */
 .process-section-container.hint-dismissed .process-hover-hint {
   opacity: 0;
@@ -1646,6 +1712,7 @@ h3 {
 }
 
 /* Interactive Info Card - Clean Glassmorphism */
+
 .interactive-info-card {
   position: relative;
   width: 100%;
@@ -3222,7 +3289,6 @@ a.contact-info-row:hover .contact-info-icon {
     /* Rapat supaya teks panjang muat satu baris */
     margin-top: 15px;
   }
-
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3806,6 +3872,13 @@ a.contact-info-row:hover .contact-info-icon {
   transform: translateX(32px);
   will-change: transform, opacity;
 }
+
+/* Mobile-only Career Pathway elements — hidden by default (shown only in @media ≤ 968px) */
+.cv-mobile-sticky-header,
+.cv-mobile-cards-rail {
+  display: none;
+}
+
 
 /* ── Card stack container ─────────────────────────────────────────────────── */
 /* Cards are positioned absolute inside this; size must match ~4 × card width */
@@ -4591,34 +4664,244 @@ a.contact-info-row:hover .contact-info-icon {
    ═══════════════════════════════════════════════════════════ */
 
 @media (max-width: 968px) {
+  /* ── Hide Creative Playground on mobile ── */
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  /* ── Horizon container: auto height, full bleed background ── */
   .horizon-container {
     height: auto !important;
+    min-height: auto !important;
     overflow: visible !important;
+    /* Pixel stars background still fills via position:absolute;inset:0 */
   }
 
   .horizon-wrapper {
+    flex-direction: column !important;
     width: 100% !important;
     height: auto !important;
-    flex-direction: column !important;
     transform: none !important;
   }
 
   .horizon-slide {
     width: 100% !important;
     height: auto !important;
-    min-height: 80vh !important;
-    padding: 80px 24px !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    min-height: unset !important;
+    padding: 0 !important;
+    border-bottom: none;
+    overflow: visible !important;
+    /* No 3D transforms from GSAP */
+    transform: none !important;
+    rotationY: 0 !important;
   }
 
-  .lab-grid-layout {
-    grid-template-columns: 100%;
-    gap: 40px;
+  /* ── Career Pathway mobile layout ── */
+
+  /* The slide itself becomes normal document flow */
+  .slide--cv {
+    display: block !important;
+    position: relative;
+    padding: 0 0 48px !important;   /* bottom breathing room */
+    background: transparent;
+    transform: none !important;
   }
 
-  .glitch-cards-wrapper {
+  /* Sticky header wrapper — sits near the top of the section */
+  .cv-mobile-sticky-header {
+    position: relative;          /* NOT sticky on mobile — just flows naturally */
+    top: 0;
+    z-index: 10;
+    background: rgba(4, 4, 15, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 56px 20px 16px;     /* top: push down from nav bar */
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .cv-mobile-sticky-header .slide-badge {
+    font-size: 0.65rem;
+    margin-bottom: 6px;
+  }
+
+  .cv-mobile-sticky-header .slide-title {
+    font-size: clamp(1.6rem, 8vw, 2.6rem) !important;
+    line-height: 1.05;
+    margin-bottom: 6px;
+  }
+
+  .cv-mobile-sticky-header .slide-description {
+    font-size: 0.72rem !important;
+    color: var(--text-muted);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Horizontal swipe cards rail */
+  .cv-mobile-cards-rail {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    /* Push cards up slightly so they overlap with the header area */
+    padding: 16px 20px 40px;
+    scrollbar-width: none;
+  }
+  .cv-mobile-cards-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cv-mobile-cards-rail .cv-mobile-card {
+    flex: 0 0 80vw;
+    scroll-snap-align: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    /* Enough height to show all content without clipping */
+    min-height: 260px;
+  }
+
+  .cv-mobile-card-glow {
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .cv-mobile-card-year {
+    font-family: var(--font-code);
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 6px;
+  }
+
+  .cv-mobile-card-badge {
+    display: inline-block;
+    font-family: var(--font-code);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 14px;
+  }
+
+  .cv-mobile-card-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.15), transparent);
+    margin-bottom: 14px;
+  }
+
+  .cv-mobile-card-role {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .cv-mobile-card-institution {
+    font-family: var(--font-code);
+    font-size: 0.7rem;
+    color: var(--accent-cyan);
+    margin: 0 0 12px;
+  }
+
+  .cv-mobile-card-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* CV download card at the end of the rail */
+  .cv-mobile-download-card {
+    flex: 0 0 68vw;
+    scroll-snap-align: center;
+    background: rgba(255,255,255,0.015);
+    border: 1px dashed rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
     flex-direction: column;
-    gap: 30px;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  /* Hide desktop timeline stuff on mobile */
+  .cv-timeline-area,
+  .cv-scroll-hint {
+    display: none !important;
+  }
+
+  /* ── KEY FIX: hide the desktop .horizon-slide-content on mobile ── */
+  /* This prevents the duplicate "CAREER PATHWAY" header from showing */
+  .slide--cv .horizon-slide-content {
+    display: none !important;
+  }
+
+  /* ── KEY FIX: reset 3D transforms that cause tilting ── */
+  /* GSAP applies rotationY on desktop; on mobile we force flat */
+  .horizon-slide,
+  .slide--cv {
+    transform: none !important;
+    rotationY: 0 !important;
+  }
+
+  /* Show mobile-only elements */
+  .cv-mobile-sticky-header,
+  .cv-mobile-cards-rail {
+    display: block;
+  }
+  .cv-mobile-cards-rail {
+    display: flex;
+  }
+
+  /* ── Swipe hint for Career Pathway cards ── */
+  .cv-mobile-cards-rail::before {
+    content: "← geser untuk lihat riwayat →";
+    display: block;
+    flex: 0 0 100%;
+    order: -1;
+    font-family: var(--font-code);
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    letter-spacing: 0.1em;
+    padding: 0 20px 4px;
+    margin-bottom: -8px;
+    animation: hint-pulse 2.5s ease-in-out infinite;
+  }
+
+  /* ── Swipe hint for About cards ── */
+  .about-cards-wrapper::before {
+    content: "← swipe to explore →";
+    display: block;
+    flex: 0 0 100%;
+    order: -1;
+    font-family: var(--font-code);
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    letter-spacing: 0.1em;
+    padding: 0 20px 4px;
+    animation: hint-pulse 2.5s ease-in-out infinite;
   }
 
   /* 3D Projects mobile overrides */
@@ -4626,6 +4909,30 @@ a.contact-info-row:hover .contact-info-icon {
     height: 320px;
     margin-top: 10px;
     touch-action: pan-y !important;
+  }
+
+  /* Projects overrides */
+  .project-slider .swiper-slide {
+    width: 280px !important;
+  }
+  .project-card {
+    height: 340px;
+  }
+  .project-title {
+    font-size: 1rem;
+  }
+
+  /* Achievements overrides */
+  .achievements-marquee-wrapper {
+    padding: 20px 0;
+  }
+  .marquee-card {
+    width: 220px;
+    min-width: 220px;
+    padding: 16px 18px;
+  }
+  .interactive-info-grid {
+    grid-template-columns: 1fr;
   }
 
   .project-detail-modal {
@@ -4816,6 +5123,137 @@ a.contact-info-row:hover .contact-info-icon {
    ════════════════════════════════ */
 @media (max-width: 768px) {
 
+  /* ── ABOUT SECTION MOBILE ── */
+  .about-spatial-section {
+    padding: 60px 5% 70px;
+    gap: 28px;
+  }
+  .about-spatial-card {
+    min-height: auto;
+    padding-bottom: 20px;
+  }
+  .about-spatial-heading {
+    font-size: clamp(1.8rem, 8vw, 2.6rem);
+  }
+  .about-spatial-badges {
+    gap: 6px;
+  }
+  .about-spatial-badge {
+    font-size: 0.6rem;
+    padding: 4px 9px;
+  }
+
+  /* ── CREATIVE PLAYGROUND & CAREER PATHWAY MOBILE ── */
+  .slide--kinetic {
+    display: none !important;
+  }
+  .horizon-slide {
+    min-height: 70vh !important;
+    padding: 60px 5% !important;
+  }
+  .kinetic-hero-title {
+    font-size: clamp(1.6rem, 9vw, 3.5rem) !important;
+  }
+  .glitch-card {
+    padding: 20px 16px;
+  }
+
+  /* ── PROJECTS MOBILE ── */
+  .project-slider .swiper-slide {
+    width: calc(100vw - 48px) !important;
+    max-width: 300px !important;
+  }
+  .project-card {
+    height: 300px;
+    border-radius: 14px;
+  }
+  .project-float-wrapper {
+    animation: none !important;
+  }
+  .btn-quick-view {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .modal-content-card {
+    border-radius: 16px;
+    max-height: 90vh;
+  }
+  .modal-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .modal-image-wrap {
+    height: 180px;
+    min-height: 180px;
+  }
+  .modal-info {
+    padding: 20px 16px 24px;
+  }
+  .modal-close-btn {
+    top: 10px;
+    right: 10px;
+  }
+
+  /* ── ACHIEVEMENTS MOBILE ── */
+  .achievements-marquee-wrapper {
+    overflow: hidden;
+  }
+  .marquee-track {
+    touch-action: pan-y;
+  }
+  .marquee-card {
+    width: 180px;
+    min-width: 180px;
+    padding: 14px 14px;
+    border-radius: 12px;
+  }
+  .marquee-card h3,
+  .marquee-card-title {
+    font-size: 0.85rem;
+  }
+  .achievement-card {
+    padding: 20px 16px;
+  }
+
+  /* ── CONTACT MOBILE ── */
+  .contact-wrapper {
+    flex-direction: column;
+    gap: 24px;
+    padding: 0;
+  }
+  .contact-glass-card {
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+  .hud-form {
+    gap: 16px;
+  }
+  .hud-input-group input,
+  .hud-input-group textarea {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+  }
+  .hud-input-group--textarea textarea {
+    min-height: 100px;
+  }
+  .contact-info-row {
+    gap: 10px;
+  }
+  .contact-info-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+  .contact-info-text {
+    font-size: 0.82rem;
+  }
+  .hud-corner {
+    display: none;
+  }
+  .hud-divider {
+    margin: 20px 0;
+  }
+
   /* ── NAVBAR ── */
   .navbar {
     top: 12px;
@@ -4926,7 +5364,13 @@ a.contact-info-row:hover .contact-info-icon {
 
   .section-title {
     font-size: clamp(1.7rem, 5.5vw, 2.4rem);
-    word-break: break-word;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+  
+  .ach-marquee-section .section-title {
+    white-space: nowrap;
+    font-size: clamp(1.6rem, 7vw, 2rem);
   }
 
   .container {
@@ -4938,48 +5382,7 @@ a.contact-info-row:hover .contact-info-icon {
     display: none !important;
   }
 
-  /* ── ABOUT — Card Stack ── */
-  .about-card-stack {
-    height: 500px;
-    perspective: 1000px;
-  }
-
-  .card-content-grid {
-    grid-template-columns: 1fr;
-    padding: 24px 20px;
-    gap: 20px;
-    align-content: center;
-  }
-
-  .card-col-tech {
-    height: auto;
-  }
-
-  .card-title {
-    font-size: clamp(1.4rem, 5vw, 2rem);
-  }
-
-  .card-watermark {
-    font-size: 90px;
-    bottom: 8px;
-    right: 8px;
-  }
-
-  .card-desc {
-    font-size: 0.82rem;
-    max-width: 100%;
-  }
-
-  .tech-badge-pill {
-    font-size: 0.68rem;
-    padding: 5px 12px;
-  }
-
-  /* Stack drag hint — show but smaller */
-  .stack-drag-hint {
-    font-size: 0.58rem;
-    gap: 6px;
-  }
+  /* ── ABOUT — Spatial Hologram (responsive handled by its own @media block) ── */
 
   /* ── WORKFLOW KINETIC TYPOGRAPHY ── */
   .workflow-text-item {
@@ -5079,6 +5482,9 @@ a.contact-info-row:hover .contact-info-icon {
   }
 
   /* ── FOOTER ── */
+  .footer-grid-bg {
+    opacity: 0.03;
+  }
   .mega-link {
     font-size: 14vw;
     margin-bottom: 32px;
@@ -5089,14 +5495,25 @@ a.contact-info-row:hover .contact-info-icon {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 20px;
-    padding-top: 28px;
+    gap: 16px;
+    padding: 20px 5%;
   }
 
-  .footer-nav ul,
+  .footer-nav ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 16px;
+  }
+
   .footer-socials {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 12px;
+  }
+
+  .footer-link {
+    font-size: 0.8rem;
   }
 
   .time-display {
@@ -5105,7 +5522,7 @@ a.contact-info-row:hover .contact-info-icon {
   }
 
   .mega-footer {
-    padding: 60px 0 calc(20px + var(--safe-bottom));
+    padding: 40px 5% 30px;
     margin-top: 60px;
   }
 
@@ -5235,6 +5652,85 @@ a.contact-info-row:hover .contact-info-icon {
    ════════════════════════════════ */
 @media (max-width: 480px) {
 
+  /* ── ABOUT SECTION SMALL MOBILE ── */
+  .about-cards-wrapper {
+    gap: 12px;
+    padding: 8px 16px 24px;
+  }
+  .about-spatial-card {
+    flex: 0 0 85vw !important;
+    width: 85vw !important;
+    min-height: 320px;
+  }
+  .about-spatial-card--cyan,
+  .about-spatial-card--purple,
+  .about-spatial-card--green {
+    margin-top: 2px;
+  }
+  .about-spatial-badge.highlight {
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  /* ── PROCESS SECTION SMALL MOBILE ── */
+  .process-item-text {
+    font-size: clamp(1.3rem, 8.5vw, 2rem) !important;
+  }
+  .process-item-num {
+    display: none !important;
+  }
+
+  /* ── PROJECTS SMALL MOBILE ── */
+  .project-slider .swiper-slide {
+    width: calc(100vw - 32px) !important;
+  }
+  .project-card {
+    height: 260px;
+  }
+  .project-title {
+    font-size: 0.9rem;
+  }
+
+  /* ── ACHIEVEMENTS SMALL MOBILE ── */
+  .marquee-card {
+    width: 155px;
+    min-width: 155px;
+    padding: 12px;
+  }
+  .marquee-card-icon ion-icon {
+    font-size: 1.2rem;
+  }
+
+  /* ── CONTACT SMALL MOBILE ── */
+  .contact-glass-card {
+    padding: 16px 14px;
+  }
+  .hud-form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .hud-form-tag,
+  .hud-form-tag-right {
+    font-size: 0.55rem;
+  }
+  .hud-form button[type="submit"] {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── FOOTER SMALL MOBILE ── */
+  .footer-nav ul {
+    gap: 8px 12px;
+  }
+  .footer-link {
+    font-size: 0.75rem;
+  }
+  .footer-bottom p,
+  .copyright,
+  .time-display {
+    font-size: 0.65rem;
+  }
+
   /* Navbar */
   .navbar {
     top: 8px;
@@ -5264,33 +5760,17 @@ a.contact-info-row:hover .contact-info-icon {
   .section-title {
     font-size: clamp(1.5rem, 7vw, 2rem);
   }
+  
+  .ach-marquee-section .section-title {
+    white-space: nowrap;
+    font-size: clamp(1.4rem, 8vw, 1.8rem);
+  }
 
   .container {
     padding: 0 16px;
   }
 
-  /* About stack — tighter on very small screens */
-  .about-card-stack {
-    height: 440px;
-  }
-
-  .card-content-grid {
-    padding: 18px 16px;
-    gap: 16px;
-  }
-
-  .card-title {
-    font-size: clamp(1.2rem, 5.5vw, 1.6rem);
-  }
-
-  .card-icon-wrap {
-    width: 44px;
-    height: 44px;
-  }
-
-  .card-watermark {
-    font-size: 70px;
-  }
+  /* About stack — spatial section handles responsiveness via its own @media block */
 
   /* Workflow */
   .workflow-text-item {
@@ -5953,41 +6433,40 @@ html[data-theme="light"] .scroll-indicator {
   color: #8a6ab0 !important;
 }
 
-/* About Section cards stack */
-html[data-theme="light"] .about-layer-card {
-  background: rgba(255, 255, 255, 0.88) !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+/* About Section — Spatial Hologram (light mode) */
+html[data-theme="light"] .about-spatial-card {
+  background: rgba(250, 250, 252, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
 }
-html[data-theme="light"] .card-title {
-  color: #2c2c2c !important;
+html[data-theme="light"] .about-spatial-card-title {
+  color: #1a1a2e !important;
 }
-html[data-theme="light"] .card-desc {
-  color: #555555 !important;
+html[data-theme="light"] .about-spatial-card-desc {
+  color: #444 !important;
 }
-html[data-theme="light"] .card-eyebrow {
-  color: rgba(0, 0, 0, 0.5) !important;
+html[data-theme="light"] .about-spatial-eyebrow-card {
+  color: rgba(0, 0, 0, 0.45) !important;
 }
-html[data-theme="light"] .card-watermark {
-  color: rgba(0, 0, 0, 0.02) !important;
+html[data-theme="light"] .about-spatial-watermark {
+  -webkit-text-stroke-color: rgba(0, 0, 0, 0.04) !important;
 }
-html[data-theme="light"] .tech-terminal-box {
+html[data-theme="light"] .about-spatial-terminal {
   background: rgba(0, 0, 0, 0.03) !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
 }
-html[data-theme="light"] .tech-badge-pill {
+html[data-theme="light"] .about-spatial-badge {
   background: rgba(0, 0, 0, 0.04) !important;
   color: #2c2c2c !important;
   border-color: rgba(0, 0, 0, 0.06) !important;
 }
-html[data-theme="light"] .tech-badge-pill.highlight {
+html[data-theme="light"] .about-spatial-badge.highlight {
   background: rgba(138, 106, 176, 0.15) !important;
   color: #8a6ab0 !important;
   border-color: rgba(138, 106, 176, 0.3) !important;
 }
-html[data-theme="light"] .terminal-header {
-  color: rgba(0, 0, 0, 0.4) !important;
-  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+html[data-theme="light"] .about-spatial-terminal-header {
+  color: rgba(0, 0, 0, 0.35) !important;
 }
 
 /* Process Dashboard & physics lab */
@@ -6373,8 +6852,8 @@ html[data-theme="light"] .hud-form-tag-right {
 }
 
 /* ── DARK MODE BORDER SOFTENING (PERGELAP AGAR TIDAK TERLALU TERANG) ── */
-.about-layer-card {
-  border-color: rgba(255, 255, 255, 0.05); /* softened from 0.07 */
+.about-spatial-card {
+  border-color: rgba(255, 255, 255, 0.05); /* dark mode softened */
 }
 .lab-terminal {
   border-color: rgba(255, 255, 255, 0.05); /* softened from 0.06 */

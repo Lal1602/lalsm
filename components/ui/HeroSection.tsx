@@ -13,7 +13,7 @@ export default function HeroSection() {
           {/* Image Side */}
           <div className="hero-image-container">
             <div className="image-blob">
-              <Image src="/me7.jpeg" alt="Bilal Profile" width={350} height={350} priority />
+              <Image src="/mee.jpeg" alt="Bilal Profile" width={350} height={350} priority />
             </div>
             <div className="stats-badge">
               {/* @ts-ignore */}
