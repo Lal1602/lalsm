@@ -881,14 +881,18 @@ h3 {
 /* ── About Spatial Section ────────────────────────────────────────────────── */
 
 .about-spatial-section {
+  padding: 80px 0 100px;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-container-inner {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 40px;
-  padding: 80px 8% 100px;
-  min-height: 100vh;
-  position: relative;
-  overflow: hidden;
+  width: 100%;
 }
 
 /* ── Top heading label ───────────────────────────────────────────────────── */
@@ -916,6 +920,7 @@ h3 {
   font-weight: 900;
   line-height: 1.05;
   color: #fff;
+  margin-bottom: 0;
 }
 
 .about-spatial-heading em {
@@ -1242,6 +1247,77 @@ h3 {
   transform: translateY(0);
 }
 
+/* ── Hover Prompt (Idle State Big Text) ─────────────────────────────────── */
+
+.about-spatial-hover-prompt {
+  position: absolute;
+  top: 66%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.95;
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.5s ease;
+}
+
+.about-spatial-card.is-active .about-spatial-hover-prompt {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1.1) translateY(10px);
+  filter: blur(8px);
+}
+
+.hover-prompt-icon {
+  font-size: 3rem;
+  color: var(--text-muted);
+  opacity: 0.9;
+  animation: prompt-float 2s ease-in-out infinite;
+}
+
+.hover-prompt-main {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.05);
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.about-spatial-card--cyan .hover-prompt-main { -webkit-text-stroke: 1.5px rgba(0, 243, 255, 0.8); text-shadow: 0 0 25px rgba(0, 243, 255, 0.3); }
+.about-spatial-card--purple .hover-prompt-main { -webkit-text-stroke: 1.5px rgba(188, 19, 254, 0.8); text-shadow: 0 0 25px rgba(188, 19, 254, 0.3); }
+.about-spatial-card--green .hover-prompt-main { -webkit-text-stroke: 1.5px rgba(0, 255, 136, 0.8); text-shadow: 0 0 25px rgba(0, 255, 136, 0.3); }
+
+.about-spatial-card--cyan .hover-prompt-icon { color: var(--accent-cyan); filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.5)); }
+.about-spatial-card--purple .hover-prompt-icon { color: var(--accent-purple); filter: drop-shadow(0 0 8px rgba(188, 19, 254, 0.5)); }
+.about-spatial-card--green .hover-prompt-icon { color: #00ff88; filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.5)); }
+
+.hover-prompt-sub {
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+}
+
+.about-spatial-card--cyan .hover-prompt-sub { color: var(--accent-cyan); }
+.about-spatial-card--purple .hover-prompt-sub { color: var(--accent-purple); }
+.about-spatial-card--green .hover-prompt-sub { color: #00ff88; }
+
+@keyframes prompt-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@media (max-width: 968px) {
+  .about-spatial-hover-prompt {
+    display: none !important;
+  }
+}
+
 /* Top accent line per card */
 .about-spatial-card--cyan   .about-spatial-terminal { border-top: 1.5px solid rgba(0, 243, 255, 0.35); }
 .about-spatial-card--purple .about-spatial-terminal { border-top: 1.5px solid rgba(188, 19, 254, 0.35); }
@@ -1322,13 +1398,23 @@ h3 {
 
 /* ── Mobile fallback — flat vertical layout, no 3D ───────────────────────── */
 
+  /* Hidden by default on desktop, shown on mobile/tablet */
+  .scroll-indicator-arrow {
+    display: none;
+  }
+  
+  .about-cards-container {
+    width: 100%;
+  }
+
 @media (max-width: 968px) {
   .about-spatial-section {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 32px;
-    padding: 60px 5% 80px;
+    padding: 60px 0 80px;
     min-height: auto;
+  }
+  
+  .about-container-inner {
+    gap: 20px;
   }
 
   .about-spatial-heading {
@@ -1339,6 +1425,59 @@ h3 {
   .about-spatial-cue   { display: none; }
 
   /* ── About cards: horizontal swipe rail on mobile ── */
+  .about-cards-container {
+    position: relative;
+    width: 100%;
+    /* Add padding to account for arrows */
+    padding: 0;
+  }
+  
+  .scroll-indicator-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0, 243, 255, 0.05);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    color: var(--accent-cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 20;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+  }
+
+  .scroll-indicator-arrow.visible {
+    opacity: 1;
+    pointer-events: auto;
+    animation: neon-arrow-pulse 2s infinite;
+  }
+  
+  @keyframes neon-arrow-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+    50% { box-shadow: 0 0 20px rgba(0, 243, 255, 0.6); }
+  }
+
+  .scroll-indicator-arrow:active {
+    transform: translateY(-50%) scale(0.9);
+  }
+
+  .scroll-indicator-arrow.left {
+    left: -10px;
+  }
+
+  .scroll-indicator-arrow.right {
+    right: -10px;
+  }
+
   .about-cards-wrapper {
     /* Horizontal scroll container */
     flex-direction: row !important;
@@ -1350,11 +1489,7 @@ h3 {
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
     /* Padding so first/last cards peek nicely */
-    padding: 8px 20px 24px;
-    /* Negative margin to extend to edges past section padding */
-    margin-left: -5%;
-    margin-right: -5%;
-    width: calc(100% + 10%);
+    padding: 8px 5px 24px;
     /* Hide scrollbar */
     scrollbar-width: none;
   }
@@ -1496,12 +1631,23 @@ h3 {
     font-size: clamp(1.5rem, 7vw, 2.5rem) !important;
   }
 
+  /* Keep number visible on mobile — show it like desktop */
   .process-item-num {
     font-size: 0.75rem !important;
-    width: 36px;
+    display: inline-block !important;
+    opacity: 1 !important;
   }
 
-  .process-hover-hint,
+  /* Hide desktop-only hint, show mobile-only hint */
+  .process-hint-desktop {
+    display: none !important;
+  }
+
+  .process-hint-mobile {
+    display: inline-flex !important;
+  }
+
+  /* pop badge stays hidden on mobile */
   .process-item-pop-badge {
     display: none !important;
   }
@@ -1683,7 +1829,36 @@ h3 {
   50%       { opacity: 0.65; transform: none; }
 }
 
-/* Fade hint out once user has hovered at least one item */
+/* Desktop-only hint: hidden on mobile */
+.process-hint-desktop {
+  display: inline-flex;
+}
+
+/* Mobile-only hint: hidden on desktop by default */
+.process-hint-mobile {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: lowercase;
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: 48px;
+  margin-top: -8px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.hint-tap-icon {
+  font-size: 1rem;
+  color: rgba(0, 243, 255, 0.5);
+  display: flex;
+  align-items: center;
+  animation: hint-pulse 2s ease-in-out infinite;
+}
+
+/* Fade hint out once user has tapped at least one item */
 .process-section-container.hint-dismissed .process-hover-hint {
   opacity: 0;
   transition: opacity 0.6s ease;
@@ -4889,20 +5064,7 @@ a.contact-info-row:hover .contact-info-icon {
     animation: hint-pulse 2.5s ease-in-out infinite;
   }
 
-  /* ── Swipe hint for About cards ── */
-  .about-cards-wrapper::before {
-    content: "← swipe to explore →";
-    display: block;
-    flex: 0 0 100%;
-    order: -1;
-    font-family: var(--font-code);
-    font-size: 0.62rem;
-    color: rgba(255,255,255,0.35);
-    text-align: center;
-    letter-spacing: 0.1em;
-    padding: 0 20px 4px;
-    animation: hint-pulse 2.5s ease-in-out infinite;
-  }
+  /* Removed swipe hint for About cards to prevent scroll boundary bug */
 
   /* 3D Projects mobile overrides */
   .project-3d-canvas-wrap {

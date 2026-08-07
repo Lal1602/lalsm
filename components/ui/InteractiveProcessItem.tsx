@@ -14,8 +14,10 @@ interface InteractiveProcessItemProps {
   step: Step;
   index: number;
   isActive: boolean;
+  isMobile?: boolean;
   onHoverStart: () => void;
   onHoverEnd: () => void;
+  onClickItem?: () => void;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -179,148 +181,96 @@ const ANIMATIONS = [
     },
   },
   {
-    // ── 03 DEVELOPMENT ─ "Split-Flap Board" ─────────────────────────────────
-    // Character: Like an airport departures board — each letter flips on its own
-    // Y/X axis to reveal itself, alternating direction (odd flips down, even flips up).
-    // Purple neon glow builds char by char, then all pulse together once complete.
-    // Fully deterministic (index-based), no Math.random() anywhere.
+    // ── 03 DEVELOPMENT ─ "Circuit Board Compile" ─────────────────────────────
+    // Character: Like code being typed/compiled char-by-char with a glitch flicker.
+    // Fast enter: chars materialize from a digital scan line (Y-scale expand from 0),
+    // Then wobble/vibrate like electricity running through circuits.
+    // Leave: Calm — only color/glow fades away. Text stays visible. Clean.
     color: "#bc13fe",
     enter: (chars: HTMLElement[], numEl: HTMLElement | null) => {
       const tl = gsap.timeline({ overwrite: "auto" as const });
 
-      // Set starting state: each char is a "blank tile" — flipped away (rotationX 90 or -90)
-      chars.forEach((char, i) => {
-        const dir = i % 2 === 0 ? -90 : 90; // alternating flip direction
-        gsap.set(char, {
-          rotationX: dir,
-          scaleX: 0.7,
-          opacity: 0,
-          transformPerspective: 400,
-          transformOrigin: "50% 50%",
-          backgroundSize: "250% 100%",
-          backgroundPosition: "0% 50%",
-          textShadow: "none",
-        });
+      // Set initial state: squashed flat (scaleY 0), translucent, slightly offset
+      gsap.set(chars, {
+        scaleY: 0,
+        scaleX: 0.8,
+        y: 6,
+        opacity: 0.3,
+        transformPerspective: 500,
+        transformOrigin: "50% 100%",
+        textShadow: "none",
+        backgroundSize: "100% 0%",
+        backgroundPosition: "50% 100%",
       });
 
-      // Phase 1: Reveal — each char flips into view, staggered left-to-right
+      // 1. Fast compile-in: chars "scan" into existence from bottom, left-to-right
       tl.to(chars, {
-        rotationX: 0,
-        scaleX: 1,
+        scaleY: 1.25, // overshoot tall first (like a typewriter key spring)
+        scaleX: 0.9,
+        y: -4,
         opacity: 1,
-        textShadow: "0 0 18px rgba(188, 19, 254, 0.9), 0 0 4px rgba(188,19,254,0.5)",
-        duration: 0.28,
-        stagger: {
-          each: 0.055,
-          from: "start" as const,
-          ease: "power1.in",
-        },
-        ease: "back.out(1.8)",
-      });
+        duration: 0.14,
+        stagger: { each: 0.03, from: "start" as const },
+        ease: "power3.out",
+      })
+      // 2. Impact spark: neon flash as each char fully materializes
+      .to(chars, {
+        textShadow: "0 0 30px rgba(188, 19, 254, 1), 0 0 8px rgba(255, 255, 255, 0.7)",
+        backgroundSize: "100% 100%",
+        backgroundPosition: "50% 50%",
+        duration: 0.08,
+        stagger: { each: 0.03, from: "start" as const },
+      }, "<")
+      // 3. Elastic settle back to normal height
+      .to(chars, {
+        scaleY: 1,
+        scaleX: 1,
+        y: 0,
+        duration: 0.45,
+        stagger: { each: 0.03, from: "start" as const },
+        ease: "elastic.out(1.3, 0.4)",
+      }, "<0.08")
+      // 4. Electric vibration: rapid horizontal micro-shudder (like voltage through a wire)
+      .to(chars, {
+        x: 2,
+        duration: 0.05,
+        stagger: { each: 0.01, from: "center" as const, yoyo: true, repeat: 5 },
+        ease: "none",
+      }, "-=0.3")
+      .to(chars, { x: 0, duration: 0.06, ease: "power2.out" })
+      // 5. Steady glow at rest
+      .to(chars, {
+        textShadow: "0 0 10px rgba(188, 19, 254, 0.55)",
+        duration: 0.25,
+        ease: "power1.out",
+      }, "<");
 
-      // Phase 2: Overshoot bounce — chars pop slightly forward then settle
-      tl.to(
-        chars,
-        {
-          scaleX: 1.08,
-          scaleY: 1.1,
-          duration: 0.1,
-          stagger: { each: 0.04, from: "start" as const },
-          ease: "power2.out",
-        },
-        // Start as soon as first chars finish flipping
-        `+=${chars.length * 0.055 * 0.3}`
-      ).to(
-        chars,
-        {
-          scaleX: 1,
-          scaleY: 1,
-          duration: 0.22,
-          stagger: { each: 0.025, from: "start" as const },
-          ease: "elastic.out(1.4, 0.5)",
-        },
-        "-=0.06"
-      );
-
-      // Phase 3: Collective pulse — all chars breathe together once
-      tl.to(
-        chars,
-        {
-          textShadow:
-            "0 0 28px rgba(188, 19, 254, 1), 0 0 8px rgba(255,255,255,0.3), 0 0 50px rgba(188,19,254,0.35)",
-          duration: 0.18,
-          ease: "power2.in",
-        },
-        "-=0.05"
-      ).to(chars, {
-        textShadow: "0 0 8px rgba(188, 19, 254, 0.45)",
-        duration: 0.35,
-        ease: "power2.out",
-      });
-
-      // Number element: quick skewX snap + scale like a mechanical click
       if (numEl) {
-        gsap.set(numEl, { skewX: -15, scale: 0.85, opacity: 0.5 });
-        tl.to(
-          numEl,
-          {
-            skewX: 0,
-            scale: 1.1,
-            opacity: 1,
-            duration: 0.2,
-            ease: "back.out(3)",
-          },
-          0
-        ).to(numEl, { scale: 1, duration: 0.3, ease: "elastic.out(1.2, 0.45)" });
+        gsap.set(numEl, { skewX: -20, scale: 0.8, opacity: 0 });
+        tl.to(numEl, {
+          skewX: 0, scale: 1.1, opacity: 1,
+          duration: 0.18, ease: "back.out(2.5)",
+        }, 0.05)
+        .to(numEl, { scale: 1, duration: 0.3, ease: "elastic.out(1.2, 0.45)" });
       }
       return tl;
     },
     leave: (chars: HTMLElement[], numEl: HTMLElement | null) => {
+      // Exactly like Discovery/Design: only fade glow/color. Text stays visible.
       const tl = gsap.timeline({ overwrite: "auto" as const });
-
-      // Flip back out — reverse direction from how they came in
-      chars.forEach((char, i) => {
-        const dir = i % 2 === 0 ? 90 : -90; // mirror of enter
-        tl.to(
-          char,
-          {
-            rotationX: dir,
-            scaleX: 0.7,
-            opacity: 0,
-            textShadow: "none",
-            backgroundSize: "250% 0%",
-            backgroundPosition: "100% 50%",
-            duration: 0.18,
-            ease: "power2.in",
-          },
-          // Stagger from the end — like the board clearing from right to left
-          (chars.length - 1 - i) * 0.025
-        );
-      });
-
-      if (numEl) {
-        tl.to(
-          numEl,
-          { skewX: -8, scale: 0.9, opacity: 0.5, duration: 0.15, ease: "power2.in" },
-          0
-        );
-      }
-
-      // After all chars are flipped out, instantly reset to clean neutral state
-      // so the next enter() starts from the correct gsap.set() position
-      tl.set(chars, {
-        rotationX: 0,
-        scaleX: 1,
+      tl.to(chars, {
         scaleY: 1,
-        opacity: 1,
+        scaleX: 1,
+        y: 0,
+        x: 0,
         textShadow: "none",
-        backgroundSize: "250% 0%",
-        backgroundPosition: "100% 50%",
+        backgroundSize: "100% 0%",
+        backgroundPosition: "50% 100%",
+        duration: 0.3,
+        stagger: { each: 0.02, from: "end" as const },
+        ease: "power2.in",
       });
-      if (numEl) {
-        tl.set(numEl, { skewX: 0, scale: 1, opacity: 1 });
-      }
-
+      if (numEl) tl.to(numEl, { scale: 1, skewX: 0, opacity: 1, duration: 0.2, ease: "power2.out" }, 0);
       return tl;
     },
   },
@@ -422,8 +372,10 @@ export default function InteractiveProcessItem({
   step,
   index,
   isActive,
+  isMobile = false,
   onHoverStart,
   onHoverEnd,
+  onClickItem,
 }: InteractiveProcessItemProps) {
   const textRef = useRef<HTMLSpanElement>(null);
   const numRef = useRef<HTMLSpanElement>(null);
@@ -481,8 +433,12 @@ export default function InteractiveProcessItem({
       */}
       <span
         className="process-item-trigger-wrapper"
-        onMouseEnter={onHoverStart}
-        onMouseLeave={onHoverEnd}
+        data-process-index={index}
+        onMouseEnter={!isMobile ? onHoverStart : undefined}
+        onMouseLeave={!isMobile ? onHoverEnd : undefined}
+        onPointerEnter={!isMobile ? onHoverStart : undefined}
+        onPointerMove={!isMobile ? onHoverStart : undefined}
+        onClick={isMobile ? onClickItem : undefined}
         style={{
           display: "inline-flex",
           alignItems: "baseline",
@@ -492,6 +448,7 @@ export default function InteractiveProcessItem({
           borderRadius: "6px",
           userSelect: "none",
           whiteSpace: "nowrap",
+          WebkitTapHighlightColor: "transparent",
         }}
       >
         <span

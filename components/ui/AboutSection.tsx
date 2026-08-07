@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface TechItem {
   icon: string;
@@ -15,6 +15,7 @@ interface CardData {
   title: [string, string];
   desc: string;
   tech: TechItem[];
+  hoverPrompt: string;
 }
 
 const CARDS: CardData[] = [
@@ -35,6 +36,7 @@ const CARDS: CardData[] = [
       { icon: "cube-outline",       label: "Three.js",    highlight: true },
       { icon: "layers-outline",     label: "WebGL",       highlight: true },
     ],
+    hoverPrompt: "INITIALIZE",
   },
   {
     number: "02",
@@ -53,6 +55,7 @@ const CARDS: CardData[] = [
       { icon: "database-outline", label: "PostgreSQL" },
       { icon: "logo-github",      label: "Git"        },
     ],
+    hoverPrompt: "EXECUTE",
   },
   {
     number: "03",
@@ -69,10 +72,37 @@ const CARDS: CardData[] = [
       { icon: "game-controller-outline", label: "Phaser.js", highlight: true },
       { icon: "brush-outline",           label: "Canvas API"     },
     ],
+    hoverPrompt: "DEPLOY",
   },
 ];
 
 export default function AboutSection() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      // 5px buffer to account for sub-pixel rounding
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    // Check initial scroll state when component mounts and on resize
+    handleScroll();
+    window.addEventListener('resize', handleScroll);
+    return () => window.removeEventListener('resize', handleScroll);
+  }, []);
+
+  const scrollByAmount = (amount: number) => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="section about-spatial-section" id="about" aria-label="About Section">
       <div
@@ -83,21 +113,47 @@ export default function AboutSection() {
         ABOUT
       </div>
 
-      {/* ── Left heading ──────────────────────────────────────────────────── */}
-      <div className="about-spatial-label">
-        <p className="about-spatial-eyebrow">// ABOUT ME</p>
-        <h2 className="section-title about-spatial-heading" data-scroll>
-          What I <em>Build.</em>
-        </h2>
-        <div className="about-spatial-cue" aria-hidden="true">
-          <span className="about-spatial-cue-arrow" />
-          <span className="about-spatial-cue-text">hover to reveal</span>
+      <div className="container about-container-inner">
+        {/* ── Left heading ──────────────────────────────────────────────────── */}
+        <div className="about-spatial-label">
+          <p className="about-spatial-eyebrow">// ABOUT ME</p>
+          <h2 className="section-title about-spatial-heading" data-scroll>
+            What I <em>Build.</em>
+          </h2>
+          <div className="about-spatial-cue" aria-hidden="true">
+            <span className="about-spatial-cue-arrow" />
+            <span className="about-spatial-cue-text">hover to reveal</span>
+          </div>
         </div>
-      </div>
 
-      {/* ── Cards ─────────────────────────────────────────────────────────── */}
-      <div className="about-cards-wrapper" id="about-cards-wrapper">
-        {CARDS.map((card) => (
+        {/* ── Cards ─────────────────────────────────────────────────────────── */}
+        <div className="about-cards-container">
+          {/* Scroll Indicator Arrows */}
+          <div 
+            className={`scroll-indicator-arrow left ${canScrollLeft ? 'visible' : ''}`}
+            onClick={() => scrollByAmount(-300)}
+            aria-hidden="true"
+          >
+            {/* @ts-ignore */}
+            <ion-icon suppressHydrationWarning name="chevron-back-outline"></ion-icon>
+          </div>
+          
+          <div 
+            className={`scroll-indicator-arrow right ${canScrollRight ? 'visible' : ''}`}
+            onClick={() => scrollByAmount(300)}
+            aria-hidden="true"
+          >
+            {/* @ts-ignore */}
+            <ion-icon suppressHydrationWarning name="chevron-forward-outline"></ion-icon>
+          </div>
+
+          <div 
+            className="about-cards-wrapper" 
+            id="about-cards-wrapper"
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+          >
+            {CARDS.map((card) => (
           <article
             key={card.number}
             className={`about-spatial-card about-spatial-card--${card.accent}`}
@@ -114,6 +170,16 @@ export default function AboutSection() {
             {/* Watermark number */}
             <div className="about-spatial-watermark" aria-hidden="true">
               {card.number}
+            </div>
+
+            {/* Creative Hover Prompt (Visible when Idle) */}
+            <div className="about-spatial-hover-prompt" aria-hidden="true">
+              <div className="hover-prompt-icon">
+                {/* @ts-ignore */}
+                <ion-icon suppressHydrationWarning name="scan-outline"></ion-icon>
+              </div>
+              <div className="hover-prompt-main">HOVER ME</div>
+              <div className="hover-prompt-sub">// TO REVEAL CONTENT //</div>
             </div>
 
             {/* Card content */}
@@ -160,6 +226,8 @@ export default function AboutSection() {
             </div>
           </article>
         ))}
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -36,66 +36,70 @@ const STEPS = [
 ];
 
 export default function ProcessDashboard() {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [interactionDisabled, setInteractionDisabled] = useState<boolean>(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isDesktop, setIsDesktop] = useState<boolean>(false);
-  // Once user hovers any process item, quietly fade the hint away
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const [hintDismissed, setHintDismissed] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Check viewport width for responsive rendering (client-side only)
   useEffect(() => {
     function handleResize() {
-      setIsDesktop(window.innerWidth >= 1024);
+      const w = window.innerWidth;
+      setIsDesktop(w >= 1024);
+      setIsMobile(w < 768);
     }
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Performance-optimized Scroll-Based Debouncing to prevent chaotic ghost hovers
+  // Robust fix for "stationary mouse scroll" hover bug — desktop only
   useEffect(() => {
-    let lastScrollTop = window.scrollY;
-    let lastScrollTime = Date.now();
-    let debounceTimer: NodeJS.Timeout;
+    if (isMobile) return;
+    let lastX = 0;
+    let lastY = 0;
 
-    function handleScroll() {
-      const now = Date.now();
-      const currentScrollTop = window.scrollY;
-      
-      const deltaY = Math.abs(currentScrollTop - lastScrollTop);
-      const deltaTime = now - lastScrollTime;
-      const speed = deltaTime > 0 ? deltaY / deltaTime : 0;
-
-      lastScrollTop = currentScrollTop;
-      lastScrollTime = now;
-
-      // If scrolling velocity is high, temporarily suspend all hover interactions
-      if (speed > 0.4) {
-        setInteractionDisabled(true);
-      }
-
-      // Re-enable interactions after scrolling comes to a complete halt for 150ms
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        setInteractionDisabled(false);
-      }, 150);
+    function handleMouseMove(e: MouseEvent) {
+      lastX = e.clientX;
+      lastY = e.clientY;
     }
 
+    function handleScroll() {
+      if (lastX === 0 && lastY === 0) return;
+      const el = document.elementFromPoint(lastX, lastY);
+      if (el) {
+        const trigger = el.closest('[data-process-index]');
+        if (trigger) {
+          const idx = parseInt(trigger.getAttribute('data-process-index') || '0', 10);
+          setActiveIndex(idx);
+          setHintDismissed(true);
+        } else if (!el.closest('.process-list-wrapper')) {
+          setActiveIndex(null);
+        }
+      }
+    }
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("scroll", handleScroll);
-      clearTimeout(debounceTimer);
     };
-  }, []);
+  }, [isMobile]);
 
-  const activeStep = STEPS[activeIndex] || STEPS[0];
+  const handleItemClick = (idx: number) => {
+    // On mobile: toggle — clicking same item deactivates it
+    setActiveIndex(prev => prev === idx ? null : idx);
+    if (!hintDismissed) setHintDismissed(true);
+  };
+
+  const activeStep = activeIndex !== null ? STEPS[activeIndex] : null;
 
   return (
-    <section 
+    <section
       ref={containerRef}
       className={`section process-section-container${hintDismissed ? " hint-dismissed" : ""}`}
-      id="workflow" 
+      id="workflow"
       aria-label="Workflow Section"
     >
       <div className="parallax-text" style={{ top: "8%", left: "8%" }} data-speed="0.08">
@@ -105,20 +109,28 @@ export default function ProcessDashboard() {
       <div className="container">
         <h2 className="section-title" data-scroll>How I Work</h2>
 
-        {/* Subtle interaction hint — whisper-level, CSS-only, no layout disruption */}
-        <p className="process-hover-hint" aria-hidden="true">
+        {/* Desktop hint */}
+        <p className="process-hover-hint process-hint-desktop" aria-hidden="true">
           <span className="hint-cursor" />
           hover each phase to reveal
         </p>
 
-        <div className="process-grid">
-          {/* Dynamic Conduit overlay for desktop rendering */}
-          {isDesktop && <DynamicConduit activeIndex={activeIndex} />}
+        {/* Mobile hint */}
+        <p className="process-hover-hint process-hint-mobile" aria-hidden="true">
+          <span className="hint-tap-icon">
+            {/* @ts-ignore */}
+            <ion-icon suppressHydrationWarning name="finger-print-outline"></ion-icon>
+          </span>
+          tap a phase — unlock the sequence
+        </p>
 
-          {/* Process steps left column */}
-          <ol 
-            className={`process-list-wrapper ${interactionDisabled ? "scroll-disabled-interactions" : ""}`}
+        <div className="process-grid">
+          {isDesktop && activeIndex !== null && <DynamicConduit activeIndex={activeIndex} />}
+
+          <ol
+            className="process-list-wrapper"
             aria-label="Workflow steps"
+            onMouseLeave={() => !isMobile && setActiveIndex(null)}
           >
             {STEPS.map((step, idx) => (
               <InteractiveProcessItem
@@ -126,24 +138,22 @@ export default function ProcessDashboard() {
                 step={step}
                 index={idx}
                 isActive={activeIndex === idx}
+                isMobile={isMobile}
                 onHoverStart={() => {
-                  if (!interactionDisabled) {
+                  if (!isMobile) {
                     setActiveIndex(idx);
-                    // Dismiss hint on first interaction
                     if (!hintDismissed) setHintDismissed(true);
                   }
                 }}
-                onHoverEnd={() => {
-                  // Keep active step pinned to prevent visual jitter
-                }}
+                onHoverEnd={() => {}}
+                onClickItem={() => handleItemClick(idx)}
               />
             ))}
           </ol>
 
-          {/* Informational holographic card right column */}
-          <HolographicCard 
-            activeStep={activeStep} 
-            activeIndex={activeIndex} 
+          <HolographicCard
+            activeStep={activeStep}
+            activeIndex={activeIndex}
           />
         </div>
       </div>

@@ -12,8 +12,8 @@ interface Step {
 }
 
 interface HolographicCardProps {
-  activeStep: Step;
-  activeIndex: number;
+  activeStep: Step | null;
+  activeIndex: number | null;
 }
 
 export default function HolographicCard({ activeStep, activeIndex }: HolographicCardProps) {
@@ -30,7 +30,8 @@ export default function HolographicCard({ activeStep, activeIndex }: Holographic
     { rgb: "255, 80, 0", hex: "#ff5000", eyebrow: "PHASE 04 // LAUNCH & MONITOR" },    // Deployment (Orange)
   ];
 
-  const currentTheme = themes[activeIndex] || themes[0];
+  const isIdle = activeIndex === null || !activeStep;
+  const currentTheme = isIdle ? { rgb: "255, 255, 255", hex: "#ffffff", eyebrow: "STATUS // IDLE" } : themes[activeIndex];
 
   // GSAP Spring entrance timelines for card content
   useEffect(() => {
@@ -43,19 +44,21 @@ export default function HolographicCard({ activeStep, activeIndex }: Holographic
       { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.2)" }
     );
 
-    // Staggered text reveal
-    tl.fromTo(
-      [iconRef.current, titleRef.current, descRef.current],
-      { y: 10, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.4, stagger: 0.08, ease: "power2.out" },
-      "-=0.35"
-    );
-  }, [activeIndex]);
+    if (!isIdle) {
+      // Staggered text reveal
+      tl.fromTo(
+        [iconRef.current, titleRef.current, descRef.current],
+        { y: 10, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.08, ease: "power2.out" },
+        "-=0.35"
+      );
+    }
+  }, [activeIndex, isIdle]);
 
   return (
     <div 
       ref={cardRef}
-      className={`interactive-info-card accent-${activeIndex}`}
+      className={`interactive-info-card ${isIdle ? 'is-idle' : `accent-${activeIndex}`}`}
       id="interactive-info-card"
       style={{
         ["--card-theme-color" as any]: currentTheme.hex,
@@ -66,25 +69,42 @@ export default function HolographicCard({ activeStep, activeIndex }: Holographic
       <div className="card-ambient-glow" />
 
       {/* Relative container ensuring text sits beautifully */}
-      <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Card Header */}
-        <div className="card-header-area">
-          <span className="card-eyebrow-tech">{currentTheme.eyebrow}</span>
-          <div ref={iconRef} className="card-icon-container">
-            {/* @ts-ignore */}
-            <ion-icon suppressHydrationWarning name={activeStep.icon}></ion-icon>
+      <div style={{ position: "relative", zIndex: 1, height: "100%", width: "100%" }}>
+        {isIdle ? (
+          <div className="card-idle-prompt" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", textAlign: "center", gap: "16px", opacity: 0.8 }}>
+            <div style={{ fontSize: "3rem", color: "var(--text-muted)", opacity: 0.5, animation: "prompt-float 2s ease-in-out infinite" }}>
+              {/* @ts-ignore */}
+              <ion-icon suppressHydrationWarning name="bulb-outline"></ion-icon>
+            </div>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "2rem", fontWeight: 900, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.05)", WebkitTextStroke: "1px rgba(255,255,255,0.4)" }}>
+              HOVER A PHASE
+            </h2>
+            <p style={{ fontFamily: "var(--font-code)", fontSize: "0.75rem", letterSpacing: "0.2em", color: "var(--text-muted)" }}>
+              // TO DECRYPT WORKFLOW //
+            </p>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Card Header */}
+            <div className="card-header-area">
+              <span className="card-eyebrow-tech">{currentTheme.eyebrow}</span>
+              <div ref={iconRef} className="card-icon-container">
+                {/* @ts-ignore */}
+                <ion-icon suppressHydrationWarning name={activeStep.icon}></ion-icon>
+              </div>
+            </div>
 
-        {/* Card Typography */}
-        <h2 ref={titleRef} className="card-main-title">{activeStep.title}</h2>
-        <p ref={descRef} className="card-description-text">{activeStep.desc}</p>
+            {/* Card Typography */}
+            <h2 ref={titleRef} className="card-main-title">{activeStep.title}</h2>
+            <p ref={descRef} className="card-description-text">{activeStep.desc}</p>
 
-        {/* The Live Interactive Workflow Laboratory Visuals */}
-        <InfinityNodeDiagram 
-          activeIndex={activeIndex} 
-          hexColor={currentTheme.hex} 
-        />
+            {/* The Live Interactive Workflow Laboratory Visuals */}
+            <InfinityNodeDiagram 
+              activeIndex={activeIndex as number} 
+              hexColor={currentTheme.hex} 
+            />
+          </>
+        )}
       </div>
     </div>
   );
