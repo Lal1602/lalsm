@@ -5,3 +5,12 @@
     scroll-behavior: smooth;
   }
 }
+
+/* Ensure mobile scroll lock works fully on Safari/iOS and Android */
+@media (max-width: 768px) {
+  html:has(body[style*="overflow: hidden"]),
+  html:has(body[style*="overflow: hidden"]) body {
+    overflow: hidden !important;
+    /* touch-action: none causes issues with scrolling inside modal, overflow: hidden on html+body is standard */
+  }
+}

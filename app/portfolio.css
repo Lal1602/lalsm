@@ -1844,8 +1844,8 @@ h3 {
   letter-spacing: 0.15em;
   text-transform: lowercase;
   color: rgba(255, 255, 255, 0.25);
-  margin-bottom: 48px;
-  margin-top: -8px;
+  margin-bottom: 16px;
+  margin-top: -28px;
   user-select: none;
   pointer-events: none;
 }
@@ -1858,8 +1858,8 @@ h3 {
   animation: hint-pulse 2s ease-in-out infinite;
 }
 
-/* Fade hint out once user has tapped at least one item */
-.process-section-container.hint-dismissed .process-hover-hint {
+/* Fade hint out once user has interacted (desktop only) */
+.process-section-container.hint-dismissed .process-hint-desktop {
   opacity: 0;
   transition: opacity 0.6s ease;
 }
@@ -4868,7 +4868,6 @@ a.contact-info-row:hover .contact-info-icon {
     overflow: visible !important;
     /* No 3D transforms from GSAP */
     transform: none !important;
-    rotationY: 0 !important;
   }
 
   /* ── Career Pathway mobile layout ── */
@@ -4887,11 +4886,8 @@ a.contact-info-row:hover .contact-info-icon {
     position: relative;          /* NOT sticky on mobile — just flows naturally */
     top: 0;
     z-index: 10;
-    background: rgba(4, 4, 15, 0.82);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: transparent;
     padding: 56px 20px 16px;     /* top: push down from nav bar */
-    border-bottom: 1px solid rgba(255,255,255,0.07);
   }
 
   .cv-mobile-sticky-header .slide-badge {
@@ -4911,6 +4907,7 @@ a.contact-info-row:hover .contact-info-icon {
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -5036,7 +5033,6 @@ a.contact-info-row:hover .contact-info-icon {
   .horizon-slide,
   .slide--cv {
     transform: none !important;
-    rotationY: 0 !important;
   }
 
   /* Show mobile-only elements */
@@ -5048,23 +5044,7 @@ a.contact-info-row:hover .contact-info-icon {
     display: flex;
   }
 
-  /* ── Swipe hint for Career Pathway cards ── */
-  .cv-mobile-cards-rail::before {
-    content: "← geser untuk lihat riwayat →";
-    display: block;
-    flex: 0 0 100%;
-    order: -1;
-    font-family: var(--font-code);
-    font-size: 0.62rem;
-    color: rgba(255,255,255,0.35);
-    text-align: center;
-    letter-spacing: 0.1em;
-    padding: 0 20px 4px;
-    margin-bottom: -8px;
-    animation: hint-pulse 2.5s ease-in-out infinite;
-  }
-
-  /* Removed swipe hint for About cards to prevent scroll boundary bug */
+  /* Removed swipe hint text, using interactive arrows instead */
 
   /* 3D Projects mobile overrides */
   .project-3d-canvas-wrap {

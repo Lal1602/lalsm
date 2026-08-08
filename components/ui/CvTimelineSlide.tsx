@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import horizonScrollState from "@/lib/horizonScrollState";
 
@@ -95,6 +95,30 @@ export default function CvTimelineSlide() {
   const lineRef01  = useRef<HTMLDivElement>(null);
   const lineRef12  = useRef<HTMLDivElement>(null);
   const lineRef23  = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    handleScroll();
+    window.addEventListener('resize', handleScroll);
+    return () => window.removeEventListener('resize', handleScroll);
+  }, []);
+
+  const scrollByAmount = (amount: number) => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const slide = slideRef.current;
@@ -304,7 +328,27 @@ export default function CvTimelineSlide() {
         </p>
       </div>
 
-      <div className="cv-mobile-cards-rail">
+      <div style={{ position: "relative" }}>
+        {/* Scroll Indicator Arrows */}
+        <div 
+          className={`scroll-indicator-arrow left ${canScrollLeft ? 'visible' : ''}`}
+          onClick={() => scrollByAmount(-250)}
+          aria-hidden="true"
+        >
+          {/* @ts-ignore */}
+          <ion-icon suppressHydrationWarning name="chevron-back-outline"></ion-icon>
+        </div>
+        
+        <div 
+          className={`scroll-indicator-arrow right ${canScrollRight ? 'visible' : ''}`}
+          onClick={() => scrollByAmount(250)}
+          aria-hidden="true"
+        >
+          {/* @ts-ignore */}
+          <ion-icon suppressHydrationWarning name="chevron-forward-outline"></ion-icon>
+        </div>
+
+        <div className="cv-mobile-cards-rail" ref={scrollContainerRef} onScroll={handleScroll}>
         {TIMELINE_DATA.map((item, idx) => (
           <div className="cv-mobile-card" key={idx}>
             <div
@@ -342,6 +386,7 @@ export default function CvTimelineSlide() {
             Get Resume PDF
           </a>
         </div>
+      </div>
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════

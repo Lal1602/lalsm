@@ -54,15 +54,17 @@ export default function AiChatOverlay() {
     scrollToBottom();
   }, [messages, isOpen, isLoading]);
 
-  // Toggle body class for layout shifting (desktop content push)
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add("ai-chat-sidebar-open");
+      document.body.style.overflow = "hidden";
     } else {
       document.body.classList.remove("ai-chat-sidebar-open");
+      document.body.style.overflow = "";
     }
     return () => {
       document.body.classList.remove("ai-chat-sidebar-open");
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
