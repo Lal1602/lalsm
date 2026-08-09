@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useThemeStore } from "@/stores";
 
 interface EstimatorFeature {
   id: string;
@@ -23,6 +24,7 @@ export default function ProjectEstimatorSlide() {
   const [weeks, setWeeks] = useState(2);
   const [complexity, setComplexity] = useState("Low");
   const [costRating, setCostRating] = useState("$");
+  const themeType = useThemeStore((state) => state.theme.type);
 
   const toggleFeature = (id: string) => {
     setSelectedFeatures(prev =>
@@ -187,21 +189,21 @@ Let's connect and discuss the roadmap!`;
                 value={projectType}
                 onChange={(e) => setProjectType(e.target.value)}
                 style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: themeType === "light" ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.03)",
+                  border: themeType === "light" ? "1px solid rgba(0,0,0,0.1)" : "1px solid rgba(255,255,255,0.08)",
                   borderRadius: "8px",
                   padding: "12px",
-                  color: "white",
+                  color: themeType === "light" ? "#1a1a2e" : "white",
                   fontSize: "0.9rem",
                   fontFamily: "var(--font-body)",
                   outline: "none",
                   cursor: "pointer"
                 }}
               >
-                <option value="web-app" style={{ backgroundColor: "#0c0c14" }}>Modern Web Application</option>
-                <option value="mobile-app" style={{ backgroundColor: "#0c0c14" }}>Mobile Cross-Platform App</option>
-                <option value="3d-game" style={{ backgroundColor: "#0c0c14" }}>3D Interactive Web / Game</option>
-                <option value="e-commerce" style={{ backgroundColor: "#0c0c14" }}>E-Commerce Platform</option>
+                <option value="web-app" style={{ backgroundColor: themeType === "light" ? "#fff" : "#0c0c14" }}>Modern Web Application</option>
+                <option value="mobile-app" style={{ backgroundColor: themeType === "light" ? "#fff" : "#0c0c14" }}>Mobile Cross-Platform App</option>
+                <option value="3d-game" style={{ backgroundColor: themeType === "light" ? "#fff" : "#0c0c14" }}>3D Interactive Web / Game</option>
+                <option value="e-commerce" style={{ backgroundColor: themeType === "light" ? "#fff" : "#0c0c14" }}>E-Commerce Platform</option>
               </select>
             </div>
 
@@ -233,11 +235,15 @@ Let's connect and discuss the roadmap!`;
                       onClick={() => toggleFeature(feat.id)}
                       style={{
                         textAlign: "left",
-                        background: isChecked ? "rgba(188, 19, 254, 0.08)" : "rgba(255,255,255,0.02)",
-                        border: isChecked ? "1px solid rgba(188, 19, 254, 0.4)" : "1px solid rgba(255,255,255,0.06)",
+                        background: isChecked 
+                          ? (themeType === "light" ? "rgba(138, 106, 176, 0.15)" : "rgba(188, 19, 254, 0.08)") 
+                          : (themeType === "light" ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.02)"),
+                        border: isChecked 
+                          ? (themeType === "light" ? "1px solid rgba(138, 106, 176, 0.4)" : "1px solid rgba(188, 19, 254, 0.4)") 
+                          : (themeType === "light" ? "1px solid rgba(0,0,0,0.08)" : "1px solid rgba(255,255,255,0.06)"),
                         borderRadius: "8px",
                         padding: "12px",
-                        color: isChecked ? "white" : "var(--text-muted)",
+                        color: isChecked ? (themeType === "light" ? "#8a6ab0" : "white") : "var(--text-muted)",
                         fontSize: "0.85rem",
                         fontFamily: "var(--font-body)",
                         fontWeight: 600,
@@ -276,22 +282,22 @@ Let's connect and discuss the roadmap!`;
             className="glass-card"
             style={{
               flex: "0.8 1 0px",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              background: "rgba(12, 12, 20, 0.4)",
+              border: themeType === "light" ? "1px solid rgba(0, 0, 0, 0.1)" : "1px solid rgba(255, 255, 255, 0.08)",
+              background: themeType === "light" ? "rgba(255, 255, 255, 0.85)" : "rgba(12, 12, 20, 0.4)",
               borderRadius: "16px",
               padding: "24px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
               position: "relative",
-              boxShadow: "inset 0 0 20px rgba(255,255,255,0.02)"
+              boxShadow: themeType === "light" ? "0 10px 30px rgba(0,0,0,0.05)" : "inset 0 0 20px rgba(255,255,255,0.02)"
             }}
           >
             <div>
               <p style={{ fontFamily: "var(--font-code)", fontSize: "0.7rem", color: "var(--accent-purple)", margin: 0 }}>
                 // SYS.PLANNER_CALCULATION
               </p>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, color: "white", marginTop: "12px", marginBottom: "20px" }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, color: themeType === "light" ? "#1a1a2e" : "white", marginTop: "12px", marginBottom: "20px" }}>
                 SCOPE SUMMARY
               </h3>
 

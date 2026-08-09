@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { useThemeStore } from "@/stores";
 
 interface DynamicConduitProps {
   activeIndex: number;
@@ -21,12 +22,10 @@ export default function DynamicConduit({ activeIndex }: DynamicConduitProps) {
   } | null>(null);
 
   // Curated theme colors for each step (architectural accent tones)
-  const themeColors = [
-    "#00f3ff", // Discovery (Cyan)
-    "#ffd700", // Design (Gold)
-    "#bc13fe", // Development (Purple)
-    "#ff5000", // Deployment (Orange)
-  ];
+  const themeType = useThemeStore((state) => state.theme.type);
+  const themeColors = themeType === "light" 
+    ? ["#007acc", "#d97706", "#b58900", "#c2410c"]
+    : ["#00f3ff", "#ffd700", "#bc13fe", "#ff5000"];
 
   const activeColor = themeColors[activeIndex] || themeColors[0];
 
@@ -135,7 +134,7 @@ export default function DynamicConduit({ activeIndex }: DynamicConduitProps) {
         <path
           d={offsetPath1}
           fill="none"
-          stroke="rgba(255, 255, 255, 0.04)"
+          stroke={themeType === "light" ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.04)"}
           strokeWidth="0.8"
         />
 
@@ -143,7 +142,7 @@ export default function DynamicConduit({ activeIndex }: DynamicConduitProps) {
         <path
           d={offsetPath2}
           fill="none"
-          stroke="rgba(255, 255, 255, 0.04)"
+          stroke={themeType === "light" ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.04)"}
           strokeWidth="0.8"
         />
 
@@ -162,7 +161,7 @@ export default function DynamicConduit({ activeIndex }: DynamicConduitProps) {
         />
 
         {/* Single high-precision technical signal pulse traveling along the pathway */}
-        <circle r="2.2" fill="#ffffff" filter="url(#svgPipelineGlow)">
+        <circle r="2.2" fill={themeType === "light" ? "#1a1a2e" : "#ffffff"} filter="url(#svgPipelineGlow)">
           <animateMotion path={pathD} dur="1.8s" repeatCount="indefinite" />
         </circle>
       </svg>

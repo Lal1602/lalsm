@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface Theme {
-  type: string;
+  type: "light" | "dark";
   color: string;
 }
 
@@ -38,3 +38,13 @@ export const useThemeStore = create<ThemeStore>()(
     }
   )
 );
+
+if (typeof document !== "undefined") {
+  useThemeStore.subscribe((state) => {
+    document.documentElement.setAttribute("data-theme", state.theme.type);
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute("content", state.theme.color);
+    }
+  });
+}

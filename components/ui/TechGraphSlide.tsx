@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useThemeStore } from "@/stores";
 
 interface Node {
   id: string;
@@ -50,6 +51,7 @@ const CONNECTIONS: Connection[] = [
 
 export default function TechGraphSlide() {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const themeType = useThemeStore((state) => state.theme.type);
 
   // Helper to check if a node or connection is highlighted
   const isHighlighted = (nodeId: string) => {
@@ -96,7 +98,7 @@ export default function TechGraphSlide() {
       <div className="horizon-slide-content" style={{ zIndex: 2 }}>
         <p className="slide-badge">// TECH STACK MAPPING</p>
         <h2 className="slide-title" style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}>
-          STACK <span style={{ color: "transparent", WebkitTextStroke: "1px rgba(255,255,255,0.7)" }}>CONNECTIVITY</span>
+          STACK <span style={{ color: "transparent", WebkitTextStroke: themeType === "light" ? "1px rgba(0,0,0,0.5)" : "1px rgba(255,255,255,0.7)" }}>CONNECTIVITY</span>
         </h2>
         <p className="slide-description">
           Hover over any developer core technology or portfolio project node to trace dependencies and active integrations.
@@ -154,7 +156,7 @@ export default function TechGraphSlide() {
                     key={idx}
                     d={pathData}
                     fill="none"
-                    stroke={highlighted ? "url(#connGlow)" : "rgba(255, 255, 255, 0.05)"}
+                    stroke={highlighted ? (themeType === "light" ? "rgba(0, 122, 204, 0.6)" : "rgba(0, 243, 255, 0.6)") : (themeType === "light" ? "rgba(0,0,0,0.05)" : "rgba(255, 255, 255, 0.05)")}
                     strokeWidth={highlighted ? 2 : 1.2}
                     style={{
                       transition: "stroke 0.3s, stroke-width 0.3s",
@@ -197,37 +199,33 @@ export default function TechGraphSlide() {
                       />
                     )}
 
-                    {/* Node Dot */}
-                    <circle
-                      cx={node.x}
-                      cy={node.y}
-                      r={6}
-                      fill={isTech ? "var(--accent-cyan)" : "var(--accent-purple)"}
-                      stroke="var(--bg-color)"
-                      strokeWidth={2}
-                      style={{
-                        boxShadow: isTech ? "0 0 10px var(--accent-cyan)" : "0 0 10px var(--accent-purple)"
-                      }}
-                    />
-
                     {/* Label Box (Outer borders) */}
                     <rect
                       x={isTech ? node.x - 110 : node.x + 12}
                       y={node.y - 12}
                       width={98}
                       height={24}
-                      rx={6}
-                      fill="rgba(255, 255, 255, 0.02)"
-                      stroke={isHovered ? (isTech ? "var(--accent-cyan)" : "var(--accent-purple)") : "rgba(255,255,255,0.06)"}
-                      strokeWidth={1}
-                      style={{ transition: "stroke 0.2s" }}
+                      rx="8"
+                      fill={isHovered ? (themeType === "light" ? "rgba(255,255,255,0.9)" : "rgba(255, 255, 255, 0.1)") : (themeType === "light" ? "rgba(255,255,255,0.6)" : "rgba(12, 12, 20, 0.8)")}
+                      stroke={isHovered ? (themeType === "light" ? "#8a6ab0" : "#bc13fe") : (themeType === "light" ? "rgba(0,0,0,0.1)" : "rgba(255, 255, 255, 0.2)")}
+                      strokeWidth="1"
+                      style={{ transition: "all 0.3s ease" }}
+                    />
+                    
+                    {/* Glowing Node Dot */}
+                    <circle 
+                      cx={node.x} 
+                      cy={node.y} 
+                      r={4} 
+                      fill={isHovered ? (themeType === "light" ? "#8a6ab0" : "#bc13fe") : (themeType === "light" ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.3)")}
+                      style={{ transition: "all 0.3s ease" }}
                     />
 
                     {/* Label Text */}
                     <text
                       x={isTech ? node.x - 61 : node.x + 61}
                       y={node.y + 4}
-                      fill={isHovered ? "white" : "var(--text-muted)"}
+                      fill={themeType === "light" ? "#1a1a2e" : "#ffffff"}
                       textAnchor="middle"
                       style={{ 
                         fontSize: "9px", 
@@ -251,7 +249,7 @@ export default function TechGraphSlide() {
               flexDirection: "column",
               gap: "12px",
               marginLeft: "30px",
-              borderLeft: "1px solid rgba(255,255,255,0.08)",
+              borderLeft: themeType === "light" ? "1px solid rgba(0,0,0,0.1)" : "1px solid rgba(255,255,255,0.08)",
               paddingLeft: "24px",
               justifyContent: "center",
               fontFamily: "var(--font-code)",
@@ -267,7 +265,7 @@ export default function TechGraphSlide() {
               <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "var(--accent-purple)" }}></span>
               WebGL & Gaming core
             </p>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.4)" }}>
+            <p style={{ margin: 0, color: themeType === "light" ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.4)" }}>
               // Hover a node to visualize lines connecting stack items to production implementations.
             </p>
           </div>

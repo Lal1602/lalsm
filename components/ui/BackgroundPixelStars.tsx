@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback, useEffect, useRef } from "react";
+import { useThemeStore } from "@/stores";
 
 // 16-bit color palette — tinted towards cyan/violet to match portfolio theme
 const STAR_COLORS = [
@@ -11,6 +12,14 @@ const STAR_COLORS = [
   "#FFAAFF", // Light purple (matches --accent-violet vibe)
   "#AAFFAA", // Light green
   "#FFAAAA", // Light red
+] as const;
+
+const LIGHT_STAR_COLORS = [
+  "#1a1a2e", // Dark navy/near-black
+  "#2c3e50", // Dark slate
+  "#34495e", // Wet asphalt
+  "#444466", // Muted purple-grey
+  "#005a99", // Dark cyan
 ] as const;
 
 // ─── Configuration ───────────────────────────────────────────────
@@ -88,6 +97,7 @@ export const BackgroundPixelStars = memo(
     const containerRef = useRef<HTMLDivElement | null>(null);
     const animationFrameRef = useRef<number | null>(null);
     const regenIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const theme = useThemeStore((state) => state.theme);
 
     const backgroundStarsRef = useRef<BackgroundStar[]>([]);
     const shootingStarsRef = useRef<ShootingStar[]>([]);
@@ -133,14 +143,16 @@ export const BackgroundPixelStars = memo(
       backgroundStarsRef.current = [];
       const area = canvas.width * canvas.height;
       const numStars = Math.floor(area * STAR_DENSITY);
+      const currentThemeType = useThemeStore.getState().theme.type;
+      const palette = currentThemeType === "light" ? LIGHT_STAR_COLORS : STAR_COLORS;
       for (let i = 0; i < numStars; i++) {
         const gridX = Math.floor(Math.random() * (canvas.width / PIXEL_SIZE)) * PIXEL_SIZE;
         const gridY = Math.floor(Math.random() * (canvas.height / PIXEL_SIZE)) * PIXEL_SIZE;
-        const baseOpacity = Math.random() * 0.5 + 0.5;
+        const baseOpacity = currentThemeType === "light" ? (Math.random() * 0.4 + 0.2) : (Math.random() * 0.5 + 0.5);
         backgroundStarsRef.current.push({
           x: gridX,
           y: gridY,
-          color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)]!,
+          color: palette[Math.floor(Math.random() * palette.length)]!,
           baseOpacity,
           currentOpacity: baseOpacity,
           twinkle: Math.random() < TWINKLE_PROBABILITY,
@@ -155,15 +167,17 @@ export const BackgroundPixelStars = memo(
       const canvas = canvasRef.current;
       if (!canvas || backgroundStarsRef.current.length === 0) return;
       const count = Math.max(1, Math.floor(backgroundStarsRef.current.length * REGEN_PERCENT));
+      const currentThemeType = useThemeStore.getState().theme.type;
+      const palette = currentThemeType === "light" ? LIGHT_STAR_COLORS : STAR_COLORS;
       for (let i = 0; i < count; i++) {
         const idx = Math.floor(Math.random() * backgroundStarsRef.current.length);
         const gridX = Math.floor(Math.random() * (canvas.width / PIXEL_SIZE)) * PIXEL_SIZE;
         const gridY = Math.floor(Math.random() * (canvas.height / PIXEL_SIZE)) * PIXEL_SIZE;
-        const baseOpacity = Math.random() * 0.5 + 0.5;
+        const baseOpacity = currentThemeType === "light" ? (Math.random() * 0.4 + 0.2) : (Math.random() * 0.5 + 0.5);
         backgroundStarsRef.current[idx] = {
           x: gridX,
           y: gridY,
-          color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)]!,
+          color: palette[Math.floor(Math.random() * palette.length)]!,
           baseOpacity,
           currentOpacity: baseOpacity,
           twinkle: Math.random() < TWINKLE_PROBABILITY,
@@ -234,6 +248,8 @@ export const BackgroundPixelStars = memo(
                 star.y >= -30 && star.y <= canvas.height + 30,
             );
 
+          const currentThemeType = useThemeStore.getState().theme.type;
+          
           shootingStarsRef.current.forEach((star) => {
             // Draw trail
             star.trail.forEach((point) => {
@@ -241,7 +257,7 @@ export const BackgroundPixelStars = memo(
               ctx.translate(point.x, point.y);
               ctx.rotate((star.angle * Math.PI) / 180);
               ctx.translate(-point.x, -point.y);
-              ctx.fillStyle = `rgba(180, 242, 255, ${point.opacity})`;
+              ctx.fillStyle = currentThemeType === "light" ? `rgba(44, 62, 80, ${point.opacity})` : `rgba(180, 242, 255, ${point.opacity})`;
               ctx.fillRect(point.x, point.y, SHOOTING_STAR_PIXEL_SIZE, SHOOTING_STAR_PIXEL_SIZE);
               ctx.restore();
             });
@@ -251,7 +267,7 @@ export const BackgroundPixelStars = memo(
             ctx.translate(star.x, star.y);
             ctx.rotate((star.angle * Math.PI) / 180);
             ctx.translate(-star.x, -star.y);
-            ctx.fillStyle = "#ffffff";
+            ctx.fillStyle = currentThemeType === "light" ? "#1a1a2e" : "#ffffff";
             ctx.globalAlpha = 1.0;
             for (let py = 0; py < 2; py++) {
               for (let px = 0; px < 4; px++) {
@@ -316,12 +332,17 @@ export const BackgroundPixelStars = memo(
         window.addEventListener("resize", handleResize);
       });
 
+      const unsub = useThemeStore.subscribe(() => {
+        initBackgroundStars();
+      });
+
       return () => {
         cancelAnimationFrame(initRafId);
         if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
         if (regenIntervalRef.current) clearInterval(regenIntervalRef.current);
         clearTimeout(shootingStarTimeoutId);
         window.removeEventListener("resize", handleResize);
+        unsub();
       };
     }, [animateCanvas, createNewShootingStar, getCanvasSize, initBackgroundStars, regenerateBackgroundStars]);
 
@@ -337,8 +358,9 @@ export const BackgroundPixelStars = memo(
           // NO solid background here — TubesCursor WebGL provides the dark bg.
           // Only the subtle dot grid remains as a retro LCD-screen texture.
           // Dots are very faint so they don't overwhelm the neon tubes below.
-          backgroundImage:
-            "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
+          backgroundImage: theme.type === 'light'
+            ? "radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px)"
+            : "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
           backgroundSize: "10px 10px",
           backgroundPosition: "0 0",
           // Transparent — tubes WebGL bg shows through the gaps between stars.
@@ -361,8 +383,10 @@ export const BackgroundPixelStars = memo(
       </div>
     );
   },
-  // Never re-render from parent — all state is in refs
-  () => true,
+  // Re-render when theme changes to update the grid background color
+  (prevProps, nextProps) => {
+    return prevProps.width === nextProps.width && prevProps.height === nextProps.height;
+  }
 );
 
 BackgroundPixelStars.displayName = "BackgroundPixelStars";

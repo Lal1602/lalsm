@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { useThemeStore } from "@/stores";
 
 interface Step {
   num: string;
@@ -24,12 +25,12 @@ interface InteractiveProcessItemProps {
 // CARTOONISH CHARACTER ANIMATIONS — Awwwards-quality, personality-driven
 // Each phase has a distinct "character" with anticipation → action → settle
 // ─────────────────────────────────────────────────────────────────────────────
-const ANIMATIONS = [
+const getAnimations = (themeType: "light" | "dark") => [
   {
     // ── 01 DISCOVERY ─ "Wide-Eyed Surprise" ─────────────────────────────────
     // Character: Letters widen eyes (scaleY), gasp upward with overshoot,
     // then wobble side-to-side in excitement before settling
-    color: "#00f3ff",
+    color: themeType === "light" ? "#007acc" : "#00f3ff",
     enter: (chars: HTMLElement[], numEl: HTMLElement | null) => {
       const tl = gsap.timeline({ overwrite: "auto" as const });
       // Anticipation: slight squash down first
@@ -48,7 +49,9 @@ const ANIMATIONS = [
             scaleY: 1.5,
             scaleX: 0.8,
             y: -18,
-            textShadow: "0 0 20px rgba(0, 243, 255, 0.9), 0 6px 0 rgba(0, 243, 255, 0.3)",
+            textShadow: themeType === "light" 
+              ? "0 0 20px rgba(0, 122, 204, 0.9), 0 6px 0 rgba(0, 122, 204, 0.3)" 
+              : "0 0 20px rgba(0, 243, 255, 0.9), 0 6px 0 rgba(0, 243, 255, 0.3)",
             backgroundSize: "100% 100%",
             backgroundPosition: "0% 50%",
             duration: 0.25,
@@ -115,7 +118,7 @@ const ANIMATIONS = [
     // ── 02 DESIGN ─ "Paint Splash Wave" ─────────────────────────────────────
     // Character: Letters wave like a flag in the wind, undulating Y sine,
     // each char slightly offset in phase — like paint being splashed across
-    color: "#ffd700",
+    color: themeType === "light" ? "#d97706" : "#ffd700",
     enter: (chars: HTMLElement[], numEl: HTMLElement | null) => {
       const tl = gsap.timeline({ overwrite: "auto" as const });
 
@@ -134,7 +137,9 @@ const ANIMATIONS = [
             rotation: Math.sin((i / chars.length) * Math.PI * 2) * 4,
             backgroundSize: "100% 100%",
             backgroundPosition: "50% 50%",
-            textShadow: `0 0 16px rgba(255, 215, 0, 0.85), 0 ${Math.abs(waveY) * 0.5}px 0 rgba(255, 215, 0, 0.2)`,
+            textShadow: themeType === "light"
+              ? `0 0 16px rgba(217, 119, 6, 0.85), 0 ${Math.abs(waveY) * 0.5}px 0 rgba(217, 119, 6, 0.2)`
+              : `0 0 16px rgba(255, 215, 0, 0.85), 0 ${Math.abs(waveY) * 0.5}px 0 rgba(255, 215, 0, 0.2)`,
             duration: 0.35,
             ease: "power2.out",
           },
@@ -150,7 +155,7 @@ const ANIMATIONS = [
           scaleX: 1,
           scaleY: 1,
           rotation: 0,
-          textShadow: "0 0 8px rgba(255, 215, 0, 0.4)",
+          textShadow: themeType === "light" ? "0 0 8px rgba(217, 119, 6, 0.4)" : "0 0 8px rgba(255, 215, 0, 0.4)",
           duration: 0.5,
           stagger: { each: 0.03, from: "center" as const },
           ease: "elastic.out(1.1, 0.5)",
@@ -186,7 +191,7 @@ const ANIMATIONS = [
     // Fast enter: chars materialize from a digital scan line (Y-scale expand from 0),
     // Then wobble/vibrate like electricity running through circuits.
     // Leave: Calm — only color/glow fades away. Text stays visible. Clean.
-    color: "#bc13fe",
+    color: themeType === "light" ? "#b58900" : "#bc13fe",
     enter: (chars: HTMLElement[], numEl: HTMLElement | null) => {
       const tl = gsap.timeline({ overwrite: "auto" as const });
 
@@ -215,7 +220,9 @@ const ANIMATIONS = [
       })
       // 2. Impact spark: neon flash as each char fully materializes
       .to(chars, {
-        textShadow: "0 0 30px rgba(188, 19, 254, 1), 0 0 8px rgba(255, 255, 255, 0.7)",
+        textShadow: themeType === "light"
+          ? "0 0 30px rgba(181, 137, 0, 1), 0 0 8px rgba(0, 0, 0, 0.7)"
+          : "0 0 30px rgba(188, 19, 254, 1), 0 0 8px rgba(255, 255, 255, 0.7)",
         backgroundSize: "100% 100%",
         backgroundPosition: "50% 50%",
         duration: 0.08,
@@ -240,7 +247,7 @@ const ANIMATIONS = [
       .to(chars, { x: 0, duration: 0.06, ease: "power2.out" })
       // 5. Steady glow at rest
       .to(chars, {
-        textShadow: "0 0 10px rgba(188, 19, 254, 0.55)",
+        textShadow: themeType === "light" ? "0 0 10px rgba(181, 137, 0, 0.55)" : "0 0 10px rgba(188, 19, 254, 0.55)",
         duration: 0.25,
         ease: "power1.out",
       }, "<");
@@ -280,7 +287,7 @@ const ANIMATIONS = [
     // ── 04 DEPLOYMENT ─ "Rocket Launch" ─────────────────────────────────────
     // Character: Anticipation squash (crouch), rocket launch up with trail,
     // then slam back down with cartoon impact bounce
-    color: "#ff5000",
+    color: themeType === "light" ? "#c2410c" : "#ff5000",
     enter: (chars: HTMLElement[], numEl: HTMLElement | null) => {
       const tl = gsap.timeline({ overwrite: "auto" as const });
 
@@ -301,7 +308,9 @@ const ANIMATIONS = [
             scaleX: 0.7,
             y: -30,
             backgroundSize: "180% 180%",
-            textShadow: "0 0 24px rgba(255, 80, 0, 1), 0 8px 0 rgba(255, 180, 0, 0.4)",
+            textShadow: themeType === "light"
+              ? "0 0 24px rgba(194, 65, 12, 1), 0 8px 0 rgba(194, 65, 12, 0.4)"
+              : "0 0 24px rgba(255, 80, 0, 1), 0 8px 0 rgba(255, 180, 0, 0.4)",
             duration: 0.22,
             stagger: { each: 0.02, from: "end" as const },
             ease: "power4.out",
@@ -338,7 +347,7 @@ const ANIMATIONS = [
           {
             scaleY: 1,
             scaleX: 1,
-            textShadow: "0 0 8px rgba(255, 80, 0, 0.5)",
+            textShadow: themeType === "light" ? "0 0 8px rgba(194, 65, 12, 0.5)" : "0 0 8px rgba(255, 80, 0, 0.5)",
             duration: 0.18,
             stagger: { each: 0.01, from: "center" as const },
             ease: "power2.out",
@@ -380,7 +389,8 @@ export default function InteractiveProcessItem({
   const textRef = useRef<HTMLSpanElement>(null);
   const numRef = useRef<HTMLSpanElement>(null);
   const itemRef = useRef<HTMLLIElement>(null);
-  const currentTheme = ANIMATIONS[index] || ANIMATIONS[0]!;
+  const themeType = useThemeStore((state) => state.theme.type);
+  const currentTheme = React.useMemo(() => getAnimations(themeType)[index] || getAnimations(themeType)[0]!, [themeType, index]);
   const activeAnimRef = useRef<gsap.core.Timeline | gsap.core.Tween | null>(null);
 
   // Transform perspective setup once on mount

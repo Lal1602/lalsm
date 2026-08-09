@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import horizonScrollState from "@/lib/horizonScrollState";
+import { useThemeStore } from "@/stores";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 // Ordered OLDEST → NEWEST  (index 0 = first to fly out)
@@ -99,6 +100,7 @@ export default function CvTimelineSlide() {
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const themeType = useThemeStore((state) => state.theme.type);
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -366,10 +368,10 @@ export default function CvTimelineSlide() {
         {/* CV download card */}
         <div className="cv-mobile-download-card">
           <div>
-            <p style={{ fontFamily: "var(--font-code)", fontSize: "0.6rem", color: "rgba(255,255,255,0.28)", margin: "0 0 6px" }}>
+            <p style={{ fontFamily: "var(--font-code)", fontSize: "0.6rem", color: themeType === "light" ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.28)", margin: "0 0 6px" }}>
               {`// FILE_DOCUMENT`}
             </p>
-            <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", fontWeight: 700, color: "white", margin: "0 0 6px" }}>
+            <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", fontWeight: 700, color: themeType === "light" ? "var(--text-main)" : "white", margin: "0 0 6px" }}>
               CURRICULUM VITAE
             </h4>
             <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>

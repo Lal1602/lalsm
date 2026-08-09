@@ -6421,6 +6421,17 @@ html {
 }
 html[data-theme="light"] {
   background-color: #EAEAEF;
+  --bg-color: #EAEAEF;
+  --text-main: #1a1a2e;
+  --text-muted: #555577;
+  --accent-cyan: #007acc;
+  --accent-purple: #8a6ab0;
+  --accent-gold: #b58900;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --concave-center: rgba(220, 220, 230, 0.4);
+  --concave-edge: rgba(234, 234, 239, 0.98);
+  --concave-shadow: rgba(0, 0, 0, 0.15);
 }
 
 /* Body dynamic background layers to avoid page transition gaps and flashing */
@@ -7533,4 +7544,49 @@ html[data-theme="light"] .career-grid-overlay {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+/* --- Light Mode Navbar Overlay --- */
+html[data-theme="light"] .nav-overlay-panel {
+  background: rgba(245, 245, 248, 0.96);
+}
+
+html[data-theme="light"] .overlay-grid-bg {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+html[data-theme="light"] .overlay-hud-footer {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+html[data-theme="light"] .menu-toggle-btn:hover .hamburger-line {
+  background-color: var(--text-main);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Light Mode Career Mobile Cards --- */
+html[data-theme="light"] .cv-mobile-cards-rail .cv-mobile-card {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+html[data-theme="light"] .cv-mobile-card-year {
+  color: rgba(0, 0, 0, 0.5);
+}
+html[data-theme="light"] .cv-mobile-card-badge {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(0, 0, 0, 0.6);
+}
+html[data-theme="light"] .cv-mobile-card-divider {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.15), transparent);
+}
+html[data-theme="light"] .cv-mobile-card-role {
+  color: var(--text-main);
+}
+html[data-theme="light"] .cv-mobile-download-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.12);
 }

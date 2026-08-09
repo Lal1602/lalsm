@@ -2,9 +2,10 @@ import gsap from "gsap";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-import { usePortalStore, useScrollStore } from "@/stores";
+import { usePortalStore, useScrollStore, useThemeStore } from "@/stores";
 
 export const ScrollHint = () => {
+  const themeType = useThemeStore((state) => state.theme.type);
   const [hintText, setHintText] = useState('');
   const [showScrollHint, setShowScrollHint] = useState(false);
   const portal = usePortalStore((state) => state.activePortalId);
@@ -52,8 +53,8 @@ export const ScrollHint = () => {
     <div className="fixed w-full bottom-5 scroll-hint" style={{ opacity: 0 }}>
       <div className="flex items-center justify-center animate-pulse">
         { showScrollHint }
-        <Image src={svgSrc} width={18} height={18} alt="night mode" loading="lazy" />
-        <span className="text-white">{hintText}</span>
+        <Image src={svgSrc} width={18} height={18} alt="scroll hint" loading="lazy" style={{ filter: themeType === "light" ? "invert(1)" : "none", transition: "filter 0.3s" }} />
+        <span style={{ color: "var(--text-main)", marginLeft: "6px", transition: "color 0.3s" }}>{hintText}</span>
       </div>
     </div>
   );

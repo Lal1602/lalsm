@@ -3,6 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useEffect, useRef, useState, useMemo } from "react";
 import * as THREE from "three";
+import { useThemeStore } from "@/stores";
 
 // Silence THREE.Clock deprecation warning from internal Three.js/R3F library calls
 if (typeof window !== "undefined") {
@@ -38,6 +39,8 @@ function CyberSphere({
   useEffect(() => {
     isCollapsedRef.current = isCollapsed;
   }, [isCollapsed]);
+
+  const themeType = useThemeStore((state) => state.theme.type);
 
   // Physics state Refs
   const sphereScaleRef = useRef(1.0);
@@ -140,8 +143,8 @@ function CyberSphere({
     const pos = new Float32Array(particleCount * 3);
     const cols = new Float32Array(particleCount * 3);
 
-    const colorCyan = new THREE.Color("#00f3ff");
-    const colorPurple = new THREE.Color("#bc13fe");
+    const colorCyan = new THREE.Color(themeType === "light" ? "#8a6ab0" : "#00f3ff");
+    const colorPurple = new THREE.Color(themeType === "light" ? "#b58900" : "#bc13fe");
 
     for (let i = 0; i < particleCount; i++) {
       // Volumetric distribution inside the sphere
@@ -169,7 +172,7 @@ function CyberSphere({
     }
 
     return { positions: pos, colors: cols };
-  }, []);
+  }, [themeType]);
 
   return (
     <group ref={containerRef}>
@@ -199,7 +202,7 @@ function CyberSphere({
       <mesh>
         <icosahedronGeometry args={[1.55, 2]} />
         <meshBasicMaterial
-          color="#00f3ff"
+          color={themeType === "light" ? "#8a6ab0" : "#00f3ff"}
           wireframe
           transparent
           opacity={0.15}
@@ -214,6 +217,7 @@ function CyberSphere({
 // Glowing rings orbiting the sphere core
 function OrbitingRings() {
   const groupRef = useRef<THREE.Group>(null);
+  const themeType = useThemeStore((state) => state.theme.type);
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
@@ -229,7 +233,7 @@ function OrbitingRings() {
       <mesh rotation={[Math.PI / 2.3, 0, 0]}>
         <torusGeometry args={[2.0, 0.015, 12, 80]} />
         <meshBasicMaterial
-          color="#00f3ff"
+          color={themeType === "light" ? "#8a6ab0" : "#00f3ff"}
           transparent
           opacity={0.2}
           blending={THREE.AdditiveBlending}
@@ -240,7 +244,7 @@ function OrbitingRings() {
       <mesh rotation={[-Math.PI / 2.4, Math.PI / 4, 0]}>
         <torusGeometry args={[2.2, 0.01, 12, 80]} />
         <meshBasicMaterial
-          color="#bc13fe"
+          color={themeType === "light" ? "#b58900" : "#bc13fe"}
           transparent
           opacity={0.15}
           blending={THREE.AdditiveBlending}

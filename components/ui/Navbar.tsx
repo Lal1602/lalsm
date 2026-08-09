@@ -1,23 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { useThemeStore } from "@/stores";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const mobileLinksRef = useRef<HTMLUListElement>(null);
-  const [theme, setTheme] = useState("dark");
-
-  // Read initial theme from document element on mount
-  useEffect(() => {
-    const activeTheme = document.documentElement.getAttribute("data-theme") || "dark";
-    setTheme(activeTheme);
-  }, []);
+  const { theme, nextTheme } = useThemeStore();
 
   const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    document.documentElement.setAttribute("data-theme", nextTheme);
-    localStorage.setItem("theme", nextTheme);
+    nextTheme();
   };
 
   // Close mobile menu on navigation click
@@ -83,9 +75,9 @@ export default function Navbar() {
         {/* Group Controls (Theme Toggle + Hamburger) */}
         <div className="navbar-actions">
           <button
-            className={`theme-toggle-switch ${theme}`}
+            className={`theme-toggle-switch ${theme.type}`}
             onClick={toggleTheme}
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            aria-label={`Switch to ${theme.type === "dark" ? "light" : "dark"} theme`}
           >
             {/* Moon Icon (Left) */}
             <span className="theme-icon moon-icon">

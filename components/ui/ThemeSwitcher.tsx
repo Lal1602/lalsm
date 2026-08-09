@@ -26,14 +26,6 @@ const ThemeSwitcher = () => {
     setPositionClass(isMobile ? 'top-2 right-2' : 'top-6 right-6');
   }, [isMobile]);
 
-  useEffect(() => {
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]')
-
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', theme.color);
-    }
-  }, [theme.color]);
-
   return (
     <div className={`fixed ${positionClass}`} ref={themeSwitcherRef} style={{ opacity: 0, zIndex: 2 }}>
       <div className="flex items-center justify-center gap-2">

@@ -869,11 +869,20 @@ export default function AiChatOverlay() {
            ═══════════════════════════════════════ */
         html[data-theme="light"] .ai-chat-sidebar {
           border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
-          background: rgba(255, 255, 255, 0.92) !important;
-          color: #2c2c2c !important;
+          background: rgba(245, 245, 250, 0.96) !important;
+          color: #1a1a2e !important;
         }
+        
+        /* Reduce SVG background shapes opacity in light mode */
+        html[data-theme="light"] .ai-chat-bg-shapes {
+          opacity: 0.3 !important;
+        }
+        html[data-theme="light"] .ai-chat-bg-pattern {
+          opacity: 0.2 !important;
+        }
+
         html[data-theme="light"] .ai-chat-title {
-          color: #2c2c2c !important;
+          color: #1a1a2e !important;
         }
         html[data-theme="light"] .ai-chat-eyebrow {
           color: rgba(0, 0, 0, 0.5) !important;
@@ -882,29 +891,40 @@ export default function AiChatOverlay() {
           color: rgba(0, 0, 0, 0.45) !important;
         }
         html[data-theme="light"] .ai-chat-btn-reset:hover {
-          background: rgba(0, 0, 0, 0.03) !important;
+          background: rgba(0, 0, 0, 0.05) !important;
         }
         html[data-theme="light"] .ai-chat-btn-close {
           color: rgba(0, 0, 0, 0.45) !important;
         }
         html[data-theme="light"] .ai-chat-btn-close:hover {
           color: #000 !important;
-          background: rgba(0, 0, 0, 0.03) !important;
+          background: rgba(0, 0, 0, 0.05) !important;
         }
         html[data-theme="light"] .ai-chat-msg-label {
           color: rgba(0, 0, 0, 0.45) !important;
         }
+        
+        /* AI Bubbles */
         html[data-theme="light"] .ai-chat-bubble.ai {
-          background: rgba(0, 0, 0, 0.03) !important;
-          border: 1px solid rgba(0, 0, 0, 0.04) !important;
-          color: #2c2c2c !important;
+          background: rgba(255, 255, 255, 0.8) !important;
+          border: 1px solid rgba(0, 0, 0, 0.08) !important;
+          color: #1a1a2e !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
         }
+        
+        /* User Bubbles */
+        html[data-theme="light"] .ai-chat-bubble.user {
+          background: rgba(0, 122, 204, 0.1) !important;
+          border: 1px solid rgba(0, 122, 204, 0.2) !important;
+          color: #005a99 !important;
+        }
+
         html[data-theme="light"] .ai-chat-typing-cursor {
           background-color: rgba(0, 0, 0, 0.5) !important;
         }
         html[data-theme="light"] .ai-chat-typing-bubble {
-          background: rgba(0, 0, 0, 0.03) !important;
-          border: 1px solid rgba(0, 0, 0, 0.04) !important;
+          background: rgba(255, 255, 255, 0.8) !important;
+          border: 1px solid rgba(0, 0, 0, 0.08) !important;
         }
         html[data-theme="light"] .ai-chat-typing-dot {
           background-color: rgba(0, 0, 0, 0.4) !important;
@@ -913,13 +933,13 @@ export default function AiChatOverlay() {
           border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
         }
         html[data-theme="light"] .ai-chat-input {
-          background: rgba(0, 0, 0, 0.03) !important;
-          border: 1px solid rgba(0, 0, 0, 0.08) !important;
-          color: #2c2c2c !important;
+          background: rgba(255, 255, 255, 0.7) !important;
+          border: 1px solid rgba(0, 0, 0, 0.1) !important;
+          color: #1a1a2e !important;
         }
         html[data-theme="light"] .ai-chat-input:focus {
-          border-color: rgba(138, 106, 176, 0.4) !important;
-          background: rgba(0, 0, 0, 0.05) !important;
+          border-color: rgba(138, 106, 176, 0.5) !important;
+          background: rgba(255, 255, 255, 0.95) !important;
         }
         html[data-theme="light"] .ai-chat-toggle-btn {
           background: linear-gradient(135deg, #eaeae5, #eaeaea) !important;
@@ -936,17 +956,18 @@ export default function AiChatOverlay() {
           border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
         }
         html[data-theme="light"] .ai-chat-suggestion-pill {
-          background: rgba(0, 0, 0, 0.03) !important;
-          border: 1px solid rgba(0, 0, 0, 0.08) !important;
-          color: #2c2c2c !important;
+          background: rgba(255, 255, 255, 0.6) !important;
+          border: 1px solid rgba(0, 0, 0, 0.1) !important;
+          color: #1a1a2e !important;
         }
         html[data-theme="light"] .ai-chat-suggestion-pill:hover {
-          background: rgba(138, 106, 176, 0.1) !important;
-          border-color: rgba(138, 106, 176, 0.3) !important;
+          background: rgba(138, 106, 176, 0.15) !important;
+          border-color: rgba(138, 106, 176, 0.4) !important;
           color: #8a6ab0 !important;
         }
         html[data-theme="light"] .ai-chat-backdrop {
-          background: rgba(0, 0, 0, 0.25) !important;
+          background: rgba(255, 255, 255, 0.4) !important;
+          backdrop-filter: blur(4px) !important;
         }
       ` }} />
     </>
