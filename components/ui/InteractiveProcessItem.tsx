@@ -270,6 +270,7 @@ const getAnimations = (themeType: "light" | "dark") => [
         scaleX: 1,
         y: 0,
         x: 0,
+        opacity: 1,
         textShadow: "none",
         backgroundSize: "100% 0%",
         backgroundPosition: "50% 100%",
