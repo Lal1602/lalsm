@@ -337,7 +337,6 @@ export default function CvTimelineSlide() {
           onClick={() => scrollByAmount(-250)}
           aria-hidden="true"
         >
-          {/* @ts-ignore */}
           <ion-icon suppressHydrationWarning name="chevron-back-outline"></ion-icon>
         </div>
         
@@ -346,7 +345,6 @@ export default function CvTimelineSlide() {
           onClick={() => scrollByAmount(250)}
           aria-hidden="true"
         >
-          {/* @ts-ignore */}
           <ion-icon suppressHydrationWarning name="chevron-forward-outline"></ion-icon>
         </div>
 

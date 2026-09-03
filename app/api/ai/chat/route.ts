@@ -3,9 +3,24 @@ import { NextResponse } from 'next/server';
 
 const apiKey = process.env.GEMINI_API_KEY;
 
+interface HistoryMessage {
+  role: 'user' | 'ai';
+  text: string;
+}
+
+interface GeminiContent {
+  role: 'user' | 'model';
+  parts: { text: string }[];
+}
+
+interface ParsedReply {
+  reply?: string;
+  suggestions?: string[];
+}
+
 export async function POST(request: Request) {
   let message = '';
-  let history: any[] = [];
+  let history: HistoryMessage[] = [];
   try {
     const body = await request.json();
     message = body.message;
@@ -22,7 +37,7 @@ export async function POST(request: Request) {
 
       // Simulate real AI network delay
       await new Promise((resolve) => setTimeout(resolve, 800));
-      return NextResponse.json({ reply: simulatedReply });
+      return NextResponse.json(simulatedReply);
     }
 
     const ai = new GoogleGenAI({ apiKey });
@@ -31,7 +46,7 @@ export async function POST(request: Request) {
     // In @google/genai generateContent, we pass contents as an array of objects:
     // { role: 'user' | 'model', parts: [{ text: '...' }] }
     // Note that 'ai' role from frontend state is mapped to 'model' for Gemini
-    const contents: any[] = [];
+    const contents: GeminiContent[] = [];
 
     const systemInstruction = `
 # Advanced System Prompt: B.I.L.A.L. (Model: BIL-01)
@@ -111,7 +126,7 @@ Aturan Respon & Keamanan (CRITICAL SECURITY):
 
     // Map history to Gemini format
     if (history && Array.isArray(history)) {
-      history.forEach((msg: any) => {
+      history.forEach((msg: HistoryMessage) => {
         if (msg.role === 'user') {
           contents.push({ role: 'user', parts: [{ text: msg.text }] });
         } else if (msg.role === 'ai') {
@@ -134,7 +149,7 @@ Aturan Respon & Keamanan (CRITICAL SECURITY):
       'gemma-4-31b-it'             // Gemma 4 31B
     ];
 
-    let parsedReply: any = {};
+    let parsedReply: ParsedReply = {};
     let success = false;
     let lastError = null;
 
@@ -165,8 +180,9 @@ Aturan Respon & Keamanan (CRITICAL SECURITY):
           console.log(`Successfully generated response using model: ${modelName}`);
           break;
         }
-      } catch (err: any) {
-        console.warn(`Model ${modelName} failed or limit reached:`, err.message || err);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : err;
+        console.warn(`Model ${modelName} failed or limit reached:`, message);
         lastError = err;
       }
     }
@@ -180,7 +196,7 @@ Aturan Respon & Keamanan (CRITICAL SECURITY):
       throw lastError || new Error('All models in failover list failed to generate response.');
     }
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error in chatbot route handler, falling back to local simulation:', error);
 
     const simulatedResponse = getSimulatedReply(message, history);
@@ -189,7 +205,7 @@ Aturan Respon & Keamanan (CRITICAL SECURITY):
 }
 
 // Local match-based fallback engine to provide context-aware answers offline
-function getSimulatedReply(message: string, history?: any[]): { reply: string; suggestions: string[] } {
+function getSimulatedReply(message: string, history?: HistoryMessage[]): { reply: string; suggestions: string[] } {
   const msg = message.toLowerCase();
 
   // Fallback for system prompt leakage attempts or security tests

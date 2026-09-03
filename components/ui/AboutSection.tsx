@@ -134,7 +134,6 @@ export default function AboutSection() {
             onClick={() => scrollByAmount(-300)}
             aria-hidden="true"
           >
-            {/* @ts-ignore */}
             <ion-icon suppressHydrationWarning name="chevron-back-outline"></ion-icon>
           </div>
           
@@ -143,7 +142,6 @@ export default function AboutSection() {
             onClick={() => scrollByAmount(300)}
             aria-hidden="true"
           >
-            {/* @ts-ignore */}
             <ion-icon suppressHydrationWarning name="chevron-forward-outline"></ion-icon>
           </div>
 
@@ -175,7 +173,6 @@ export default function AboutSection() {
             {/* Creative Hover Prompt (Visible when Idle) */}
             <div className="about-spatial-hover-prompt" aria-hidden="true">
               <div className="hover-prompt-icon">
-                {/* @ts-ignore */}
                 <ion-icon suppressHydrationWarning name="scan-outline"></ion-icon>
               </div>
               <div className="hover-prompt-main">HOVER ME</div>
@@ -185,7 +182,6 @@ export default function AboutSection() {
             {/* Card content */}
             <div className="about-spatial-content">
               <div className="about-spatial-icon-wrap">
-                {/* @ts-ignore */}
                 <ion-icon
                   suppressHydrationWarning
                   name={card.icon}
@@ -212,7 +208,6 @@ export default function AboutSection() {
                       key={label}
                       className={`about-spatial-badge${highlight ? " highlight" : ""}`}
                     >
-                      {/* @ts-ignore */}
                       <ion-icon
                         suppressHydrationWarning
                         name={icon}

@@ -155,9 +155,9 @@ export default function DynamicConduit({ activeIndex }: DynamicConduitProps) {
           strokeWidth="1.2"
           filter="url(#svgPipelineGlow)"
           style={{
-            ["--line-color" as any]: activeColor,
+            "--line-color": activeColor,
             transition: "stroke 0.4s ease"
-          }}
+          } as React.CSSProperties}
         />
 
         {/* Single high-precision technical signal pulse traveling along the pathway */}

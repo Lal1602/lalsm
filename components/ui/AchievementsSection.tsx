@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 
 // Track 1 items (6 unique)
 const track1 = [
@@ -42,7 +41,6 @@ function MarqueeCard({ c, hidden }: { c: CertCard; hidden?: boolean }) {
         <h3 className="marquee-card-title">{c.heading} <em>{c.em}</em></h3>
         <p className="marquee-card-meta">{c.meta}</p>
         <button className="btn-quick-view marquee-card-btn" tabIndex={hidden ? -1 : 0} aria-label={`View ${c.heading} Certificate`}>
-          {/* @ts-ignore */}
           <ion-icon suppressHydrationWarning name="eye-outline" aria-hidden="true"></ion-icon>
         </button>
       </div>

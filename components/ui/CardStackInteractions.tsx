@@ -51,6 +51,9 @@ export default function CardStackInteractions() {
     }
 
     // ── Track cursor spotlight position inside each card ────────────────────
+    // Coalesced to one getBoundingClientRect() + style write per animation
+    // frame — native mousemove can fire far more often than the display
+    // repaints, and each call was forcing a synchronous layout read.
     function trackSpotlight(e: MouseEvent, card: HTMLElement) {
       const rect = card.getBoundingClientRect();
       const xPct = ((e.clientX - rect.left) / rect.width) * 100;
@@ -63,11 +66,25 @@ export default function CardStackInteractions() {
     const cleanups: (() => void)[] = [];
 
     cards.forEach((card) => {
+      let rafId = 0;
       const onEnter = () => activateCard(card);
-      const onLeave = () => deactivateAll();
-      const onMove  = (e: Event) => trackSpotlight(e as MouseEvent, card);
+      const onLeave = () => {
+        deactivateAll();
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = 0;
+        }
+      };
+      const onMove = (e: Event) => {
+        const evt = e as MouseEvent;
+        if (rafId) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
+          trackSpotlight(evt, card);
+        });
+      };
       const onFocus = () => activateCard(card);
-      const onBlur  = () => deactivateAll();
+      const onBlur = () => deactivateAll();
 
       card.addEventListener("mouseenter", onEnter);
       card.addEventListener("mouseleave", onLeave);
@@ -81,6 +98,7 @@ export default function CardStackInteractions() {
         card.removeEventListener("mousemove",  onMove);
         card.removeEventListener("focus",      onFocus);
         card.removeEventListener("blur",       onBlur);
+        if (rafId) cancelAnimationFrame(rafId);
       });
     });
 

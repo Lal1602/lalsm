@@ -448,7 +448,6 @@ export default function InteractiveProcessItem({
         onMouseEnter={!isMobile ? onHoverStart : undefined}
         onMouseLeave={!isMobile ? onHoverEnd : undefined}
         onPointerEnter={!isMobile ? onHoverStart : undefined}
-        onPointerMove={!isMobile ? onHoverStart : undefined}
         onClick={isMobile ? onClickItem : undefined}
         style={{
           display: "inline-flex",

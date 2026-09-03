@@ -26,7 +26,6 @@ interface FilmStripCardProps {
 }
 
 export default function FilmStripCard({
-  title,
   image,
   index,
   totalItems,
@@ -50,7 +49,10 @@ export default function FilmStripCard({
   const R = 7.5; // Radius of the curved film strip
   const spacing = (2 * Math.PI) / totalItems; // Angle spacing (in radians) between cards (fully looping circle)
   
-  // Custom procedural fragment shader for vector-quality perforated film holes
+  // Procedural fragment shader for a holographic HUD panel backing — a
+  // "satellite array" frame instead of a 35mm film strip, echoing the same
+  // targeting-reticle corner brackets used on the About cards so the two
+  // sections read as one consistent sci-fi system rather than two styles.
   const filmBackingShader = {
     vertexShader: `
       varying vec2 vUv;
@@ -65,33 +67,39 @@ export default function FilmStripCard({
       uniform float uHover;
 
       void main() {
-        // Base color: sleek cinematic charcoal grey, shifts slightly to lighter grey on hover
-        vec3 baseColor = mix(vec3(0.15, 0.15, 0.16), vec3(0.22, 0.22, 0.24), uHover);
-        
-        // Procedural film perforated holes logic
-        // Top zones: y in [0.89, 0.95], Bottom zones: y in [0.05, 0.11]
-        // Hole width: 0.024, spacing: 0.065
-        float repeatX = mod(vUv.x, 0.065);
-        bool inHoleX = (repeatX > 0.02) && (repeatX < 0.045);
-        bool inHoleY = (vUv.y > 0.05 && vUv.y < 0.11) || (vUv.y > 0.89 && vUv.y < 0.95);
-        
-        // If inside a perforation hole, discard the fragment (creates transparent punch-throughs)
-        if (inHoleX && inHoleY) {
-          discard;
-        }
+        // Deep-space panel base, lifts slightly brighter on hover
+        vec3 baseColor = mix(vec3(0.043, 0.043, 0.07), vec3(0.075, 0.075, 0.12), uHover);
+        vec3 accent = vec3(0.0, 0.953, 1.0); // cyan — matches --accent-cyan
 
-        // Inner film track lines (cinematic borders)
-        bool innerLine = (vUv.y > 0.148 && vUv.y < 0.153) || (vUv.y > 0.847 && vUv.y < 0.852) ||
-                         (vUv.x > 0.058 && vUv.x < 0.063) || (vUv.x > 0.937 && vUv.x < 0.942);
-        
-        vec3 finalColor = innerLine ? mix(vec3(0.25, 0.25, 0.28), vec3(0.95, 0.95, 0.95), uHover) : baseColor;
+        // Thin outer frame line
+        float edge = 0.014;
+        bool onEdge = vUv.x < edge || vUv.x > 1.0 - edge || vUv.y < edge || vUv.y > 1.0 - edge;
+
+        // HUD corner brackets — L-shaped marks at each corner, same motif
+        // as the About section's .about-spatial-card::after brackets
+        float cSize = 0.14;
+        float cThick = 0.016;
+        bool nearLeft   = vUv.x < cSize;
+        bool nearRight  = vUv.x > 1.0 - cSize;
+        bool nearBottom = vUv.y < cSize;
+        bool nearTop    = vUv.y > 1.0 - cSize;
+        bool onCornerH = (vUv.y < cThick || vUv.y > 1.0 - cThick) && (nearLeft || nearRight);
+        bool onCornerV = (vUv.x < cThick || vUv.x > 1.0 - cThick) && (nearBottom || nearTop);
+        bool onCorner = onCornerH || onCornerV;
+
+        vec3 finalColor = baseColor;
+        if (onCorner) {
+          finalColor = mix(accent * 0.55, accent, uHover);
+        } else if (onEdge) {
+          finalColor = mix(vec3(0.18, 0.18, 0.24), accent * 0.7, uHover * 0.5);
+        }
 
         gl_FragColor = vec4(finalColor, uOpacity);
       }
     `
   };
 
-  useFrame((state, delta) => {
+  useFrame(() => {
     if (!meshRef.current) return;
 
     // 1. Calculate cylindrical coordinate based on scrolling (infinite loop)
@@ -169,7 +177,7 @@ export default function FilmStripCard({
         }
       }}
     >
-      {/* 1. Procedural Film Backing Sheet (White clip frame with perforated holes) */}
+      {/* 1. Procedural HUD panel backing (holographic frame with corner brackets) */}
       <mesh position={[0, 0, 0]}>
         <planeGeometry args={[2.5, 1.5]} />
         <shaderMaterial

@@ -22,21 +22,24 @@ export default function LenisSetup() {
       });
     });
 
+    let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
 
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     // Initial refresh to ensure all triggers align with the loaded DOM height
-    setTimeout(() => {
+    const refreshTimer = setTimeout(() => {
       import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
         ScrollTrigger.refresh();
       });
     }, 1000);
 
     return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(refreshTimer);
       lenis.destroy();
     };
   }, []);

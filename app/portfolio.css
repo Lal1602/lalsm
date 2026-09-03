@@ -996,7 +996,8 @@ h3 {
 .about-spatial-card {
   flex: 1;
   min-height: 480px;
-  border-radius: 16px;
+  /* Crisp console-panel edge, not a soft rounded glass card */
+  border-radius: 3px;
   position: relative;
   overflow: hidden;
   cursor: default;
@@ -1019,18 +1020,52 @@ h3 {
     box-shadow 0.5s ease;
 }
 
-/* Per-card accent borders (always visible at top) */
+/* Per-card accent borders (always visible at top) + scanline tint var */
 .about-spatial-card--cyan {
   border-top: 2px solid rgba(0, 243, 255, 0.5);
+  --scan-color: rgba(0, 243, 255, 0.18);
 }
 
 .about-spatial-card--purple {
   border-top: 2px solid rgba(188, 19, 254, 0.5);
+  --scan-color: rgba(188, 19, 254, 0.18);
 }
 
 .about-spatial-card--green {
   border-top: 2px solid rgba(0, 255, 136, 0.5);
+  --scan-color: rgba(0, 255, 136, 0.18);
 }
+
+/* ── HUD corner brackets — replaces the "soft glass card" silhouette
+   with a targeting-reticle frame, drawn with layered gradients on one
+   pseudo-element (no extra DOM, no clip-path/box-shadow interaction) ── */
+.about-spatial-card::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  --bracket-color: rgba(255, 255, 255, 0.35);
+  background:
+    linear-gradient(to right,  var(--bracket-color) 2px, transparent 2px) top    left  / 14px 2px no-repeat,
+    linear-gradient(to bottom, var(--bracket-color) 2px, transparent 2px) top    left  / 2px 14px no-repeat,
+    linear-gradient(to left,   var(--bracket-color) 2px, transparent 2px) top    right / 14px 2px no-repeat,
+    linear-gradient(to bottom, var(--bracket-color) 2px, transparent 2px) top    right / 2px 14px no-repeat,
+    linear-gradient(to right,  var(--bracket-color) 2px, transparent 2px) bottom left  / 14px 2px no-repeat,
+    linear-gradient(to top,    var(--bracket-color) 2px, transparent 2px) bottom left  / 2px 14px no-repeat,
+    linear-gradient(to left,   var(--bracket-color) 2px, transparent 2px) bottom right / 14px 2px no-repeat,
+    linear-gradient(to top,    var(--bracket-color) 2px, transparent 2px) bottom right / 2px 14px no-repeat;
+}
+
+.about-spatial-card.is-active::after {
+  opacity: 1;
+}
+
+.about-spatial-card--cyan.is-active::after   { --bracket-color: rgba(0, 243, 255, 0.75); }
+.about-spatial-card--purple.is-active::after { --bracket-color: rgba(188, 19, 254, 0.75); }
+.about-spatial-card--green.is-active::after  { --bracket-color: rgba(0, 255, 136, 0.75); }
 
 /* ── Active state — card lifts up elegantly ──────────────────────────────── */
 
@@ -1042,23 +1077,23 @@ h3 {
 
 .about-spatial-card--cyan.is-active {
   box-shadow:
-    0 40px 80px rgba(0, 243, 255, 0.18),
-    0 0 0 1px rgba(0, 243, 255, 0.15),
-    inset 0 1px 0 rgba(0, 243, 255, 0.08);
+    0 14px 28px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 243, 255, 0.4),
+    0 0 20px rgba(0, 243, 255, 0.22);
 }
 
 .about-spatial-card--purple.is-active {
   box-shadow:
-    0 40px 80px rgba(188, 19, 254, 0.18),
-    0 0 0 1px rgba(188, 19, 254, 0.15),
-    inset 0 1px 0 rgba(188, 19, 254, 0.08);
+    0 14px 28px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(188, 19, 254, 0.4),
+    0 0 20px rgba(188, 19, 254, 0.22);
 }
 
 .about-spatial-card--green.is-active {
   box-shadow:
-    0 40px 80px rgba(0, 255, 136, 0.15),
-    0 0 0 1px rgba(0, 255, 136, 0.12),
-    inset 0 1px 0 rgba(0, 255, 136, 0.07);
+    0 14px 28px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 255, 136, 0.35),
+    0 0 20px rgba(0, 255, 136, 0.2);
 }
 
 /* ── Dimmed state — non-hovered cards when one is active ─────────────────── */
@@ -1071,16 +1106,21 @@ h3 {
 
 /* ── Cursor spotlight overlay ─────────────────────────────────────────────── */
 
+/* Scanner beam — a thin horizontal band that tracks the cursor's vertical
+   position inside the card, like a HUD reading the panel, instead of a
+   soft radial spotlight blob. Reuses the same --spot-y var CardStack-
+   Interactions.tsx already writes — no JS change needed here. */
 .about-spatial-card-spotlight {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
   z-index: 2;
-  background: radial-gradient(
-    280px circle at var(--spot-x, 50%) var(--spot-y, -20%),
-    rgba(255, 255, 255, 0.045) 0%,
-    transparent 70%
+  background: linear-gradient(
+    to bottom,
+    transparent calc(var(--spot-y, 50%) - 10%),
+    var(--scan-color, rgba(255, 255, 255, 0.12)) var(--spot-y, 50%),
+    transparent calc(var(--spot-y, 50%) + 10%)
   );
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -1355,15 +1395,27 @@ h3 {
   font-family: var(--font-code);
   font-size: 0.68rem;
   font-weight: 600;
-  padding: 5px 12px;
+  padding: 5px 10px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 50px;
+  /* Small rect chip, not a rounded pill — reads as a PCB component */
+  border-radius: 3px;
   color: rgba(255, 255, 255, 0.4);
   display: inline-flex;
   align-items: center;
   gap: 5px;
   transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+/* Status LED — matches whatever color the badge currently has */
+.about-spatial-badge::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
 }
 
 .about-spatial-card--cyan.is-active .about-spatial-badge {
@@ -3587,7 +3639,10 @@ a.contact-info-row:hover .contact-info-icon {
     box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.35s ease,
     opacity 0.3s ease;
-  will-change: transform, box-shadow;
+  /* box-shadow isn't a compositable property, so hinting it in will-change
+     bought nothing but kept every card's paint layer pinned in GPU memory
+     at once (this list runs a continuous marquee animation). */
+  will-change: transform;
   position: relative;
   z-index: 1;
   /* Isolate stacking so ::before glare is clipped by overflow:hidden */
@@ -4591,7 +4646,7 @@ a.contact-info-row:hover .contact-info-icon {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   3D FILM ROLL PROJECTS SECTION & CYBER DETAILS MODAL
+   3D SATELLITE ARRAY PROJECTS SECTION & CYBER DETAILS MODAL
    ═══════════════════════════════════════════════════════════ */
 
 .project-3d-canvas-wrap {

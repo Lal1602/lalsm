@@ -298,7 +298,6 @@ export const BackgroundPixelStars = memo(
       if (!canvas) return;
 
       let shootingStarTimeoutId: ReturnType<typeof setTimeout>;
-      let initRafId: number;
 
       // ── Shooting star scheduler (defined before use) ──
       const scheduleShootingStar = (): void => {
@@ -319,7 +318,7 @@ export const BackgroundPixelStars = memo(
       // Defer one frame so the browser resolves the parent's 200vw CSS layout
       // before we read containerRef.current.offsetWidth for canvas pixel dimensions.
       // Without this, offsetWidth may return 0 on first paint.
-      initRafId = requestAnimationFrame(() => {
+      const initRafId = requestAnimationFrame(() => {
         const { w, h } = getCanvasSize();
         canvas.width = w;
         canvas.height = h;

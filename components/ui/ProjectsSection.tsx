@@ -61,7 +61,7 @@ export default function ProjectsSection() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Pointer drag event handlers to rotate the 3D film strip cylinder
+  // Pointer drag event handlers to rotate the 3D satellite array cylinder
   const handlePointerDown = (e: React.PointerEvent) => {
     scrollRef.current.isDragging = true;
     scrollRef.current.lastX = e.clientX;
@@ -83,7 +83,7 @@ export default function ProjectsSection() {
     scrollRef.current.velocity = -deltaX * sensitivity;
   };
 
-  const handlePointerUp = (e: React.PointerEvent) => {
+  const handlePointerUp = () => {
     if (scrollRef.current.isDragging) {
       scrollRef.current.isDragging = false;
     }
@@ -107,9 +107,9 @@ export default function ProjectsSection() {
         <div className="project-hud-instruction" data-scroll>
           <span className="hud-pulse-dot"></span>
           <p className="hud-text">
-            {isDesktop 
-              ? "// GRAB & DRAG OR SCROLL TO SPIN VINTAGE FILM STRIP" 
-              : "// SWIPE LEFT/RIGHT TO SPIN • TAP A CARD TO OPEN DETAILS"}
+            {isDesktop
+              ? "// GRAB & DRAG OR SCROLL TO ROTATE THE SATELLITE ARRAY"
+              : "// SWIPE LEFT/RIGHT TO ORBIT • TAP A CARD TO OPEN DETAILS"}
           </p>
         </div>
 
@@ -148,7 +148,7 @@ export default function ProjectsSection() {
           </div>
           <div className="project-loop-bar-hud">
             <span className="hud-code">// SYS.LOOP_ACTIVE</span>
-            <span className="hud-code">REEL SPEED: 2.4 RPM</span>
+            <span className="hud-code">ORBIT VELOCITY: 2.4 RPM</span>
           </div>
         </div>
       </div>
@@ -159,7 +159,6 @@ export default function ProjectsSection() {
           <div className="modal-backdrop"></div>
           <div className="modal-content-card" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={() => setActiveProject(null)}>
-              {/* @ts-ignore */}
               <ion-icon suppressHydrationWarning name="close-outline"></ion-icon>
             </button>
             <div className="modal-body">
@@ -189,7 +188,6 @@ export default function ProjectsSection() {
                     className="btn-launch-live"
                   >
                     <span>LAUNCH ACTIVE INTERFACE</span>
-                    {/* @ts-ignore */}
                     <ion-icon suppressHydrationWarning name="rocket-outline" style={{ marginLeft: "8px", fontSize: "1.1rem" }}></ion-icon>
                   </a>
                 </div>

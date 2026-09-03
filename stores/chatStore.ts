@@ -119,7 +119,7 @@ export const useChatStore = create<ChatStore>()(
               });
 
               if (targetIndex !== -1) {
-                const swiperEl = document.getElementById('project-swiper') as any;
+                const swiperEl = document.getElementById('project-swiper') as (HTMLElement & { swiper?: { slideTo: (index: number) => void } }) | null;
                 if (swiperEl && swiperEl.swiper) {
                   swiperEl.swiper.slideTo(targetIndex);
                 }

@@ -118,7 +118,6 @@ export default function ProcessDashboard() {
         {/* Mobile hint */}
         <p className="process-hover-hint process-hint-mobile" aria-hidden="true">
           <span className="hint-tap-icon">
-            {/* @ts-ignore */}
             <ion-icon suppressHydrationWarning name="finger-print-outline"></ion-icon>
           </span>
           tap a phase — unlock the sequence

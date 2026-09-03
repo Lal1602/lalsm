@@ -45,7 +45,7 @@ function CameraParallax() {
     state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, targetX, 0.08);
     state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, targetY, 0.08);
     
-    // Look slightly deeper into the curved center of the film roll
+    // Look slightly deeper into the curved center of the orbital array
     state.camera.lookAt(0, 0, -3.2);
   });
 
@@ -86,7 +86,7 @@ export default function FilmScene({ projects, onSelectProject, scrollRef, progre
 
   return (
     <>
-      {/* 1. Cinematic Stage Lighting */}
+      {/* 1. Orbital Stage Lighting */}
       <ambientLight intensity={0.25} />
       <directionalLight position={[5, 10, 5]} intensity={0.4} />
       
@@ -94,7 +94,7 @@ export default function FilmScene({ projects, onSelectProject, scrollRef, progre
       <pointLight position={[-6, 4, -4]} intensity={2} color="#bc13fe" distance={15} />
       <pointLight position={[6, -4, -4]} intensity={2} color="#00f3ff" distance={15} />
 
-      {/* 2. Film Strip Group */}
+      {/* 2. Satellite Array Group */}
       <Suspense fallback={null}>
         <group position={[0, 0.15, 0]}>
           {projects.map((proj, idx) => (

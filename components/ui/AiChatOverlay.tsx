@@ -9,7 +9,6 @@ const TypingBubble = ({ text }: { text: string }) => {
 
   useEffect(() => {
     let i = 0;
-    setDisplayedText("");
     const interval = setInterval(() => {
       i += 1;
       setDisplayedText(text.slice(0, i));

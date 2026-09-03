@@ -61,9 +61,9 @@ export default function HolographicCard({ activeStep, activeIndex }: Holographic
       className={`interactive-info-card ${isIdle ? 'is-idle' : `accent-${activeIndex}`}`}
       id="interactive-info-card"
       style={{
-        ["--card-theme-color" as any]: currentTheme.hex,
-        ["--glow-color-rgb" as any]: currentTheme.rgb
-      }}
+        "--card-theme-color": currentTheme.hex,
+        "--glow-color-rgb": currentTheme.rgb
+      } as React.CSSProperties}
     >
       {/* Ambient background light glow - extremely subtle */}
       <div className="card-ambient-glow" />
@@ -73,7 +73,6 @@ export default function HolographicCard({ activeStep, activeIndex }: Holographic
         {isIdle ? (
           <div className="card-idle-prompt" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", textAlign: "center", gap: "16px", opacity: 0.8 }}>
             <div style={{ fontSize: "3rem", color: "var(--text-muted)", opacity: 0.5, animation: "prompt-float 2s ease-in-out infinite" }}>
-              {/* @ts-ignore */}
               <ion-icon suppressHydrationWarning name="bulb-outline"></ion-icon>
             </div>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "2rem", fontWeight: 900, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.05)", WebkitTextStroke: "1px rgba(255,255,255,0.4)" }}>
@@ -89,7 +88,6 @@ export default function HolographicCard({ activeStep, activeIndex }: Holographic
             <div className="card-header-area">
               <span className="card-eyebrow-tech">{currentTheme.eyebrow}</span>
               <div ref={iconRef} className="card-icon-container">
-                {/* @ts-ignore */}
                 <ion-icon suppressHydrationWarning name={activeStep.icon}></ion-icon>
               </div>
             </div>

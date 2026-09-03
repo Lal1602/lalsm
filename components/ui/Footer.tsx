@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Footer() {
   const [time, setTime] = useState("00:00:00");
@@ -37,22 +37,18 @@ export default function Footer() {
           </div>
 
           <div className="time-display">
-            {/* @ts-ignore */}
             <ion-icon suppressHydrationWarning name="time-outline"></ion-icon>
             <span id="surabayaTime">{time}</span>
           </div>
 
           <div className="footer-socials">
             <a href="https://github.com/Lal1602" className="social-icon" aria-label="GitHub">
-              {/* @ts-ignore */}
               <ion-icon suppressHydrationWarning name="logo-github"></ion-icon>
             </a>
             <a href="https://discordapp.com/users/535780117792817152" className="social-icon" aria-label="Discord">
-              {/* @ts-ignore */}
               <ion-icon suppressHydrationWarning name="logo-discord"></ion-icon>
             </a>
             <a href="https://www.instagram.com/chocolal_s/" className="social-icon" aria-label="Instagram">
-              {/* @ts-ignore */}
               <ion-icon suppressHydrationWarning name="logo-instagram"></ion-icon>
             </a>
           </div>

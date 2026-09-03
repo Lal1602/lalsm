@@ -28,14 +28,25 @@ function runHackerEffect(target: HTMLElement) {
 export default function GSAPEffects() {
   useEffect(() => {
     // Scroll progress
+    // Cache the bar element once (was re-querying the DOM on every scroll event)
+    // and coalesce work to one read+write per animation frame (was doing a forced
+    // layout read + DOM write on every native scroll event, which fires far more
+    // often than the display can paint, especially during Lenis smooth-scroll).
+    const bar = document.querySelector<HTMLElement>(".scroll-progress-bar");
+    let ticking = false;
     function updateProgress() {
+      ticking = false;
       const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const pct = (scrollTop / scrollHeight) * 100;
-      const bar = document.querySelector<HTMLElement>(".scroll-progress-bar");
       if (bar) bar.style.width = pct + "%";
     }
-    window.addEventListener("scroll", updateProgress);
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateProgress);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     // Parallax
     gsap.to(".parallax-text", {
@@ -229,26 +240,38 @@ export default function GSAPEffects() {
     });
 
     // Hacker text on hover
+    const hackerHoverCleanups: Array<() => void> = [];
     document.querySelectorAll<HTMLElement>(".hacker-text, .nav-link").forEach((el) => {
-      el.addEventListener("mouseover", () => runHackerEffect(el));
+      const onMouseOver = () => runHackerEffect(el);
+      el.addEventListener("mouseover", onMouseOver);
+      hackerHoverCleanups.push(() => el.removeEventListener("mouseover", onMouseOver));
     });
 
     // Magnetic buttons
+    const magnetCleanups: Array<() => void> = [];
     document.querySelectorAll<HTMLElement>(".btn, .social-icon, .nav-link, .btn-quick-view").forEach((magnet) => {
-      magnet.addEventListener("mousemove", (e) => {
+      const onMouseMove = (e: MouseEvent) => {
         const bounding = magnet.getBoundingClientRect();
         const newX = (e.clientX - bounding.left) / magnet.offsetWidth - 0.5;
         const newY = (e.clientY - bounding.top) / magnet.offsetHeight - 0.5;
         gsap.to(magnet, { duration: 0.3, x: newX * 20, y: newY * 20, ease: "power2.out" });
-      });
-      magnet.addEventListener("mouseleave", () => {
+      };
+      const onMouseLeave = () => {
         gsap.to(magnet, { duration: 1, x: 0, y: 0, ease: "elastic.out(1.2, 0.4)" });
+      };
+      magnet.addEventListener("mousemove", onMouseMove);
+      magnet.addEventListener("mouseleave", onMouseLeave);
+      magnetCleanups.push(() => {
+        magnet.removeEventListener("mousemove", onMouseMove);
+        magnet.removeEventListener("mouseleave", onMouseLeave);
       });
     });
 
     return () => {
       clearTimeout(refreshTimer);
-      window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("scroll", onScroll);
+      hackerHoverCleanups.forEach((cleanup) => cleanup());
+      magnetCleanups.forEach((cleanup) => cleanup());
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, []);

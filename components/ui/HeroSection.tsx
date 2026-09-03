@@ -16,7 +16,6 @@ export default function HeroSection() {
               <Image src="/mee.jpeg" alt="Bilal Profile" width={350} height={350} priority />
             </div>
             <div className="stats-badge">
-              {/* @ts-ignore */}
               <ion-icon suppressHydrationWarning
                 name="checkmark-done-circle"
                 style={{ color: "var(--accent-purple)", fontSize: "2.5rem" }}
@@ -57,7 +56,6 @@ export default function HeroSection() {
       </div>
 
       <a href="#about" className="scroll-indicator" aria-label="Scroll to About">
-        {/* @ts-ignore */}
         <ion-icon suppressHydrationWarning name="chevron-down-outline" aria-hidden="true"></ion-icon>
       </a>
     </section>

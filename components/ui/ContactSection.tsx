@@ -26,7 +26,6 @@ export default function ContactSection() {
             <div className="contact-info-list">
               <a href="mailto:bilal.lalsm@gmail.com" className="contact-info-row" aria-label="Email Bilal">
                 <span className="contact-info-icon">
-                  {/* @ts-ignore */}
                   <ion-icon suppressHydrationWarning name="mail-outline" aria-hidden="true"></ion-icon>
                 </span>
                 <span className="contact-info-text">
@@ -36,7 +35,6 @@ export default function ContactSection() {
               </a>
               <a href="tel:+62895340180343" className="contact-info-row" aria-label="Call Bilal">
                 <span className="contact-info-icon">
-                  {/* @ts-ignore */}
                   <ion-icon suppressHydrationWarning name="call-outline" aria-hidden="true"></ion-icon>
                 </span>
                 <span className="contact-info-text">
@@ -46,7 +44,6 @@ export default function ContactSection() {
               </a>
               <div className="contact-info-row">
                 <span className="contact-info-icon">
-                  {/* @ts-ignore */}
                   <ion-icon suppressHydrationWarning name="location-outline" aria-hidden="true"></ion-icon>
                 </span>
                 <span className="contact-info-text">
@@ -96,7 +93,6 @@ export default function ContactSection() {
             </div>
 
             <button type="submit" className="btn hud-submit-btn">
-              {/* @ts-ignore */}
               <ion-icon suppressHydrationWarning name="send-outline" aria-hidden="true"></ion-icon>
               Transmit Message
             </button>

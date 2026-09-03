@@ -64,10 +64,11 @@ export default function ProjectModal({ data, cardRect, onClose }: Props) {
 
   // Close on Escape key
   useEffect(() => {
+    if (!data) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  });
+  }, [data]);
 
   if (!data) return null;
 
@@ -92,7 +93,6 @@ export default function ProjectModal({ data, cardRect, onClose }: Props) {
           aria-label="Close"
           onClick={handleClose}
         >
-          {/* @ts-ignore */}
           <ion-icon suppressHydrationWarning name="close-outline" aria-hidden="true" />
         </button>
 
@@ -139,7 +139,6 @@ export default function ProjectModal({ data, cardRect, onClose }: Props) {
             className="ach-modal-cta"
             aria-label={`View full certificate for ${data.title}`}
           >
-            {/* @ts-ignore */}
             <ion-icon suppressHydrationWarning name="open-outline" aria-hidden="true" />
             View Full Certificate
           </a>

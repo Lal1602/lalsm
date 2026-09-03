@@ -42,7 +42,6 @@ export default function TubesCursor() {
   const appRef = useRef<TubesInstance | null>(null);
 
   useEffect(() => {
-    let initTimer: ReturnType<typeof setTimeout>;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -64,7 +63,7 @@ export default function TubesCursor() {
     const CDN_URL =
       "https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js";
 
-    initTimer = setTimeout(() => {
+    const initTimer = setTimeout(() => {
       syncSize(); // re-sync just before init in case layout shifted
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore — TypeScript cannot resolve CDN URLs statically; this is intentional.

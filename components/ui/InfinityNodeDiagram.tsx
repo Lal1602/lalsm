@@ -7,7 +7,7 @@ interface InfinityNodeDiagramProps {
   hexColor: string;
 }
 
-export default function InfinityNodeDiagram({ activeIndex, hexColor }: InfinityNodeDiagramProps) {
+export default function InfinityNodeDiagram({ activeIndex }: InfinityNodeDiagramProps) {
   const themeType = useThemeStore((state) => state.theme.type);
   return (
     <div className="node-network-box" style={{ width: "100%", height: "160px", marginTop: "24px", position: "relative" }}>

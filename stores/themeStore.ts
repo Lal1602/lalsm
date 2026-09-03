@@ -24,7 +24,7 @@ export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
       themes: [...AvailableThemes],
-      theme: AvailableThemes[0],
+      theme: AvailableThemes[1],
       nextTheme: () => {
         const themes = get().themes;
         const activeThemeIndex = themes.findIndex(theme => theme.type === get().theme.type);
