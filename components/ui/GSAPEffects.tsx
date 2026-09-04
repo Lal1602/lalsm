@@ -27,6 +27,14 @@ function runHackerEffect(target: HTMLElement) {
 
 export default function GSAPEffects() {
   useEffect(() => {
+    // Respect the OS-level "reduce motion" setting: skip/soften every
+    // non-essential animation below (parallax, scramble text, magnetic
+    // buttons, 3D tilt, scroll-linked reveals) instead of forcing them on
+    // everyone regardless of preference.
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     // Scroll progress
     function updateProgress() {
       const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
@@ -37,24 +45,34 @@ export default function GSAPEffects() {
     }
     window.addEventListener("scroll", updateProgress);
 
-    // Parallax
-    gsap.to(".parallax-text", {
-      yPercent: 30,
-      ease: "none",
-      scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
-    });
-    gsap.to(".image-blob", {
-      yPercent: 15,
-      ease: "none",
-      scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
-    });
-    gsap.to(".stats-badge", {
-      y: -80, x: -20, rotate: -5, ease: "none",
-      scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
-    });
+    // Parallax — skipped entirely under reduced motion (purely decorative)
+    if (!prefersReducedMotion) {
+      gsap.to(".parallax-text", {
+        yPercent: 30,
+        ease: "none",
+        scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
+      });
+      gsap.to(".image-blob", {
+        yPercent: 15,
+        ease: "none",
+        scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
+      });
+      gsap.to(".stats-badge", {
+        y: -80, x: -20, rotate: -5, ease: "none",
+        scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
+      });
+    }
 
-    // Section title glow
+    // Section title glow — under reduced motion, apply the end state once
+    // instead of toggling it on every scroll in/out of view.
     gsap.utils.toArray<HTMLElement>(".section-title").forEach((title) => {
+      if (prefersReducedMotion) {
+        gsap.set(title, {
+          textShadow: "0 0 20px var(--accent-cyan), 0 0 40px var(--accent-cyan)",
+          color: "#fff",
+        });
+        return;
+      }
       gsap.to(title, {
         textShadow: "0 0 20px var(--accent-cyan), 0 0 40px var(--accent-cyan)",
         color: "#fff",
@@ -71,8 +89,11 @@ export default function GSAPEffects() {
     // Detect mobile via CSS media query — reliable cross-browser, no UA sniffing
     const isMobileDevice = typeof window !== "undefined" &&
       window.matchMedia("(max-width: 768px)").matches;
+    // Mobile already shows content instantly instead of scroll-revealing it —
+    // reduced motion gets the same instant treatment.
+    const skipScrollReveals = isMobileDevice || prefersReducedMotion;
 
-    if (!isMobileDevice) {
+    if (!skipScrollReveals) {
       // Desktop: staggered fade-in driven by scroll position
       gsap.utils.toArray<HTMLElement>("[data-scroll]").forEach((elem) => {
         gsap.fromTo(elem,
@@ -91,7 +112,7 @@ export default function GSAPEffects() {
         );
       });
     } else {
-      // Mobile: show everything immediately — no scroll-trigger dependency
+      // Mobile / reduced motion: show everything immediately — no scroll-trigger dependency
       gsap.set("[data-scroll]", { y: 0, opacity: 1, clearProps: "transform" });
     }
 
@@ -101,22 +122,26 @@ export default function GSAPEffects() {
       ScrollTrigger.refresh(true);
     }, 350);
 
-    // Marquee
-    gsap.to(".marquee-wrapper", { xPercent: -50, repeat: -1, duration: 15, ease: "linear" });
-    const marqueeProxy = { skew: 0 };
-    const marqueeSkewSetter = gsap.quickSetter(".marquee-text", "skewX", "deg");
-    const marqueeClamp = gsap.utils.clamp(-20, 20);
-    ScrollTrigger.create({
-      onUpdate: (self) => {
-        const skew = marqueeClamp(self.getVelocity() / -300);
-        if (Math.abs(skew) > Math.abs(marqueeProxy.skew)) {
-          marqueeProxy.skew = skew;
-          gsap.to(marqueeProxy, { skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => marqueeSkewSetter(marqueeProxy.skew) });
-        }
-      },
-    });
+    // Marquee — under reduced motion this stays static rather than looping
+    // forever (continuous auto-scrolling text is exactly what that OS
+    // setting asks sites to avoid).
+    if (!prefersReducedMotion) {
+      gsap.to(".marquee-wrapper", { xPercent: -50, repeat: -1, duration: 15, ease: "linear" });
+      const marqueeProxy = { skew: 0 };
+      const marqueeSkewSetter = gsap.quickSetter(".marquee-text", "skewX", "deg");
+      const marqueeClamp = gsap.utils.clamp(-20, 20);
+      ScrollTrigger.create({
+        onUpdate: (self) => {
+          const skew = marqueeClamp(self.getVelocity() / -300);
+          if (Math.abs(skew) > Math.abs(marqueeProxy.skew)) {
+            marqueeProxy.skew = skew;
+            gsap.to(marqueeProxy, { skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => marqueeSkewSetter(marqueeProxy.skew) });
+          }
+        },
+      });
+    }
 
-    if (!isMobileDevice) {
+    if (!skipScrollReveals) {
       // Achievements reveal
       gsap.fromTo(".achievements-marquee-wrapper",
         { scale: 0.4, y: 200, rotationX: 45, opacity: 0, transformPerspective: 1000, transformOrigin: "center center" },
@@ -142,6 +167,9 @@ export default function GSAPEffects() {
       // Computes distance of each slide from viewport center and applies 3D rotation (rotateY)
       // and Z depth (translateZ) so slides glide along an inward-curving cylinder.
       const updateConcaveTrack = () => {
+        // Reduced motion: keep the horizontal navigation (still needed to
+        // reach the content) but skip the cosmetic 3D tilt/perspective wobble.
+        if (prefersReducedMotion) return;
         const wrapperX = (gsap.getProperty(horizonWrapper, "x") as number) || 0;
         const viewportWidth = getSlideWidth();
         const viewportCenter = viewportWidth / 2;
@@ -219,32 +247,41 @@ export default function GSAPEffects() {
     // Footer auto-glow
     ScrollTrigger.create({ trigger: ".mega-link", start: "top 65%", toggleClass: "active" });
 
-    // Hacker text on scroll
-    document.querySelectorAll<HTMLElement>("h2.section-title, h1.glitch-text").forEach((title) => {
-      ScrollTrigger.create({
-        trigger: title,
-        start: "top 80%",
-        onEnter: () => runHackerEffect(title),
+    // Hacker text on scroll — kept only on section titles (the one place it
+    // reads as a deliberate reveal moment), and skipped under reduced motion.
+    if (!prefersReducedMotion) {
+      document.querySelectorAll<HTMLElement>("h2.section-title, h1.glitch-text").forEach((title) => {
+        ScrollTrigger.create({
+          trigger: title,
+          start: "top 80%",
+          onEnter: () => runHackerEffect(title),
+        });
       });
-    });
+    }
 
-    // Hacker text on hover
-    document.querySelectorAll<HTMLElement>(".hacker-text, .nav-link").forEach((el) => {
-      el.addEventListener("mouseover", () => runHackerEffect(el));
-    });
+    // Hacker text on hover — dropped from .nav-link (navigation should feel
+    // instant and stable, not re-scramble on every hover) and scoped to
+    // elements that explicitly opt in via .hacker-text.
+    if (!prefersReducedMotion) {
+      document.querySelectorAll<HTMLElement>(".hacker-text").forEach((el) => {
+        el.addEventListener("mouseover", () => runHackerEffect(el));
+      });
+    }
 
-    // Magnetic buttons
-    document.querySelectorAll<HTMLElement>(".btn, .social-icon, .nav-link, .btn-quick-view").forEach((magnet) => {
-      magnet.addEventListener("mousemove", (e) => {
-        const bounding = magnet.getBoundingClientRect();
-        const newX = (e.clientX - bounding.left) / magnet.offsetWidth - 0.5;
-        const newY = (e.clientY - bounding.top) / magnet.offsetHeight - 0.5;
-        gsap.to(magnet, { duration: 0.3, x: newX * 20, y: newY * 20, ease: "power2.out" });
+    // Magnetic buttons — skipped under reduced motion
+    if (!prefersReducedMotion) {
+      document.querySelectorAll<HTMLElement>(".btn, .social-icon, .nav-link, .btn-quick-view").forEach((magnet) => {
+        magnet.addEventListener("mousemove", (e) => {
+          const bounding = magnet.getBoundingClientRect();
+          const newX = (e.clientX - bounding.left) / magnet.offsetWidth - 0.5;
+          const newY = (e.clientY - bounding.top) / magnet.offsetHeight - 0.5;
+          gsap.to(magnet, { duration: 0.3, x: newX * 20, y: newY * 20, ease: "power2.out" });
+        });
+        magnet.addEventListener("mouseleave", () => {
+          gsap.to(magnet, { duration: 1, x: 0, y: 0, ease: "elastic.out(1.2, 0.4)" });
+        });
       });
-      magnet.addEventListener("mouseleave", () => {
-        gsap.to(magnet, { duration: 1, x: 0, y: 0, ease: "elastic.out(1.2, 0.4)" });
-      });
-    });
+    }
 
     return () => {
       clearTimeout(refreshTimer);

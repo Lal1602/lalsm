@@ -2,17 +2,33 @@
   --bg-color: #050505;
   --text-main: #e0e0e0;
   --text-muted: #8892b0;
-  --accent-cyan: #00f3ff;
-  --accent-purple: #bc13fe;
-  --accent-gold: #ffd700;
+  /*
+    Palette refined off the original pure neon cyan/magenta/gold triad
+    (#00f3ff / #bc13fe / #ffd700) — same three-accent structure so every
+    existing var(--accent-*) usage keeps working, but pulled back from
+    the stock "AI cyberpunk template" look toward something a bit more
+    considered. Variable names kept as-is on purpose (renaming would mean
+    touching every call site across the codebase).
+  */
+  --accent-cyan: #4fb8e0;
+  --accent-purple: #8b7cf6;
+  --accent-gold: #f0a868;
   --glass-bg: rgba(255, 255, 255, 0.03);
   --glass-border: rgba(255, 255, 255, 0.06);
-  --font-display: 'Orbitron', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Rajdhani', sans-serif;
   --font-code: 'Roboto Mono', monospace;
   --concave-center: rgba(15, 12, 30, 0.25);
   --concave-edge: rgba(5, 5, 5, 0.95);
   --concave-shadow: rgba(0, 0, 0, 0.95);
+
+  /* Top-of-stack scale — replaces the old 99,999 / 999,999 / 1,999,999 /
+     2,000,000 "just go higher" z-index values with a small, readable set. */
+  --z-scrollbar: 9000;
+  --z-project-modal: 9050;
+  --z-grain: 9100;
+  --z-preloader: 9500;
+  --z-cursor: 9999;
 }
 
 * {
@@ -46,7 +62,7 @@ body::-webkit-scrollbar {
   height: 3px;
   background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
   width: 0%;
-  z-index: 99999;
+  z-index: var(--z-scrollbar);
   box-shadow: 0 0 10px var(--accent-cyan);
   transition: width 0.1s;
 }
@@ -62,7 +78,7 @@ body::-webkit-scrollbar {
   opacity: 0.035;
   pointer-events: none;
   /* Sits just below cursor, above all modals/overlays */
-  z-index: 1999999;
+  z-index: var(--z-grain);
 }
 
 /* --- Custom Cursor --- */
@@ -75,7 +91,7 @@ body::-webkit-scrollbar {
   left: 0;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  z-index: 2000000;
+  z-index: var(--z-cursor);
   pointer-events: none;
 }
 
@@ -199,7 +215,7 @@ button,
   height: 6px;
   border-radius: 50%;
   pointer-events: none;
-  z-index: 99999;
+  z-index: var(--z-project-modal);
 }
 
 /* --- Background --- */
@@ -3216,8 +3232,8 @@ a.contact-info-row:hover .contact-info-icon {
   height: 100dvh;
   /* Dynamic Viewport Height (Supaya pas di browser HP modern) */
   background-color: #000;
-  z-index: 999999;
-  /* Paling atas */
+  z-index: var(--z-preloader);
+  /* Paling atas, tapi tetap di bawah cursor */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -3660,6 +3676,7 @@ a.contact-info-row:hover .contact-info-icon {
 
 /* ── Certificate image at the top ── */
 .marquee-card-img-wrap {
+  position: relative; /* required for next/image `fill` */
   width: 100%;
   height: 165px;
   overflow: hidden;
@@ -4657,7 +4674,7 @@ a.contact-info-row:hover .contact-info-icon {
 .project-detail-modal {
   position: fixed;
   inset: 0;
-  z-index: 99999;
+  z-index: var(--z-project-modal);
   display: flex;
   align-items: center;
   justify-content: center;

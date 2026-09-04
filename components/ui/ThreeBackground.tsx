@@ -149,18 +149,27 @@ export default function ThreeBackground() {
         const start = horizonScrollState.start;
         const end = horizonScrollState.end;
 
+        let insideHorizonPin = false;
         if (start > 0 && end > 0) {
           if (window.scrollY < start) {
             // Above the horizontal showcase: normal scroll
             effectiveScrollY = window.scrollY;
           } else if (window.scrollY >= start && window.scrollY <= end) {
-            // Pinned inside the showcase: freeze exactly at the entry point
+            // Pinned inside the showcase: freeze exactly at the entry point.
+            // The Horizon section already layers its own WebGL/canvas
+            // background (TubesCursor + BackgroundPixelStars) on top of this
+            // one, and the camera/particles below are frozen anyway while
+            // pinned — so skip the render entirely here instead of paying
+            // for a frame nobody can see. Loop keeps running so it resumes
+            // instantly once the user scrolls back out.
+            insideHorizonPin = true;
             effectiveScrollY = start;
           } else {
             // Below the showcase: resume scrolling but offset the virtual horizontal scroll duration
             effectiveScrollY = window.scrollY - (end - start);
           }
         }
+        if (insideHorizonPin) return;
         camera.position.z = 4 - effectiveScrollY * 0.0025;
         particlesMesh.rotation.y = elapsedTime * 0.05;
         particlesMesh.rotation.z = effectiveScrollY * 0.0002;

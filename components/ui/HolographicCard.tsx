@@ -80,7 +80,7 @@ export default function HolographicCard({ activeStep, activeIndex }: Holographic
               HOVER A PHASE
             </h2>
             <p style={{ fontFamily: "var(--font-code)", fontSize: "0.75rem", letterSpacing: "0.2em", color: "var(--text-muted)" }}>
-              // TO DECRYPT WORKFLOW //
+              // see how each phase works //
             </p>
           </div>
         ) : (

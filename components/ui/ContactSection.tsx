@@ -9,9 +9,9 @@ export default function ContactSection() {
         <div className="contact-wrapper">
           {/* Left: Info card */}
           <article className="glass-card contact-glass-card" data-scroll>
-            <div className="uplink-status" aria-label="Connection status: Secure uplink established">
+            <div className="uplink-status" aria-label="Available for freelance and collaboration">
               <span className="live-dot" aria-hidden="true"></span>
-              SECURE UPLINK ESTABLISHED
+              AVAILABLE FOR FREELANCE &amp; COLLAB
             </div>
 
             <h3>Let&apos;s collaborate</h3>
@@ -73,32 +73,32 @@ export default function ContactSection() {
             <input type="hidden" name="access_key" value="25ba6941-8e69-4b9f-b267-15d2cd90f679" />
 
             <div className="hud-form-header" aria-hidden="true">
-              <span className="hud-form-tag">UPLINK_FORM.exe</span>
-              <span className="hud-form-tag-right">ENCRYPTION: AES-256</span>
+              <span className="hud-form-tag">MESSAGE_FORM</span>
+              <span className="hud-form-tag-right">HTTPS SECURED</span>
             </div>
 
             <div className="hud-input-group">
               <input type="text" name="name" id="contact-name" required autoComplete="name" aria-label="Your Name" placeholder=" " />
-              <label htmlFor="contact-name">ID / Name</label>
+              <label htmlFor="contact-name">Name</label>
               <span className="focus-border" aria-hidden="true"></span>
             </div>
 
             <div className="hud-input-group">
               <input type="email" name="email" id="contact-email" required autoComplete="email" aria-label="Your Email" placeholder=" " />
-              <label htmlFor="contact-email">Signal / Email</label>
+              <label htmlFor="contact-email">Email</label>
               <span className="focus-border" aria-hidden="true"></span>
             </div>
 
             <div className="hud-input-group hud-input-group--textarea">
               <textarea name="message" id="contact-message" rows={5} required aria-label="Your Message" placeholder=" "></textarea>
-              <label htmlFor="contact-message">Transmission / Message</label>
+              <label htmlFor="contact-message">Message</label>
               <span className="focus-border" aria-hidden="true"></span>
             </div>
 
             <button type="submit" className="btn hud-submit-btn">
               {/* @ts-ignore */}
               <ion-icon suppressHydrationWarning name="send-outline" aria-hidden="true"></ion-icon>
-              Transmit Message
+              Send Message
             </button>
           </form>
         </div>

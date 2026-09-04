@@ -35,7 +35,12 @@ function MarqueeCard({ c, hidden }: { c: CertCard; hidden?: boolean }) {
       data-link={c.link}
     >
       <div className="marquee-card-img-wrap">
-        <img src={c.image} alt={hidden ? "" : c.title} loading="lazy" />
+        <Image
+          src={c.image}
+          alt={hidden ? "" : c.title}
+          fill
+          sizes="(max-width: 768px) 45vw, 220px"
+        />
       </div>
       <div className="marquee-card-body">
         <span className="marquee-card-tag">{c.tag}</span>

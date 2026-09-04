@@ -1,4 +1,3 @@
-// Force Next.js recompilation after fixing syntax errors
 import HeroSection from "@/components/ui/HeroSection";
 import AboutSection from "@/components/ui/AboutSection";
 import ProcessDashboard from "@/components/ui/ProcessDashboard";
@@ -26,10 +25,10 @@ export default function Home() {
         {/* Kinetic Marquee */}
         <div className="kinetic-marquee-container">
           <div className="marquee-wrapper">
-            <span className="marquee-text">FULLSTACK DEVELOPER • CREATIVE CODER • UI/UX DESIGNER • SYSTEM ARCHITECT •</span>
-            <span className="marquee-text">FULLSTACK DEVELOPER • CREATIVE CODER • UI/UX DESIGNER • SYSTEM ARCHITECT •</span>
-            <span className="marquee-text">FULLSTACK DEVELOPER • CREATIVE CODER • UI/UX DESIGNER • SYSTEM ARCHITECT •</span>
-            <span className="marquee-text">FULLSTACK DEVELOPER • CREATIVE CODER • UI/UX DESIGNER • SYSTEM ARCHITECT •</span>
+            <span className="marquee-text">NEXT.JS • THREE.JS • GSAP • 35+ PROJECTS SHIPPED • PENS SURABAYA •</span>
+            <span className="marquee-text">NEXT.JS • THREE.JS • GSAP • 35+ PROJECTS SHIPPED • PENS SURABAYA •</span>
+            <span className="marquee-text">NEXT.JS • THREE.JS • GSAP • 35+ PROJECTS SHIPPED • PENS SURABAYA •</span>
+            <span className="marquee-text">NEXT.JS • THREE.JS • GSAP • 35+ PROJECTS SHIPPED • PENS SURABAYA •</span>
           </div>
         </div>
 

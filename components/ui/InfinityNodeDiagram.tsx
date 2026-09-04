@@ -31,7 +31,7 @@ export default function InfinityNodeDiagram({ activeIndex, hexColor }: InfinityN
             {/* Static high-end editorial boundary boxes */}
             <rect x="135" y="45" width="130" height="60" rx="5" fill={themeType === "light" ? "rgba(255,255,255,0.7)" : "rgba(8, 8, 14, 0.5)"} stroke={themeType === "light" ? "rgba(0,122,204,0.4)" : "rgba(0, 243, 255, 0.3)"} strokeWidth="1" />
             <text x="200" y="72" fill={themeType === "light" ? "#1a1a2e" : "#ffffff"} fontSize="9" fontFamily="var(--font-code)" fontWeight="700" letterSpacing="0.1em" textAnchor="middle">DISCOVERY // CORE</text>
-            <text x="200" y="86" fill={themeType === "light" ? "rgba(0,122,204,0.8)" : "rgba(0, 243, 255, 0.6)"} fontSize="7" fontFamily="var(--font-code)" textAnchor="middle">[ LATENCY // 0.082ms ]</text>
+            <text x="200" y="86" fill={themeType === "light" ? "rgba(0,122,204,0.8)" : "rgba(0, 243, 255, 0.6)"} fontSize="7" fontFamily="var(--font-code)" textAnchor="middle">[ SCOPE // DEFINED ]</text>
             
             {/* Architectural crosshairs */}
             <path d="M 120 30 L 120 20 L 130 20" fill="none" stroke={themeType === "light" ? "rgba(0,122,204,0.4)" : "rgba(0, 243, 255, 0.25)"} strokeWidth="1" />
@@ -101,7 +101,7 @@ export default function InfinityNodeDiagram({ activeIndex, hexColor }: InfinityN
             
             {/* Clean mathematical annotation typography */}
             <text x="50" y="25" fill={themeType === "light" ? "rgba(0,0,0,0.4)" : "rgba(255, 255, 255, 0.3)"} fontSize="7.5" fontFamily="var(--font-code)">F(x) = sin(x) * cos(2.4x)</text>
-            <text x="350" y="25" fill={themeType === "light" ? "rgba(181, 137, 0, 0.9)" : "rgba(188, 19, 254, 0.9)"} fontSize="7.5" fontFamily="var(--font-code)" textAnchor="end">[ MATRIX_COMPILE ]</text>
+            <text x="350" y="25" fill={themeType === "light" ? "rgba(181, 137, 0, 0.9)" : "rgba(188, 19, 254, 0.9)"} fontSize="7.5" fontFamily="var(--font-code)" textAnchor="end">[ TYPE-SAFE ]</text>
             <text x="200" y="142" fill={themeType === "light" ? "#1a1a2e" : "#ffffff"} fontSize="8" fontFamily="var(--font-code)" letterSpacing="0.05em" textAnchor="middle">ENGINEERING 60FPS GRAPHICS</text>
           </svg>
         </div>
@@ -115,17 +115,17 @@ export default function InfinityNodeDiagram({ activeIndex, hexColor }: InfinityN
               {/* Server rack 1 */}
               <rect x="15" y="25" width="90" height="24" rx="4" fill={themeType === "light" ? "rgba(255,255,255,0.7)" : "rgba(8, 8, 14, 0.7)"} stroke={themeType === "light" ? "rgba(194, 65, 12, 0.4)" : "rgba(255, 80, 0, 0.3)"} strokeWidth="1" />
               <circle cx="32" cy="37" r="2.5" fill="#00ff88" className="blink-fast" />
-              <text x="46" y="40" fill={themeType === "light" ? "rgba(0,0,0,0.65)" : "rgba(255, 255, 255, 0.65)"} fontSize="7.5" fontFamily="var(--font-code)">AWS_REGION_A</text>
+              <text x="46" y="40" fill={themeType === "light" ? "rgba(0,0,0,0.65)" : "rgba(255, 255, 255, 0.65)"} fontSize="7.5" fontFamily="var(--font-code)">BUILD</text>
               
               {/* Server rack 2 */}
               <rect x="15" y="60" width="90" height="24" rx="4" fill={themeType === "light" ? "rgba(255,255,255,0.7)" : "rgba(8, 8, 14, 0.7)"} stroke={themeType === "light" ? "rgba(194, 65, 12, 0.4)" : "rgba(255, 80, 0, 0.3)"} strokeWidth="1" />
               <circle cx="32" cy="72" r="2.5" fill="#00ff88" className="blink-slow" />
-              <text x="46" y="75" fill={themeType === "light" ? "rgba(0,0,0,0.65)" : "rgba(255, 255, 255, 0.65)"} fontSize="7.5" fontFamily="var(--font-code)">AWS_REGION_B</text>
+              <text x="46" y="75" fill={themeType === "light" ? "rgba(0,0,0,0.65)" : "rgba(255, 255, 255, 0.65)"} fontSize="7.5" fontFamily="var(--font-code)">DEPLOY</text>
               
               {/* Server rack 3 */}
               <rect x="15" y="95" width="90" height="24" rx="4" fill={themeType === "light" ? "rgba(255,255,255,0.7)" : "rgba(8, 8, 14, 0.7)"} stroke={themeType === "light" ? "rgba(194, 65, 12, 0.4)" : "rgba(255, 80, 0, 0.3)"} strokeWidth="1" />
               <circle cx="32" cy="107" r="2.5" fill={themeType === "light" ? "#d97706" : "#ffd700"} />
-              <text x="46" y="110" fill={themeType === "light" ? "rgba(0,0,0,0.65)" : "rgba(255, 255, 255, 0.65)"} fontSize="7.5" fontFamily="var(--font-code)">VERCEL_EDGE</text>
+              <text x="46" y="110" fill={themeType === "light" ? "rgba(0,0,0,0.65)" : "rgba(255, 255, 255, 0.65)"} fontSize="7.5" fontFamily="var(--font-code)">MONITOR</text>
             </g>
 
             {/* Seamless, elegant data pipeline connections */}
@@ -137,7 +137,7 @@ export default function InfinityNodeDiagram({ activeIndex, hexColor }: InfinityN
             <g transform="translate(240, 48)">
               <rect x="0" y="0" width="100" height="48" rx="5" fill={themeType === "light" ? "rgba(194, 65, 12, 0.08)" : "rgba(255, 80, 0, 0.06)"} stroke={themeType === "light" ? "#c2410c" : "#ff5000"} strokeWidth="1.2" />
               <text x="50" y="20" fill={themeType === "light" ? "#1a1a2e" : "#ffffff"} fontSize="8.5" fontWeight="700" fontFamily="var(--font-code)" textAnchor="middle">CLOUD_SERVER</text>
-              <text x="50" y="34" fill="#00ff88" fontSize="7.5" fontFamily="var(--font-code)" textAnchor="middle">ONLINE // 99.99%</text>
+              <text x="50" y="34" fill="#00ff88" fontSize="7.5" fontFamily="var(--font-code)" textAnchor="middle">SHIPPED // LIVE</text>
             </g>
           </svg>
         </div>

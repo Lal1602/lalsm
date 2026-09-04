@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Canvas } from "@react-three/fiber";
+import Image from "next/image";
 import FilmScene from "./FilmScene";
 
 interface Project {
@@ -147,8 +148,8 @@ export default function ProjectsSection() {
             <div ref={progressRef} className="project-loop-bar-fill"></div>
           </div>
           <div className="project-loop-bar-hud">
-            <span className="hud-code">// SYS.LOOP_ACTIVE</span>
-            <span className="hud-code">REEL SPEED: 2.4 RPM</span>
+            <span className="hud-code">// {projects.length} PROJECTS</span>
+            <span className="hud-code">DRAG OR SCROLL TO BROWSE</span>
           </div>
         </div>
       </div>
@@ -164,11 +165,16 @@ export default function ProjectsSection() {
             </button>
             <div className="modal-body">
               <div className="modal-image-wrap">
-                <img src={activeProject.image} alt={activeProject.title} />
+                <Image
+                  src={activeProject.image}
+                  alt={activeProject.title}
+                  fill
+                  sizes="(max-width: 900px) 100vw, 50vw"
+                />
                 <div className="modal-img-gradient"></div>
               </div>
               <div className="modal-info">
-                <p className="modal-eyebrow">// PROJECT DATAFRAME</p>
+                <p className="modal-eyebrow">// Project details</p>
                 <h3 className="modal-title">{activeProject.title}</h3>
                 
                 <div className="modal-tech-tags">
@@ -188,7 +194,7 @@ export default function ProjectsSection() {
                     rel="noopener noreferrer" 
                     className="btn-launch-live"
                   >
-                    <span>LAUNCH ACTIVE INTERFACE</span>
+                    <span>View live site</span>
                     {/* @ts-ignore */}
                     <ion-icon suppressHydrationWarning name="rocket-outline" style={{ marginLeft: "8px", fontSize: "1.1rem" }}></ion-icon>
                   </a>
