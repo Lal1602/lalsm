@@ -1,6 +1,18 @@
 {
   "name": "lalsm",
   "version": "0.1.0",
+  "description": "Bilal's Creative Developer Portfolio showcasing immersive 3D experiences, advanced GSAP animations, and AI-powered interactions.",
+  "keywords": [
+    "portfolio",
+    "creative-developer",
+    "nextjs",
+    "threejs",
+    "gsap",
+    "react-three-fiber",
+    "ai",
+    "gemini-api",
+    "webgl"
+  ],
   "private": true,
   "scripts": {
     "dev": "next dev",
