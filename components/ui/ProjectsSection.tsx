@@ -39,6 +39,8 @@ export default function ProjectsSection() {
   const [mounted, setMounted] = useState(false);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [canvasInView, setCanvasInView] = useState(false);
+  const canvasWrapRef = useRef<HTMLDivElement>(null);
 
   // References to share dynamic, high-performance scroll values across R3F and DOM
   const scrollRef = useRef({
@@ -61,6 +63,19 @@ export default function ProjectsSection() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // The film strip renders every frame for as long as it is mounted, so the
+  // loop is stopped whenever the section is scrolled away from.
+  useEffect(() => {
+    const wrap = canvasWrapRef.current;
+    if (!wrap) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setCanvasInView(entry.isIntersecting),
+      { rootMargin: "200px" },
+    );
+    io.observe(wrap);
+    return () => io.disconnect();
+  }, [mounted]);
 
   // Pointer drag event handlers to rotate the 3D film strip cylinder
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -115,7 +130,8 @@ export default function ProjectsSection() {
         </div>
 
         {/* 3D WebGL Canvas Container with pointer-event hooks */}
-        <div 
+        <div
+          ref={canvasWrapRef}
           className="project-3d-canvas-wrap"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -129,6 +145,7 @@ export default function ProjectsSection() {
             <Canvas
               camera={{ position: [0, 0, 4.0], fov: 50 }}
               dpr={[1, 1.5]}
+              frameloop={canvasInView ? "always" : "never"}
               gl={{ alpha: true, antialias: true, stencil: false }}
               style={{ background: "transparent", touchAction: isDesktop ? "none" : "pan-y" }}
             >

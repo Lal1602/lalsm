@@ -133,28 +133,43 @@ export default function ThreeBackground() {
       }
       updateThemeVisuals(currentTheme);
 
-      function animate() {
-        animId = requestAnimationFrame(animate);
-        
+      // Watch the attribute instead of re-reading it from the DOM every frame
+      const themeObserver = new MutationObserver(() => {
         const activeTheme = document.documentElement.getAttribute("data-theme") || "dark";
         if (activeTheme !== currentTheme) {
           currentTheme = activeTheme;
           updateThemeVisuals(activeTheme);
         }
+      });
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-theme"],
+      });
+
+      // Cached by a passive scroll listener so the render loop never reads
+      // scroll position back out of the document mid-frame
+      let scrollY = window.scrollY;
+      const onScroll = () => { scrollY = window.scrollY; };
+      window.addEventListener("scroll", onScroll, { passive: true });
+
+      function animate() {
+        animId = requestAnimationFrame(animate);
+
+        if (document.hidden) return;
 
         const elapsedTime = clock.getElapsedTime();
         // Calculate the effective scroll Y position for Three.js camera/particles mathematically.
         // This is stateless and perfectly handles scrolling down, scrolling up, and resizing.
-        let effectiveScrollY = window.scrollY;
+        let effectiveScrollY = scrollY;
         const start = horizonScrollState.start;
         const end = horizonScrollState.end;
 
         let insideHorizonPin = false;
         if (start > 0 && end > 0) {
-          if (window.scrollY < start) {
+          if (scrollY < start) {
             // Above the horizontal showcase: normal scroll
-            effectiveScrollY = window.scrollY;
-          } else if (window.scrollY >= start && window.scrollY <= end) {
+            effectiveScrollY = scrollY;
+          } else if (scrollY >= start && scrollY <= end) {
             // Pinned inside the showcase: freeze exactly at the entry point.
             // The Horizon section already layers its own WebGL/canvas
             // background (TubesCursor + BackgroundPixelStars) on top of this
@@ -166,7 +181,7 @@ export default function ThreeBackground() {
             effectiveScrollY = start;
           } else {
             // Below the showcase: resume scrolling but offset the virtual horizontal scroll duration
-            effectiveScrollY = window.scrollY - (end - start);
+            effectiveScrollY = scrollY - (end - start);
           }
         }
         if (insideHorizonPin) return;
@@ -199,6 +214,8 @@ export default function ThreeBackground() {
 
       return () => {
         cancelAnimationFrame(animId);
+        themeObserver.disconnect();
+        window.removeEventListener("scroll", onScroll);
         document.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("resize", onResize);
         if (renderer && containerRef.current) {

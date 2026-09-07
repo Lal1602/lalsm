@@ -102,6 +102,9 @@ export const BackgroundPixelStars = memo(
     const backgroundStarsRef = useRef<BackgroundStar[]>([]);
     const shootingStarsRef = useRef<ShootingStar[]>([]);
     const lastRenderTimeRef = useRef<number>(0);
+    // Redrawing a full-viewport canvas costs a GPU texture upload every tick, so
+    // the loop idles while the section is scrolled out of view.
+    const visibleRef = useRef<boolean>(true);
     const frameInterval = 1000 / TARGET_FPS;
 
     // ── Helpers ───────────────────────────────────────────────────
@@ -193,6 +196,10 @@ export const BackgroundPixelStars = memo(
     const animateCanvas = useCallback(
       (timestamp: number): void => {
         if (timestamp - lastRenderTimeRef.current < frameInterval) {
+          animationFrameRef.current = requestAnimationFrame(animateCanvas);
+          return;
+        }
+        if (!visibleRef.current || document.hidden) {
           animationFrameRef.current = requestAnimationFrame(animateCanvas);
           return;
         }
@@ -301,9 +308,13 @@ export const BackgroundPixelStars = memo(
       let initRafId: number;
 
       // ── Shooting star scheduler (defined before use) ──
+      // Skips spawning while offscreen so a backlog doesn't all streak across at
+      // once the moment the section scrolls back into view.
       const scheduleShootingStar = (): void => {
-        const newStar = createNewShootingStar(canvas.width);
-        shootingStarsRef.current = [...shootingStarsRef.current, newStar];
+        if (visibleRef.current && !document.hidden) {
+          const newStar = createNewShootingStar(canvas.width);
+          shootingStarsRef.current = [...shootingStarsRef.current, newStar];
+        }
         shootingStarTimeoutId = setTimeout(scheduleShootingStar, Math.random() * 4000 + 2000);
       };
 
@@ -336,12 +347,19 @@ export const BackgroundPixelStars = memo(
         initBackgroundStars();
       });
 
+      const io = new IntersectionObserver(
+        ([entry]) => { visibleRef.current = entry.isIntersecting; },
+        { rootMargin: "100px" },
+      );
+      io.observe(containerRef.current ?? canvas);
+
       return () => {
         cancelAnimationFrame(initRafId);
         if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
         if (regenIntervalRef.current) clearInterval(regenIntervalRef.current);
         clearTimeout(shootingStarTimeoutId);
         window.removeEventListener("resize", handleResize);
+        io.disconnect();
         unsub();
       };
     }, [animateCanvas, createNewShootingStar, getCanvasSize, initBackgroundStars, regenerateBackgroundStars]);

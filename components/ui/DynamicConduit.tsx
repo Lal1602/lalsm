@@ -66,17 +66,29 @@ export default function DynamicConduit({ activeIndex }: DynamicConduitProps) {
     }
 
     updateCoordinates();
-    
+
     // Safety delay to ensure layout rendering has settled
     const timeoutId = setTimeout(updateCoordinates, 150);
 
-    window.addEventListener("resize", updateCoordinates);
-    window.addEventListener("scroll", updateCoordinates, { passive: true });
+    // Three getBoundingClientRect reads plus a state update per scroll event was
+    // re-rendering this overlay far more often than the screen refreshes.
+    let frame = 0;
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        updateCoordinates();
+      });
+    };
+
+    window.addEventListener("resize", scheduleUpdate);
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
 
     return () => {
       clearTimeout(timeoutId);
-      window.removeEventListener("resize", updateCoordinates);
-      window.removeEventListener("scroll", updateCoordinates);
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("resize", scheduleUpdate);
+      window.removeEventListener("scroll", scheduleUpdate);
     };
   }, [activeIndex]);
 

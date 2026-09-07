@@ -1,6 +1,10 @@
 "use client";
 import { useEffect } from "react";
 import Lenis from "lenis";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function LenisSetup() {
   useEffect(() => {
@@ -14,29 +18,26 @@ export default function LenisSetup() {
       touchMultiplier: 2,
     });
 
-    // Update ScrollTrigger on Lenis scroll
-    lenis.on("scroll", () => {
-      // Import GSAP's ScrollTrigger dynamically or directly
-      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
-        ScrollTrigger.update();
-      });
-    });
+    // Statically imported, so this no longer kicks off a dynamic import()
+    // on every single scroll event.
+    lenis.on("scroll", ScrollTrigger.update);
 
+    // Deliberately Lenis' own rAF rather than gsap.ticker: parking a permanent
+    // callback on the ticker keeps GSAP awake every frame even when nothing is
+    // animating, which measurably cost frames while the page sat idle.
+    let rafId = 0;
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
-
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     // Initial refresh to ensure all triggers align with the loaded DOM height
-    setTimeout(() => {
-      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
-        ScrollTrigger.refresh();
-      });
-    }, 1000);
+    const refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 1000);
 
     return () => {
+      clearTimeout(refreshTimer);
+      cancelAnimationFrame(rafId);
       lenis.destroy();
     };
   }, []);

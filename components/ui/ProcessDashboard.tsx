@@ -64,8 +64,12 @@ export default function ProcessDashboard() {
       lastY = e.clientY;
     }
 
-    function handleScroll() {
-      if (lastX === 0 && lastY === 0) return;
+    let frame = 0;
+
+    // elementFromPoint forces the browser to flush layout, so it runs at most
+    // once per frame rather than on every scroll event Lenis emits.
+    function resolveHover() {
+      frame = 0;
       const el = document.elementFromPoint(lastX, lastY);
       if (el) {
         const trigger = el.closest('[data-process-index]');
@@ -79,9 +83,15 @@ export default function ProcessDashboard() {
       }
     }
 
+    function handleScroll() {
+      if (lastX === 0 && lastY === 0) return;
+      if (!frame) frame = requestAnimationFrame(resolveHover);
+    }
+
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
+      if (frame) cancelAnimationFrame(frame);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("scroll", handleScroll);
     };

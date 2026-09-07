@@ -13,11 +13,25 @@ export default function CustomCursor() {
     const textNode = textRef.current;
     if (!dot || !outline || !textNode) return;
 
-    // Use GSAP quickTo for ultra lag-free 60fps performance
-    const xToDot = gsap.quickTo(dot, "left", { duration: 0.1, ease: "power3" });
-    const yToDot = gsap.quickTo(dot, "top", { duration: 0.1, ease: "power3" });
-    const xToOutline = gsap.quickTo(outline, "left", { duration: 0.4, ease: "power3" });
-    const yToOutline = gsap.quickTo(outline, "top", { duration: 0.4, ease: "power3" });
+    // Easing runs on plain numbers, then lands on the standalone `translate`
+    // property: animating left/top re-ran layout on every mouse move, while
+    // `translate` is composited and still stacks under the centering/scale
+    // `transform` the stylesheet owns.
+    const pos = { dotX: 0, dotY: 0, outlineX: 0, outlineY: 0 };
+
+    // Written from the tweens' own onUpdate rather than a permanent
+    // gsap.ticker callback, so nothing runs once the cursor comes to rest.
+    const writeDot = () => {
+      dot.style.translate = `${pos.dotX}px ${pos.dotY}px`;
+    };
+    const writeOutline = () => {
+      outline.style.translate = `${pos.outlineX}px ${pos.outlineY}px`;
+    };
+
+    const xToDot = gsap.quickTo(pos, "dotX", { duration: 0.1, ease: "power3", onUpdate: writeDot });
+    const yToDot = gsap.quickTo(pos, "dotY", { duration: 0.1, ease: "power3", onUpdate: writeDot });
+    const xToOutline = gsap.quickTo(pos, "outlineX", { duration: 0.4, ease: "power3", onUpdate: writeOutline });
+    const yToOutline = gsap.quickTo(pos, "outlineY", { duration: 0.4, ease: "power3", onUpdate: writeOutline });
 
     const onMouseMove = (e: MouseEvent) => {
       xToDot(e.clientX);

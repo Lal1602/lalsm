@@ -68,45 +68,62 @@ export default function GlobalInteractions() {
       setModalData(data);
     }
 
-    // Tilt cards
-    function onTiltMove(e: MouseEvent) {
-      const card = (e.target as Element).closest<HTMLElement>(".tilt-card");
-      if (card) {
-        const { left, top, width, height } = card.getBoundingClientRect();
-        const x = (e.clientX - left - width / 2) / 20;
-        const y = (e.clientY - top - height / 2) / 20;
-        card.style.transform = `perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg) scale(1.02)`;
-      }
-    }
     function onTiltOut(e: MouseEvent) {
       const card = (e.target as Element).closest<HTMLElement>(".tilt-card");
       if (card) card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)";
     }
 
-    // Spotlight card hover border glow
-    function onSpotlightMove(e: MouseEvent) {
-      const card = (e.target as Element).closest<HTMLElement>(".glass-card, .project-card, .achievement-card, .about-layer-card, .workflow-step-card");
-      if (card) {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        card.style.setProperty("--mouse-x", `${x}px`);
-        card.style.setProperty("--mouse-y", `${y}px`);
+    // Tilt and spotlight both need the cursor position relative to a card.
+    // They used to run as two separate mousemove listeners, so each move wrote a
+    // transform and then immediately read a rect back — a forced reflow per
+    // event. Now one listener records the pointer, and a single frame does all
+    // the reads before any of the writes.
+    let pointerX = 0;
+    let pointerY = 0;
+    let tiltCard: HTMLElement | null = null;
+    let spotlightCard: HTMLElement | null = null;
+    let frame = 0;
+
+    function applyHoverEffects() {
+      frame = 0;
+
+      const tiltRect = tiltCard?.getBoundingClientRect();
+      const spotlightRect = spotlightCard?.getBoundingClientRect();
+
+      if (tiltCard && tiltRect) {
+        const x = (pointerX - tiltRect.left - tiltRect.width / 2) / 20;
+        const y = (pointerY - tiltRect.top - tiltRect.height / 2) / 20;
+        tiltCard.style.transform = `perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg) scale(1.02)`;
       }
+      if (spotlightCard && spotlightRect) {
+        spotlightCard.style.setProperty("--mouse-x", `${pointerX - spotlightRect.left}px`);
+        spotlightCard.style.setProperty("--mouse-y", `${pointerY - spotlightRect.top}px`);
+      }
+    }
+
+    function onHoverMove(e: MouseEvent) {
+      const target = e.target as Element;
+      tiltCard = target.closest<HTMLElement>(".tilt-card");
+      spotlightCard = target.closest<HTMLElement>(
+        ".glass-card, .project-card, .achievement-card, .about-layer-card, .workflow-step-card",
+      );
+      if (!tiltCard && !spotlightCard) return;
+      pointerX = e.clientX;
+      pointerY = e.clientY;
+      if (!frame) frame = requestAnimationFrame(applyHoverEffects);
     }
 
     document.addEventListener("click", onBurstClick);
     document.addEventListener("click", onCardClick);
-    document.addEventListener("mousemove", onTiltMove);
+    document.addEventListener("mousemove", onHoverMove, { passive: true });
     document.addEventListener("mouseout", onTiltOut);
-    document.addEventListener("mousemove", onSpotlightMove);
 
     return () => {
+      if (frame) cancelAnimationFrame(frame);
       document.removeEventListener("click", onBurstClick);
       document.removeEventListener("click", onCardClick);
-      document.removeEventListener("mousemove", onTiltMove);
+      document.removeEventListener("mousemove", onHoverMove);
       document.removeEventListener("mouseout", onTiltOut);
-      document.removeEventListener("mousemove", onSpotlightMove);
     };
   }, []);
 

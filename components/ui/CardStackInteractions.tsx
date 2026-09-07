@@ -51,12 +51,25 @@ export default function CardStackInteractions() {
     }
 
     // ── Track cursor spotlight position inside each card ────────────────────
+    // Batched into a frame so a fast mouse can't force one layout read per event.
+    let spotFrame = 0;
+    let spotCard: HTMLElement | null = null;
+    let spotX = 0;
+    let spotY = 0;
+
+    function writeSpotlight() {
+      spotFrame = 0;
+      if (!spotCard) return;
+      const rect = spotCard.getBoundingClientRect();
+      spotCard.style.setProperty("--spot-x", `${((spotX - rect.left) / rect.width) * 100}%`);
+      spotCard.style.setProperty("--spot-y", `${((spotY - rect.top) / rect.height) * 100}%`);
+    }
+
     function trackSpotlight(e: MouseEvent, card: HTMLElement) {
-      const rect = card.getBoundingClientRect();
-      const xPct = ((e.clientX - rect.left) / rect.width) * 100;
-      const yPct = ((e.clientY - rect.top) / rect.height) * 100;
-      card.style.setProperty("--spot-x", `${xPct}%`);
-      card.style.setProperty("--spot-y", `${yPct}%`);
+      spotCard = card;
+      spotX = e.clientX;
+      spotY = e.clientY;
+      if (!spotFrame) spotFrame = requestAnimationFrame(writeSpotlight);
     }
 
     // ── Attach events + collect cleanups ───────────────────────────────────
@@ -85,7 +98,10 @@ export default function CardStackInteractions() {
     });
 
     // ── Cleanup on unmount ─────────────────────────────────────────────────
-    return () => cleanups.forEach((fn) => fn());
+    return () => {
+      if (spotFrame) cancelAnimationFrame(spotFrame);
+      cleanups.forEach((fn) => fn());
+    };
   }, []);
 
   return null;

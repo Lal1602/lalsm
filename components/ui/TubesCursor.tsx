@@ -7,6 +7,11 @@ interface TubesInstance {
     setColors: (colors: string[]) => void;
     setLightsColors: (colors: string[]) => void;
   };
+  three?: {
+    minPixelRatio?: number;
+    maxPixelRatio?: number;
+    resize?: () => void;
+  };
   dispose?: () => void;
 }
 
@@ -77,6 +82,16 @@ export default function TubesCursor() {
               lights: { intensity: 200, colors: [...LIGHT_COLORS] },
             },
           });
+          // The library pins its buffer to 2x whatever the screen is, so on a 1x
+          // display it drew 4.2 megapixels (plus a bloom pass) into a 1.05
+          // megapixel canvas — resolution the screen cannot show. Both bounds
+          // default to 2, so the max alone stays clamped up at 2.
+          if (app.three) {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            app.three.minPixelRatio = dpr;
+            app.three.maxPixelRatio = dpr;
+            app.three.resize?.();
+          }
           appRef.current = app;
         })
         .catch((err: unknown) => {

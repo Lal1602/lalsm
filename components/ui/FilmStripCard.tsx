@@ -41,8 +41,12 @@ export default function FilmStripCard({
   
   const [localHovered, setLocalHovered] = useState(false);
 
-  // Load project texture using Drei's useTexture utility
-  const texture = useTexture(image);
+  // Load project texture using Drei's useTexture utility.
+  // Routed through Next's image optimizer: the sources are ~1900px wide JPEGs
+  // (up to 250KB each) but a film frame only ever renders a few hundred pixels
+  // across, so the full-size decode and GPU upload were pure first-scroll cost.
+  // The detail modal still points at the original file.
+  const texture = useTexture(`/_next/image?url=${encodeURIComponent(image)}&w=640&q=75`);
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.generateMipmaps = true;
 

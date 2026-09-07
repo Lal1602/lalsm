@@ -29,6 +29,19 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         {/*
+          The Horizon showcase pulls a ~757KB WebGL module from this CDN. Left to
+          its own import it finished downloading around the time the user was
+          already scrolling toward the section, so the parse landed as a stall
+          right on the transition. Fetching it up front moves that cost to the
+          hero, where there is idle time to absorb it.
+        */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link
+          rel="modulepreload"
+          href="https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js"
+          crossOrigin="anonymous"
+        />
+        {/*
           Font stack trimmed to what's actually used (was loading 6 families,
           3 of which — Syne, Plus Jakarta Sans, JetBrains Mono — appeared
           nowhere in the CSS). Orbitron (generic sci-fi display font) swapped

@@ -11,16 +11,16 @@ const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
 function runHackerEffect(target: HTMLElement) {
   let iterations = 0;
   if (!target.dataset.value) target.dataset.value = target.innerText;
-  const orig = target.dataset.value;
+  const orig = target.dataset.value!;
+  // Scramble off the stored string and write with textContent: reading
+  // .innerText back each tick forced a layout 33 times a second.
   const interval = setInterval(() => {
-    target.innerText = target.innerText
-      .split("")
-      .map((_, index) => {
-        if (index < iterations) return orig![index];
-        return LETTERS[Math.floor(Math.random() * 26)];
-      })
-      .join("");
-    if (iterations >= orig!.length) clearInterval(interval);
+    let out = "";
+    for (let index = 0; index < orig.length; index++) {
+      out += index < iterations ? orig[index] : LETTERS[Math.floor(Math.random() * 26)];
+    }
+    target.textContent = out;
+    if (iterations >= orig.length) clearInterval(interval);
     iterations += 1 / 3;
   }, 30);
 }
@@ -35,15 +35,34 @@ export default function GSAPEffects() {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Scroll progress
-    function updateProgress() {
-      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const pct = (scrollTop / scrollHeight) * 100;
-      const bar = document.querySelector<HTMLElement>(".scroll-progress-bar");
-      if (bar) bar.style.width = pct + "%";
+    // Scroll progress. The bar element and the page height are looked up once
+    // instead of per scroll event — re-reading scrollHeight on every event
+    // forced a layout each time — and writes are batched into a frame.
+    const progressBar = document.querySelector<HTMLElement>(".scroll-progress-bar");
+    let maxScroll = 0;
+    let progressFrame = 0;
+
+    function measurePageHeight() {
+      maxScroll =
+        document.documentElement.scrollHeight - document.documentElement.clientHeight;
     }
-    window.addEventListener("scroll", updateProgress);
+
+    function writeProgress() {
+      progressFrame = 0;
+      if (!progressBar || maxScroll <= 0) return;
+      const scrollTop = window.scrollY;
+      progressBar.style.width = (scrollTop / maxScroll) * 100 + "%";
+    }
+
+    function updateProgress() {
+      if (!progressFrame) progressFrame = requestAnimationFrame(writeProgress);
+    }
+
+    measurePageHeight();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", measurePageHeight);
+    // Pinned sections change the document height, so re-measure when GSAP does
+    ScrollTrigger.addEventListener("refresh", measurePageHeight);
 
     // Parallax — skipped entirely under reduced motion (purely decorative)
     if (!prefersReducedMotion) {
@@ -121,6 +140,7 @@ export default function GSAPEffects() {
     const refreshTimer = setTimeout(() => {
       ScrollTrigger.refresh(true);
     }, 350);
+
 
     // Marquee — under reduced motion this stays static rather than looping
     // forever (continuous auto-scrolling text is exactly what that OS
@@ -269,23 +289,41 @@ export default function GSAPEffects() {
     }
 
     // Magnetic buttons — skipped under reduced motion
+    const magnetCleanups: Array<() => void> = [];
     if (!prefersReducedMotion) {
       document.querySelectorAll<HTMLElement>(".btn, .social-icon, .nav-link, .btn-quick-view").forEach((magnet) => {
-        magnet.addEventListener("mousemove", (e) => {
+        // quickTo reuses one tween per axis; the old code allocated a fresh
+        // tween on every single mousemove event.
+        const xTo = gsap.quickTo(magnet, "x", { duration: 0.3, ease: "power2.out" });
+        const yTo = gsap.quickTo(magnet, "y", { duration: 0.3, ease: "power2.out" });
+
+        const onMove = (e: MouseEvent) => {
           const bounding = magnet.getBoundingClientRect();
           const newX = (e.clientX - bounding.left) / magnet.offsetWidth - 0.5;
           const newY = (e.clientY - bounding.top) / magnet.offsetHeight - 0.5;
-          gsap.to(magnet, { duration: 0.3, x: newX * 20, y: newY * 20, ease: "power2.out" });
-        });
-        magnet.addEventListener("mouseleave", () => {
+          xTo(newX * 20);
+          yTo(newY * 20);
+        };
+        const onLeave = () => {
           gsap.to(magnet, { duration: 1, x: 0, y: 0, ease: "elastic.out(1.2, 0.4)" });
+        };
+
+        magnet.addEventListener("mousemove", onMove);
+        magnet.addEventListener("mouseleave", onLeave);
+        magnetCleanups.push(() => {
+          magnet.removeEventListener("mousemove", onMove);
+          magnet.removeEventListener("mouseleave", onLeave);
         });
       });
     }
 
     return () => {
       clearTimeout(refreshTimer);
+      if (progressFrame) cancelAnimationFrame(progressFrame);
       window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("resize", measurePageHeight);
+      ScrollTrigger.removeEventListener("refresh", measurePageHeight);
+      magnetCleanups.forEach((fn) => fn());
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, []);

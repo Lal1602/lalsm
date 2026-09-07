@@ -154,11 +154,16 @@ export default function CvTimelineSlide() {
       card.classList.remove("is-landed");
     });
 
+    // Career slide = second of 2 slides on desktop, but ONLY slide on mobile.
+    // Evaluated once per resize instead of once per frame — matchMedia builds a
+    // new MediaQueryList on every call.
+    const mobileQuery = window.matchMedia("(max-width: 968px)");
+    let isMobile = mobileQuery.matches;
+    const onQueryChange = (e: MediaQueryListEvent) => { isMobile = e.matches; };
+    mobileQuery.addEventListener("change", onQueryChange);
+
     // ── Core update function (called every frame via onProgressUpdate) ────────
     function updateByProgress(globalProgress: number) {
-      // Career slide = second of 2 slides on desktop, but ONLY slide on mobile.
-      const isMobile = window.matchMedia("(max-width: 968px)").matches;
-      
       let p;
       if (isMobile) {
         p = gsap.utils.clamp(0, 1, globalProgress);
@@ -281,6 +286,7 @@ export default function CvTimelineSlide() {
 
     // Mobile fallback — IntersectionObserver is no longer needed because GSAP scroll-pinning now runs on mobile.
     return () => {
+      mobileQuery.removeEventListener("change", onQueryChange);
       horizonScrollState.onProgressUpdate = null;
     };
   }, []);
