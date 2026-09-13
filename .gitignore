@@ -40,4 +40,25 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+# AI Coding Assistants & Developer Tooling (Claude, Gemini, Antigravity, Cursor)
+.claude/
+CLAUDE.md
+claude.md
+Claude outputs/
+[Cc]laude [Oo]utputs/
+.gemini/
+GEMINI.md
+gemini.md
+.agents/
+AGENTS.md
+briefings/
+test_ai.js
+*.ai.log
+.cursor/
+.cursorrules
+.windsurf/
+.windsurfrules
+
+# Whitelist: Safeguard application chatbot API & components from being ignored
+!app/api/ai/**
+!components/ui/AiChatOverlay.tsx
