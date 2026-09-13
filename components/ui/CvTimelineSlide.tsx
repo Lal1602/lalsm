@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
 import horizonScrollState from "@/lib/horizonScrollState";
 import { useThemeStore } from "@/stores";
@@ -96,31 +96,7 @@ export default function CvTimelineSlide() {
   const lineRef01  = useRef<HTMLDivElement>(null);
   const lineRef12  = useRef<HTMLDivElement>(null);
   const lineRef23  = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
   const themeType = useThemeStore((state) => state.theme.type);
-
-  const handleScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 5);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
-    }
-  };
-
-  useEffect(() => {
-    handleScroll();
-    window.addEventListener('resize', handleScroll);
-    return () => window.removeEventListener('resize', handleScroll);
-  }, []);
-
-  const scrollByAmount = (amount: number) => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: amount, behavior: 'smooth' });
-    }
-  };
 
   useEffect(() => {
     const slide = slideRef.current;
@@ -173,7 +149,10 @@ export default function CvTimelineSlide() {
       }
 
       // Cards: make them visible as soon as the career slide begins (p > 0)
-      // This also means they're invisible when p === 0 (still on previous slide)
+      // This also means they're invisible when p === 0 (still on previous slide).
+      // Every branch below writes it, not just the stack branch — otherwise a
+      // reader arriving straight at a landed position (page refresh mid-section,
+      // or a jump from the waypoint rail) gets cards that never turn visible.
       const stackVisible = p > 0.001 ? 1 : 0;
 
       // Headers
@@ -245,6 +224,7 @@ export default function CvTimelineSlide() {
             rotationY: ry,
             rotationZ: rz,
             zIndex: 10 + i,
+            opacity: stackVisible,
           });
           card.classList.remove("is-landed");
 
@@ -256,6 +236,7 @@ export default function CvTimelineSlide() {
             rotationY: 0,
             rotationZ: 0,
             zIndex: i + 1,
+            opacity: stackVisible,
           });
           card.classList.add("is-landed");
         }
@@ -277,7 +258,7 @@ export default function CvTimelineSlide() {
     }
 
     // ── Subscribe to per-frame progress from ScrollTrigger ────────────────────
-    horizonScrollState.onProgressUpdate = updateByProgress;
+    const unsubscribe = horizonScrollState.subscribe(updateByProgress);
 
     // If the page was already scrolled into the career slide (e.g. refresh), catch up instantly
     if (horizonScrollState.progress > 0) {
@@ -287,7 +268,7 @@ export default function CvTimelineSlide() {
     // Mobile fallback — IntersectionObserver is no longer needed because GSAP scroll-pinning now runs on mobile.
     return () => {
       mobileQuery.removeEventListener("change", onQueryChange);
-      horizonScrollState.onProgressUpdate = null;
+      unsubscribe();
     };
   }, []);
 
@@ -321,49 +302,57 @@ export default function CvTimelineSlide() {
           – Hidden on desktop via CSS (.cv-mobile-sticky-header { display: none })
           ════════════════════════════════════════════════════════════════════ */}
       <div className="cv-mobile-sticky-header">
-        <p className="slide-badge">{`// EXPERIENCE & TIMELINE`}</p>
+        <p className="slide-badge">{`SECTOR 02 · FLIGHT RECORD`}</p>
         <h2
           className="slide-title"
-          style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            textShadow: "0 4px 24px rgba(0, 0, 0, 0.85)",
+            filter: "drop-shadow(0 2px 10px rgba(0, 0, 0, 0.6))",
+          }}
         >
-          CAREER{" "}
-          <span style={{ color: "transparent", WebkitTextStroke: "1px rgba(255,255,255,0.7)" }}>
+          <span style={{
+            background: "linear-gradient(135deg, #ffffff 40%, #c4b5fd 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            display: "inline-block",
+          }}>
+            CAREER
+          </span>{" "}
+          <span
+            style={{
+              color: "transparent",
+              WebkitTextStroke: "1.5px rgba(255, 255, 255, 0.92)",
+              textShadow: "0 0 20px rgba(192, 132, 252, 0.45)",
+              display: "inline-block",
+            }}
+          >
             PATHWAY
           </span>
         </h2>
-        <p className="slide-description">
+        <p
+          className="slide-description"
+          style={{
+            color: "rgba(255, 255, 255, 0.8)",
+            textShadow: "0 2px 12px rgba(0, 0, 0, 0.8)",
+          }}
+        >
           A brief overview of my academic background at PENS, official certification records, and student competency achievements.
         </p>
       </div>
 
-      <div style={{ position: "relative" }}>
-        {/* Scroll Indicator Arrows */}
-        <div 
-          className={`scroll-indicator-arrow left ${canScrollLeft ? 'visible' : ''}`}
-          onClick={() => scrollByAmount(-250)}
-          aria-hidden="true"
-        >
-          {/* @ts-ignore */}
-          <ion-icon suppressHydrationWarning name="chevron-back-outline"></ion-icon>
-        </div>
-        
-        <div 
-          className={`scroll-indicator-arrow right ${canScrollRight ? 'visible' : ''}`}
-          onClick={() => scrollByAmount(250)}
-          aria-hidden="true"
-        >
-          {/* @ts-ignore */}
-          <ion-icon suppressHydrationWarning name="chevron-forward-outline"></ion-icon>
-        </div>
-
-        <div className="cv-mobile-cards-rail" ref={scrollContainerRef} onScroll={handleScroll}>
+      <div className="cv-mobile-cards-rail">
         {TIMELINE_DATA.map((item, idx) => (
           <div className="cv-mobile-card" key={idx}>
             <div
               className="cv-mobile-card-glow"
               style={{ background: CARD_COLORS[idx] }}
             />
-            <p className="cv-mobile-card-year">{item.year}</p>
+            <p className="cv-mobile-card-year">
+              <span className="cv-card-index">WP·{String(idx + 1).padStart(2, "0")}</span>
+              {item.year}
+            </p>
             <span className="cv-mobile-card-badge">{item.badge}</span>
             <div className="cv-mobile-card-divider" />
             <h3 className="cv-mobile-card-role">{item.role}</h3>
@@ -395,26 +384,54 @@ export default function CvTimelineSlide() {
           </a>
         </div>
       </div>
-      </div>
 
       {/* ════════════════════════════════════════════════════════════════════
           DESKTOP LAYOUT (> 968px)
           – Full GSAP animated horizontal card stack
           – Hidden on mobile via CSS (.cv-timeline-area { display: none })
           ════════════════════════════════════════════════════════════════════ */}
-      <div className="horizon-slide-content" style={{ zIndex: 2, width: "100%" }}>
+      <div className="horizon-slide-content" style={{ position: "relative", zIndex: 10, width: "100%" }}>
         {/* ── Headers ───────────────────────────────────────────────────────── */}
-        <p className="slide-badge cv-header-anim">{`// EXPERIENCE & TIMELINE`}</p>
+        <p className="slide-badge cv-header-anim deck-badge">
+          <span className="deck-badge-rule" aria-hidden="true" />
+          {`SECTOR 02 · FLIGHT RECORD`}
+          <span className="deck-badge-rule" aria-hidden="true" />
+        </p>
         <h2
           className="slide-title cv-header-anim"
-          style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            textShadow: "0 4px 24px rgba(0, 0, 0, 0.85)",
+            filter: "drop-shadow(0 2px 10px rgba(0, 0, 0, 0.6))",
+          }}
         >
-          CAREER{" "}
-          <span style={{ color: "transparent", WebkitTextStroke: "1px rgba(255,255,255,0.7)" }}>
+          <span style={{
+            background: "linear-gradient(135deg, #ffffff 40%, #c4b5fd 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            display: "inline-block",
+          }}>
+            CAREER
+          </span>{" "}
+          <span
+            style={{
+              color: "transparent",
+              WebkitTextStroke: "1.5px rgba(255, 255, 255, 0.92)",
+              textShadow: "0 0 20px rgba(192, 132, 252, 0.45)",
+              display: "inline-block",
+            }}
+          >
             PATHWAY
           </span>
         </h2>
-        <p className="slide-description cv-header-anim">
+        <p
+          className="slide-description cv-header-anim"
+          style={{
+            color: "rgba(255, 255, 255, 0.82)",
+            textShadow: "0 2px 12px rgba(0, 0, 0, 0.8)",
+          }}
+        >
           A brief overview of my academic background at PENS, official certification records, and student competency achievements.
         </p>
 
@@ -423,7 +440,7 @@ export default function CvTimelineSlide() {
           <div className="cv-hint-wheel">
             <div className="cv-hint-dot" />
           </div>
-          <span className="cv-hint-text">scroll to unfold my journey</span>
+          <span className="cv-hint-text">scroll to plot the trajectory</span>
           <div className="cv-hint-arrows">
             <span>↓</span>
             <span>↓</span>
@@ -453,20 +470,18 @@ export default function CvTimelineSlide() {
                 data-index={String(idx)}
                 style={{ "--card-color": CARD_COLORS[idx] } as React.CSSProperties}
               >
-                {/* Shimmer rotating border */}
-                <div className="cv-card-shimmer" />
-
-                {/* Timeline connector dot */}
+                {/* Trajectory connector dot */}
                 <div className="cv-card-connector-dot" />
 
                 <div className="cv-card-inner">
-                  {/* Meta row: year + badge */}
-                  <div className="cv-card-meta">
+                  {/* Header: waypoint designation + year */}
+                  <header className="cv-card-meta">
+                    <span className="cv-card-index">
+                      WP<i aria-hidden="true">·</i>{String(idx + 1).padStart(2, "0")}
+                    </span>
                     <span className="cv-card-year">{item.year}</span>
-                    <span className="cv-card-badge">{item.badge}</span>
-                  </div>
+                  </header>
 
-                  {/* Divider */}
                   <div className="cv-card-divider" />
 
                   {/* Role & institution */}
@@ -475,6 +490,10 @@ export default function CvTimelineSlide() {
 
                   {/* Description */}
                   <p className="cv-card-desc">{item.desc}</p>
+
+                  <footer className="cv-card-foot">
+                    <span className="cv-card-badge">{item.badge}</span>
+                  </footer>
                 </div>
               </div>
             ))}
@@ -486,50 +505,22 @@ export default function CvTimelineSlide() {
           </div>
 
           {/* CV Download card */}
-          <div
-            className="glass-card cv-download-card"
-            ref={cvCardRef}
-            style={{
-              flexShrink: 0,
-              width: "210px",
-              padding: "20px",
-              border: "1px dashed rgba(255,255,255,0.12)",
-              background: "rgba(255, 255, 255, 0.01)",
-              borderRadius: "14px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              gap: "16px",
-              alignSelf: "center",
-            }}
-          >
+          <div className="cv-download-card" ref={cvCardRef}>
             <div>
-              <p style={{ fontFamily: "var(--font-code)", fontSize: "0.62rem", color: "rgba(255,255,255,0.28)", margin: 0 }}>
-                {`// FILE_DOCUMENT`}
-              </p>
-              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", fontWeight: 700, color: "white", margin: "8px 0 4px" }}>
-                CURRICULUM VITAE
-              </h4>
-              <p style={{ fontSize: "0.73rem", color: "var(--text-muted)", lineHeight: "1.45" }}>
-                Download professional resume summary (PDF, ~180 KB).
+              <p className="cv-download-kicker">{`PAYLOAD · DOSSIER`}</p>
+              <h4 className="cv-download-title">CURRICULUM VITAE</h4>
+              <p className="cv-download-desc">
+                Full resume summary, PDF, ~180 KB.
               </p>
             </div>
             <a
               href="https://drive.google.com/file/d/16mvFW569lf6yUzMRpEQUMY-NVJ4t41kZ/view?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn"
-              style={{
-                fontSize: "0.72rem",
-                padding: "8px 12px",
-                textAlign: "center",
-                display: "block",
-                background: "rgba(255,255,255,0.05)",
-                borderColor: "rgba(255,255,255,0.1)",
-                color: "white",
-              }}
+              className="cv-download-link"
             >
-              Get Resume PDF
+              Download
+              <span aria-hidden="true">↓</span>
             </a>
           </div>
         </div>

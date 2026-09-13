@@ -1,6 +1,6 @@
 import HeroSection from "@/components/ui/HeroSection";
 import AboutSection from "@/components/ui/AboutSection";
-import ProcessDashboard from "@/components/ui/ProcessDashboard";
+import ProcessSteps from "@/components/ui/ProcessSteps";
 import HorizonShowcase from "@/components/ui/HorizonShowcase";
 import ProjectsSection from "@/components/ui/ProjectsSection";
 import AchievementsSection from "@/components/ui/AchievementsSection";
@@ -33,7 +33,7 @@ export default function Home() {
         </div>
 
         <AboutSection />
-        <ProcessDashboard />
+        <ProcessSteps />
         <HorizonShowcase />
         <ProjectsSection />
         <AchievementsSection />

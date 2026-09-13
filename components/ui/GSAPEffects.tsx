@@ -27,6 +27,8 @@ function runHackerEffect(target: HTMLElement) {
 
 export default function GSAPEffects() {
   useEffect(() => {
+    const preexisting = new Set(ScrollTrigger.getAll());
+
     // Respect the OS-level "reduce motion" setting: skip/soften every
     // non-essential animation below (parallax, scramble text, magnetic
     // buttons, 3D tilt, scroll-linked reveals) instead of forcing them on
@@ -58,9 +60,17 @@ export default function GSAPEffects() {
       if (!progressFrame) progressFrame = requestAnimationFrame(writeProgress);
     }
 
+    const handleViewportChange = () => {
+      measurePageHeight();
+      ScrollTrigger.refresh();
+    };
+
     measurePageHeight();
     window.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", measurePageHeight);
+    window.addEventListener("resize", handleViewportChange);
+    if (typeof window !== "undefined" && window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleViewportChange);
+    }
     // Pinned sections change the document height, so re-measure when GSAP does
     ScrollTrigger.addEventListener("refresh", measurePageHeight);
 
@@ -233,11 +243,9 @@ export default function GSAPEffects() {
           fastScrollEnd: true,
           preventOverlaps: true,
           onUpdate: (self) => {
-            // Pipe progress to shared state so CvTimelineSlide can subscribe
-            horizonScrollState.progress = self.progress;
-            if (horizonScrollState.onProgressUpdate) {
-              horizonScrollState.onProgressUpdate(self.progress);
-            }
+            // Pipe progress to shared state; CvTimelineSlide, HorizonHud and
+            // HorizonShowcase all subscribe to it.
+            horizonScrollState.emit(self.progress);
           },
           snap: {
             snapTo: (value) => {
@@ -317,14 +325,19 @@ export default function GSAPEffects() {
       });
     }
 
+    const owned = ScrollTrigger.getAll().filter((t) => !preexisting.has(t));
+
     return () => {
       clearTimeout(refreshTimer);
       if (progressFrame) cancelAnimationFrame(progressFrame);
       window.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", measurePageHeight);
+      window.removeEventListener("resize", handleViewportChange);
+      if (typeof window !== "undefined" && window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleViewportChange);
+      }
       ScrollTrigger.removeEventListener("refresh", measurePageHeight);
       magnetCleanups.forEach((fn) => fn());
-      ScrollTrigger.getAll().forEach((t) => t.kill());
+      owned.forEach((t) => t.kill());
     };
   }, []);
 

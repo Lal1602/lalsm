@@ -150,7 +150,9 @@ export const BackgroundPixelStars = memo(
       const palette = currentThemeType === "light" ? LIGHT_STAR_COLORS : STAR_COLORS;
       for (let i = 0; i < numStars; i++) {
         const gridX = Math.floor(Math.random() * (canvas.width / PIXEL_SIZE)) * PIXEL_SIZE;
-        const gridY = Math.floor(Math.random() * (canvas.height / PIXEL_SIZE)) * PIXEL_SIZE;
+        // Seam boundary clearance: keep stars at least 50px below top edge
+        const minY = Math.ceil(50 / PIXEL_SIZE) * PIXEL_SIZE;
+        const gridY = minY + Math.floor(Math.random() * ((canvas.height - minY) / PIXEL_SIZE)) * PIXEL_SIZE;
         const baseOpacity = currentThemeType === "light" ? (Math.random() * 0.4 + 0.2) : (Math.random() * 0.5 + 0.5);
         backgroundStarsRef.current.push({
           x: gridX,
@@ -172,10 +174,11 @@ export const BackgroundPixelStars = memo(
       const count = Math.max(1, Math.floor(backgroundStarsRef.current.length * REGEN_PERCENT));
       const currentThemeType = useThemeStore.getState().theme.type;
       const palette = currentThemeType === "light" ? LIGHT_STAR_COLORS : STAR_COLORS;
+      const minY = Math.ceil(50 / PIXEL_SIZE) * PIXEL_SIZE;
       for (let i = 0; i < count; i++) {
         const idx = Math.floor(Math.random() * backgroundStarsRef.current.length);
         const gridX = Math.floor(Math.random() * (canvas.width / PIXEL_SIZE)) * PIXEL_SIZE;
-        const gridY = Math.floor(Math.random() * (canvas.height / PIXEL_SIZE)) * PIXEL_SIZE;
+        const gridY = minY + Math.floor(Math.random() * ((canvas.height - minY) / PIXEL_SIZE)) * PIXEL_SIZE;
         const baseOpacity = currentThemeType === "light" ? (Math.random() * 0.4 + 0.2) : (Math.random() * 0.5 + 0.5);
         backgroundStarsRef.current[idx] = {
           x: gridX,

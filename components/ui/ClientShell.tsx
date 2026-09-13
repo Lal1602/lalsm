@@ -6,7 +6,6 @@ const ThreeBackground = dynamic(() => import("./ThreeBackground"), { ssr: false 
 const CustomCursor = dynamic(() => import("./CustomCursor"), { ssr: false });
 const Navbar = dynamic(() => import("./Navbar"), { ssr: false });
 const GSAPEffects = dynamic(() => import("./GSAPEffects"), { ssr: false });
-const CardStackInteractions = dynamic(() => import("./CardStackInteractions"), { ssr: false });
 const SwiperInit = dynamic(() => import("./SwiperInit"), { ssr: false });
 const GlobalInteractions = dynamic(() => import("./GlobalInteractions"), { ssr: false });
 const LenisSetup = dynamic(() => import("./LenisSetup"), { ssr: false });
@@ -21,7 +20,6 @@ export default function ClientShell() {
       <CustomCursor />
       <Navbar />
       <GSAPEffects />
-      <CardStackInteractions />
       <SwiperInit />
       <GlobalInteractions />
       <AiChatOverlay />

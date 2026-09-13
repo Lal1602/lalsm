@@ -2,10 +2,32 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import BackgroundPixelStars from "./BackgroundPixelStars";
+import StarChart from "./StarChart";
+import HorizonHud from "./HorizonHud";
+import CosmicNebulaSeam from "./CosmicNebulaSeam";
+import horizonScrollState from "@/lib/horizonScrollState";
 
 // Lazy-loaded — both use browser APIs, must be client-only
 const CvTimelineSlide = dynamic(() => import("./CvTimelineSlide"), { ssr: false });
 const TubesCursor = dynamic(() => import("./TubesCursor"), { ssr: false });
+
+// The two stops on the horizontal transit. Order matches the slides below.
+const WAYPOINTS = [
+  { code: "01", label: "Observation Deck" },
+  { code: "02", label: "Flight Record" },
+];
+
+/*
+  Manifest strip under the title. Replaces the old paragraph, which only
+  described the star field the visitor was already looking at. These are real
+  values: the coordinates are PENS Surabaya, the payload is the stack this
+  section actually runs on.
+*/
+const MANIFEST = [
+  { key: "Origin", val: "07.2756°S · 112.7937°E" },
+  { key: "Vessel", val: "BILAL // CREATIVE DEV" },
+  { key: "Payload", val: "WEBGL · MOTION · SYSTEMS" },
+];
 
 export default function HorizonShowcase() {
   const [mounted, setMounted] = useState(false);
@@ -56,11 +78,32 @@ export default function HorizonShowcase() {
     };
   }, [showCursor]);
 
+  // ── Publish the active waypoint onto the container ────────────────────────
+  // CSS keys off data-waypoint to park the star chart's two rotating layers
+  // whenever slide 01 is off screen, so they cost nothing on the career slide.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    let current = -1;
+    const apply = (progress: number) => {
+      const index = Math.round(progress * (WAYPOINTS.length - 1));
+      if (index === current) return;
+      current = index;
+      el.dataset.waypoint = String(index);
+    };
+
+    const unsubscribe = horizonScrollState.subscribe(apply);
+    apply(horizonScrollState.progress);
+    return unsubscribe;
+  }, [mounted]);
+
   return (
     <section
       ref={sectionRef}
       className="horizon-container"
       id="playground"
+      data-waypoint="0"
       aria-label="Horizon Showcase Section"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -122,28 +165,56 @@ export default function HorizonShowcase() {
       {/* 3D Concave optical depth vignette — z-index 15, always on top */}
       <div className="horizon-concave-backdrop" />
 
+      {/* ── Seamless Cosmic-to-Cyber Transition Bridge (Procedural Nebula Continuation + Cyber Grid) ── */}
+      <div className="horizon-top-transition" aria-hidden="true">
+        <CosmicNebulaSeam part="lower" />
+        <div className="horizon-top-cyber-grid" />
+      </div>
+
       {/* Slides wrapper — GSAP translates this horizontally for scroll */}
       <div className="horizon-wrapper">
 
-        {/* SLIDE 1: CREATIVE PLAYGROUND (Hidden on mobile) */}
+        {/* SLIDE 1: OBSERVATION DECK (Hidden on mobile) */}
         <div className="horizon-slide slide--kinetic hide-on-mobile">
+          <StarChart />
+
           <div className="horizon-slide-content">
-            <p className="slide-badge">{"// PLAYGROUND"}</p>
+            <p className="slide-badge deck-badge">
+              <span className="deck-badge-rule" aria-hidden="true" />
+              {"SECTOR 01 · OBSERVATION DECK"}
+              <span className="deck-badge-rule" aria-hidden="true" />
+            </p>
+
             <h2 className="kinetic-hero-title">
               CREATIVE<br />
               <span className="text-hollow">PLAYGROUND</span>
             </h2>
-            <p className="slide-description">
-              An immersive retro-pixel star field — every star twinkles and shooting stars
-              streak across the cosmos as the canvas of creativity.
-            </p>
+
+            <dl className="transit-manifest">
+              {MANIFEST.map((row) => (
+                <div className="manifest-cell" key={row.key}>
+                  <dt>{row.key}</dt>
+                  <dd>{row.val}</dd>
+                </div>
+              ))}
+              <div className="manifest-cell manifest-cell--signal">
+                <dt>Signal</dt>
+                <dd>
+                  <i className="manifest-pulse" aria-hidden="true" />
+                  TRANSMITTING
+                </dd>
+              </div>
+            </dl>
           </div>
         </div>
 
-        {/* SLIDE 2: CAREER PATHWAY */}
+        {/* SLIDE 2: FLIGHT RECORD — career pathway */}
         {mounted && <CvTimelineSlide />}
 
       </div>
+
+      {/* Instrument frame — fixed relative to the section, above the slides */}
+      <HorizonHud waypoints={WAYPOINTS} />
     </section>
   );
 }

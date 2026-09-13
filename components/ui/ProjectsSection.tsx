@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { Canvas } from "@react-three/fiber";
 import Image from "next/image";
 import FilmScene from "./FilmScene";
+import CosmicBackdrop from "./CosmicBackdrop";
 
 interface Project {
   title: string;
@@ -42,6 +43,10 @@ export default function ProjectsSection() {
   const [canvasInView, setCanvasInView] = useState(false);
   const canvasWrapRef = useRef<HTMLDivElement>(null);
 
+  // Dynamic telemetry states for the bottom gyroscope widget
+  const [orbitalDeg, setOrbitalDeg] = useState(90);
+  const [coordIndex, setCoordIndex] = useState(21);
+
   // References to share dynamic, high-performance scroll values across R3F and DOM
   const scrollRef = useRef({
     current: 0,
@@ -64,20 +69,42 @@ export default function ProjectsSection() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // The film strip renders every frame for as long as it is mounted, so the
-  // loop is stopped whenever the section is scrolled away from.
+  // Frame observer to pause WebGL rendering when outside viewport
   useEffect(() => {
     const wrap = canvasWrapRef.current;
     if (!wrap) return;
     const io = new IntersectionObserver(
       ([entry]) => setCanvasInView(entry.isIntersecting),
-      { rootMargin: "200px" },
+      { rootMargin: "200px" }
     );
     io.observe(wrap);
     return () => io.disconnect();
   }, [mounted]);
 
-  // Pointer drag event handlers to rotate the 3D film strip cylinder
+  // Periodic telemetry updater based on scroll angle
+  useEffect(() => {
+    if (!mounted) return;
+    let rId: number;
+    let lastDeg = -1;
+
+    const tick = () => {
+      const cur = scrollRef.current.current;
+      const MathPI2 = Math.PI * 2;
+      const norm = (((cur % MathPI2) + MathPI2) % MathPI2) / MathPI2;
+      const deg = Math.round(norm * 360);
+      if (deg !== lastDeg) {
+        lastDeg = deg;
+        setOrbitalDeg(deg);
+        setCoordIndex((Math.round(norm * (projects.length - 1)) % projects.length) + 1);
+      }
+      rId = requestAnimationFrame(tick);
+    };
+
+    rId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rId);
+  }, [mounted]);
+
+  // Pointer drag event handlers
   const handlePointerDown = (e: React.PointerEvent) => {
     scrollRef.current.isDragging = true;
     scrollRef.current.lastX = e.clientX;
@@ -89,17 +116,15 @@ export default function ProjectsSection() {
     if (!scrollRef.current.isDragging) return;
     const deltaX = e.clientX - scrollRef.current.lastX;
     scrollRef.current.lastX = e.clientX;
-    
-    // Accumulate total drag distance
+
     scrollRef.current.dragDistance += Math.abs(deltaX);
-    
-    // Smooth dragging sensitivity scale
-    const sensitivity = 0.003; 
+
+    const sensitivity = 0.003;
     scrollRef.current.target -= deltaX * sensitivity;
     scrollRef.current.velocity = -deltaX * sensitivity;
   };
 
-  const handlePointerUp = (e: React.PointerEvent) => {
+  const handlePointerUp = () => {
     if (scrollRef.current.isDragging) {
       scrollRef.current.isDragging = false;
     }
@@ -107,29 +132,51 @@ export default function ProjectsSection() {
 
   const handleWheel = (e: React.WheelEvent) => {
     if (!isDesktop) return;
-    // Wheel zoom/scroll rotation support
     const sensitivity = 0.001;
     scrollRef.current.target += e.deltaY * sensitivity;
   };
 
   return (
-    <section className="section" id="projects" aria-label="Projects Section" style={{ overflow: "visible", position: "relative" }}>
-      <div className="parallax-text" style={{ top: "-20px", right: "0" }} data-speed="0.15">WORK</div>
-      
-      <div className="container" style={{ position: "relative", zIndex: 10 }}>
-        <h2 className="section-title" data-scroll>Projects</h2>
-        
-        {/* Helper HUD instruction bar */}
-        <div className="project-hud-instruction" data-scroll>
-          <span className="hud-pulse-dot"></span>
-          <p className="hud-text">
-            {isDesktop 
-              ? "// GRAB & DRAG OR SCROLL TO SPIN VINTAGE FILM STRIP" 
-              : "// SWIPE LEFT/RIGHT TO SPIN • TAP A CARD TO OPEN DETAILS"}
-          </p>
+    <section
+      className="section cosmic-projects-section"
+      id="projects"
+      aria-label="Projects Section"
+    >
+      {/* 1. Deep Space Atmospheric Canvas & Nebula Backdrop */}
+      {mounted && <CosmicBackdrop />}
+
+      {/* 2. Top Viewport HUD Frame */}
+      <div className="cosmos-top-frame" aria-hidden="true">
+        <div className="cosmos-corner-bracket is-tl"></div>
+        <div className="cosmos-frame-line"></div>
+      </div>
+
+      {/* Upper-Right Mid Space Monospace Label */}
+      <div className="cosmos-archive-tag" aria-hidden="true">
+        ARCHIVE_X-01
+      </div>
+
+      <div className="container cosmic-projects-container" style={{ position: "relative", zIndex: 10 }}>
+        {/* 3. High-Fashion Editorial Serif Section Title & Metadata */}
+        <div className="project-cosmic-header">
+          <div className="project-title-row">
+            <h2 className="project-serif-title">PROJECTS</h2>
+            <div className="project-header-meta">
+              <span className="meta-subtext">microscopic subtext</span>
+              <span className="meta-instruction">
+                {isDesktop
+                  ? "// GRAB & DRAG OR SCROLL TO SPIN VINTAGE FILM STRIP"
+                  : "// SWIPE LEFT/RIGHT • TAP TO EXPAND ARCHIVE RECORD"}
+              </span>
+            </div>
+          </div>
+          <div className="project-index-line">
+            <span className="index-label">COSMIC DATABASE / INDEX [{projects.length}]</span>
+            <div className="index-hairline"></div>
+          </div>
         </div>
 
-        {/* 3D WebGL Canvas Container with pointer-event hooks */}
+        {/* 4. 3D WebGL Canvas Container with Cyber-Glass Monitors */}
         <div
           ref={canvasWrapRef}
           className="project-3d-canvas-wrap"
@@ -149,9 +196,9 @@ export default function ProjectsSection() {
               gl={{ alpha: true, antialias: true, stencil: false }}
               style={{ background: "transparent", touchAction: isDesktop ? "none" : "pan-y" }}
             >
-              <FilmScene 
-                projects={projects} 
-                onSelectProject={(proj) => setActiveProject(proj)} 
+              <FilmScene
+                projects={projects}
+                onSelectProject={(proj) => setActiveProject(proj)}
                 scrollRef={scrollRef}
                 progressRef={progressRef}
               />
@@ -159,14 +206,36 @@ export default function ProjectsSection() {
           )}
         </div>
 
-        {/* Sleek Cinematic Looping Animation Bar */}
-        <div className="project-loop-bar-container" data-scroll>
-          <div className="project-loop-bar-track">
-            <div ref={progressRef} className="project-loop-bar-fill"></div>
-          </div>
+        {/* 6. Sleek Cosmic Progress Bar & Drag Indicator */}
+        <div className="project-loop-bar-container">
           <div className="project-loop-bar-hud">
-            <span className="hud-code">// {projects.length} PROJECTS</span>
-            <span className="hud-code">DRAG OR SCROLL TO BROWSE</span>
+            <span className="hud-code">• // {projects.length} PROJECTS //</span>
+            <div className="project-loop-bar-track">
+              <div ref={progressRef} className="project-loop-bar-fill"></div>
+            </div>
+            <span className="hud-code">DRAG TO EXPLORE THE GALAXY</span>
+          </div>
+        </div>
+
+        {/* 7. Bottom Celestial Gyroscope / Orbital Instrument Widget */}
+        <div className="cosmos-gyroscope-widget" aria-hidden="true">
+          <div className="gyro-readout left">
+            <span className="gyro-val">{orbitalDeg}° ORBITAL</span>
+            <span className="gyro-sub">STR106</span>
+          </div>
+
+          <div className="gyro-orb-wrap">
+            <div className="gyro-orb">
+              <div className="gyro-ring"></div>
+              <div className="gyro-core-glow"></div>
+            </div>
+          </div>
+
+          <div className="gyro-readout right">
+            <span className="gyro-val">
+              {String(coordIndex).padStart(2, "0")} COORDINATE
+            </span>
+            <span className="gyro-sub">0E</span>
           </div>
         </div>
       </div>
@@ -191,9 +260,9 @@ export default function ProjectsSection() {
                 <div className="modal-img-gradient"></div>
               </div>
               <div className="modal-info">
-                <p className="modal-eyebrow">// Project details</p>
+                <p className="modal-eyebrow">// Cosmic archive record</p>
                 <h3 className="modal-title">{activeProject.title}</h3>
-                
+
                 <div className="modal-tech-tags">
                   {activeProject.tech.split(",").map((tech, idx) => (
                     <span className="tech-badge" key={idx}>
@@ -201,21 +270,31 @@ export default function ProjectsSection() {
                     </span>
                   ))}
                 </div>
-                
+
                 <p className="modal-desc">{activeProject.fullDesc}</p>
-                
-                <div className="modal-actions">
-                  <a 
-                    href={activeProject.link} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="btn-launch-live"
+
+                <a
+                  href={activeProject.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-launch-live"
+                >
+                  <span>Launch Live Demo</span>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ marginLeft: "8px" }}
                   >
-                    <span>View live site</span>
-                    {/* @ts-ignore */}
-                    <ion-icon suppressHydrationWarning name="rocket-outline" style={{ marginLeft: "8px", fontSize: "1.1rem" }}></ion-icon>
-                  </a>
-                </div>
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </a>
               </div>
             </div>
           </div>

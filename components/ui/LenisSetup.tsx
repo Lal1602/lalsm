@@ -32,12 +32,18 @@ export default function LenisSetup() {
     }
     rafId = requestAnimationFrame(raf);
 
+    // Expose the instance so programmatic scrolls (Horizon waypoint rail) go
+    // through Lenis. A native window.scrollTo would be immediately overridden
+    // by Lenis' own animation target on the next frame.
+    window.__lenis = lenis;
+
     // Initial refresh to ensure all triggers align with the loaded DOM height
     const refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 1000);
 
     return () => {
       clearTimeout(refreshTimer);
       cancelAnimationFrame(rafId);
+      delete window.__lenis;
       lenis.destroy();
     };
   }, []);
