@@ -115,7 +115,7 @@ export default function ProjectDossier({ project, index, total, designation, onC
           </div>
 
           <div className="cosmos-dossier-info">
-            <p className="cosmos-code cosmos-dossier-eyebrow">// TRANSMISSION DECODED</p>
+            <p className="cosmos-code cosmos-dossier-eyebrow">{"// TRANSMISSION DECODED"}</p>
             <h3 className="cosmos-dossier-title" id="cosmos-dossier-title">
               {project.title}
             </h3>

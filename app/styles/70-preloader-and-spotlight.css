@@ -1,0 +1,275 @@
+/* --- Footer Removed (Replaced below) --- */
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.social-icon {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  transition: color 0.3s, transform 0.3s;
+}
+
+.social-icon:hover {
+  color: var(--accent-cyan);
+  transform: translateY(-3px);
+}
+
+/* --- PRELOADER STYLES (RESPONSIVE UPDATED) --- */
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  /* Fallback untuk browser lama */
+  height: 100dvh;
+  /* Dynamic Viewport Height (Supaya pas di browser HP modern) */
+  background-color: #000;
+  z-index: var(--z-preloader);
+  /* Paling atas, tapi tetap di bawah cursor */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--accent-cyan);
+  font-family: var(--font-display);
+  overflow: hidden;
+  /* Mencegah scroll di dalam preloader */
+}
+
+.loader-content {
+  text-align: center;
+  width: 100%;
+  padding: 0 20px;
+  /* Safe area biar gak mepet pinggir layar HP */
+}
+
+.counter {
+  font-size: 8rem;
+  /* Desktop Default */
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  /* Supaya angka tidak goyang lebarnya saat berubah */
+}
+
+.loading-text {
+  font-family: var(--font-code);
+  letter-spacing: 5px;
+  /* Desktop Default */
+  margin-top: 20px;
+  color: var(--text-muted);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+/* Hacker Text Effect Styles */
+.hacker-text {
+  font-family: var(--font-code);
+  /* Pastikan font monospaced biar lebar huruf konsisten */
+  display: inline-block;
+}
+
+/* --- SPOTLIGHT EFFECT --- */
+.spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* Biar bisa diklik tembus */
+  z-index: 1;
+  /* Di atas background Three.js, di bawah konten utama */
+  background: radial-gradient(600px circle at var(--x) var(--y),
+      rgba(0, 243, 255, 0.06),
+      /* Warna Cyan tipis di tengah */
+      transparent 40%);
+  will-change: background;
+  /* Optimasi performa */
+}
+
+/* --- Responsive Modifications (FIX 4: Symmetry & Harmony) --- */
+@media (max-width: 968px) {
+  .hero {
+    /* Fix 3: Increase bottom padding to prevent overlap with scroll indicator */
+    padding-bottom: 120px;
+  }
+
+  .hero-wrapper {
+    /* FIX 2: Change column-reverse to column so Image is TOP, Text is BOTTOM */
+    flex-direction: column;
+    text-align: center;
+    gap: 40px;
+    /* Slightly reduced gap */
+    padding-top: 20px;
+  }
+
+  .hero-content {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-subtitle {
+    margin: 0 auto 30px;
+    padding: 0 15px;
+    /* Prevent text touching edges */
+    font-size: 1rem;
+    /* Slightly smaller reading text */
+  }
+
+  .image-blob {
+    width: 250px;
+    /* Slightly smaller image on tablet/mobile */
+    height: 250px;
+  }
+
+  /* FIX 2 & 4: Adjust badge for better visibility and centering */
+  .stats-badge {
+    /* Posisi (biarkan ini) */
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 10;
+    width: max-content;
+
+    /* --- BAGIAN YG DIUBAH UTK MENGECILKAN UKURAN --- */
+    bottom: -20px;
+    /* Naikkan sedikit biar nempel gambar (tadinya -20px) */
+    padding: 6px 12px;
+    /* KURANGI PADDING: Biar kotaknya lebih tipis (tadinya 8px 15px) */
+    border-radius: 8px;
+    /* Perkecil lengkungan sudut */
+  }
+
+  .stats-badge strong {
+    font-size: 0.9rem;
+    /* KURANGI FONT ANGKA: (tadinya 1.1rem) */
+  }
+
+  /* Tambahan: Kecilkan teks "Projects Done" */
+  .stats-badge span {
+    font-size: 0.65rem !important;
+    /* (tadinya 0.8rem) */
+  }
+
+  /* Tambahan: Paksa ikon centang jadi kecil */
+  .stats-badge ion-icon {
+    font-size: 1.8rem !important;
+    /* (tadinya 2.5rem bawaan HTML) */
+  }
+
+  /* FIX 1: Adjust large text to prevent overflow */
+  .glitch-text {
+    font-size: 2.2rem;
+    /* Reduced from 2.5rem */
+    line-height: 1.2;
+    word-wrap: break-word;
+  }
+
+  /* FIX 1: Hide extremely large parallax text that causes overflow on mobile */
+  .parallax-text {
+    opacity: 0.02;
+    font-size: 8vw;
+    /* Reduced size */
+  }
+
+  .counter {
+    font-size: 6rem;
+    /* Turun dari 8rem ke 6rem */
+  }
+
+  .loading-text {
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    /* Spasi dirapatkan dikit */
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    width: 95%;
+    padding: 10px 20px;
+  }
+
+  /* ADDED: Balance content width to match Navbar (95%) */
+  .container {
+    padding: 0 20px;
+    /* Pastikan ada jarak kiri-kanan */
+    /* overflow-x: hidden; */
+    /* Mencegah scroll samping */
+  }
+
+  .section {
+    padding: 40px 0;
+    /* Di HP lebih rapat lagi */
+  }
+
+  /* Adjust Section Titles for Mobile */
+  .section-title {
+    font-size: 2rem;
+    /* Ukuran standar */
+  }
+
+  /* Solusi Paling Ampuh: Responsif Font Size */
+  h2.section-title {
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    /* Otomatis mengecil kalau layar sempit */
+    word-wrap: break-word;
+    /* Patahkan kata jika kepepet banget */
+    max-width: 100%;
+  }
+
+  /* nav-links & menu-toggle mobile overrides moved to the
+             comprehensive responsive block at the bottom of this file. */
+
+  .swiper {
+    overflow: hidden;
+    /* Prevent overflow on small screens */
+  }
+
+  /* Fix button centering */
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    align-items: center;
+    margin-bottom: 20px;
+    /* Extra margin to ensure distance from scroll arrow */
+  }
+
+  .btn-group .btn {
+    margin-left: 0 !important;
+    /* Remove inline style margin */
+    width: 100%;
+    /* Full width buttons look better on small mobile */
+    max-width: 250px;
+    text-align: center;
+  }
+
+  /* Adjust Hero Text further for very small screens */
+  .glitch-text {
+    font-size: 1.8rem;
+  }
+
+  .counter {
+    font-size: 4rem;
+    /* Ukuran pas buat HP, tidak terlalu dominan */
+  }
+
+  .loading-text {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    /* Rapat supaya teks panjang muat satu baris */
+    margin-top: 15px;
+  }
+}
+

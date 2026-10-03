@@ -1,0 +1,717 @@
+/* ═══════════════════════════════════════════════════════════
+   HORIZON SHOWCASE — Immersive Side-Scroller Section
+   ═══════════════════════════════════════════════════════════ */
+
+/* Ensure GSAP pin-spacer dynamically adapts to full viewport width across all zoom levels */
+.pin-spacer {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 100vw !important;
+}
+
+.horizon-container,
+.pin-spacer > .horizon-container {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 100vw !important;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  /* Harmonized cosmic gradient seamlessly continuing HIW bottom boundary from #0b0d30 down */
+  background: linear-gradient(180deg,
+    #0b0d30 0%,
+    #0b0d30 5%,
+    #080a26 16%,
+    #06081c 30%,
+    #050614 50%,
+    #04060f 75%,
+    #030308 100%
+  );
+  z-index: 50;
+  display: block;
+  perspective: 1500px;
+  /* Force own composite layer so pin transform doesn't trigger a full
+     repaint of children that are on their own layers */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.horizon-concave-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  background: transparent;
+  /* Only keep bottom concave vignette so the top can merge seamlessly with the cosmic nebula */
+  box-shadow: inset 0 -140px 140px -70px var(--concave-shadow);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0px, transparent 350px, #000 500px);
+  mask-image: linear-gradient(180deg, transparent 0px, transparent 350px, #000 500px);
+  /* No transition — box-shadow transition triggers full paint (not GPU-composited)
+     and can cause flicker in layered canvas elements during scroll */
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ── Seamless Cosmic-to-Cyber Transition Bridge ────────────────────────────
+   Continues the deep-space nebula from HIW into the digital HUD radar of Horizon. */
+.horizon-top-transition {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 400px;
+  pointer-events: none;
+  z-index: 18;
+  overflow: hidden;
+}
+
+.horizon-top-cyber-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(139, 92, 246, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.09) 1px, transparent 1px);
+  background-size: 40px 40px;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0px, transparent 48px, rgba(0, 0, 0, 0.15) 110px, rgba(0, 0, 0, 0.6) 240px, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0px, transparent 48px, rgba(0, 0, 0, 0.15) 110px, rgba(0, 0, 0, 0.6) 240px, transparent 100%);
+}
+
+/* ── Old CSS grid backdrop removed — replaced by BackgroundPixelStars canvas component ── */
+/* The canvas is rendered inside .horizon-wrapper at z-index: 1 from HorizonShowcase.tsx   */
+.horizon-grid-backdrop {
+  /* Kept as a dark base so fallback looks decent if canvas is loading */
+  position: absolute;
+  inset: 0;
+  background-color: rgba(5, 5, 5, 0.92);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.horizon-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  will-change: transform;
+  transform-style: preserve-3d;
+  position: relative;
+  z-index: 20;
+}
+
+.horizon-slide {
+  width: 100vw;
+  height: 100vh;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 8%;
+  box-sizing: border-box;
+  background-color: transparent !important;
+  will-change: transform;
+}
+
+/* Career pathway slide needs overflow:visible so cards can fly across the full width */
+.slide--cv {
+  overflow: visible;
+}
+
+/* Slide Ambient Glows — Disabled so ONLY the horizontal section grid background is used */
+.slide-background-glow {
+  display: none !important;
+}
+
+.glow--violet {
+  background: radial-gradient(circle, var(--accent-purple) 0%, transparent 80%);
+  right: 10%;
+  top: -10%;
+}
+
+.glow--cyan {
+  background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 80%);
+  left: 10%;
+  bottom: -10%;
+}
+
+/* Content typography */
+.horizon-slide-content {
+  position: relative;
+  z-index: 10;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.horizon-slide-content.full-width {
+  max-width: 100%;
+}
+
+.slide-badge {
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  color: var(--accent-cyan);
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+}
+
+.slide-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 15px;
+  background: linear-gradient(90deg, #ffffff, var(--text-muted));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.slide-description {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 52ch;
+  margin-bottom: 30px;
+}
+
+/* SLIDE 1: KINETIC HERO — Perfectly centered, no lateral padding offset */
+.slide--kinetic {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 0 !important;
+  /* Remove 8% side padding so flex center is truly dead-center */
+}
+
+.slide--kinetic .horizon-slide-content {
+  position: relative;
+  z-index: 30;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  max-width: 900px !important;
+  padding: 0 5% !important;
+  margin: 0 auto !important;
+}
+
+.slide--kinetic .slide-description {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+  max-width: 55ch !important;
+  margin-bottom: 0 !important;
+}
+
+.kinetic-hero-title {
+  position: relative;
+  z-index: 30;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 25px 0;
+  transform-style: preserve-3d;
+}
+
+.text-hollow {
+  color: transparent !important;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.2);
+  transition: -webkit-text-stroke 0.3s ease;
+}
+
+.horizon-slide:hover .text-hollow {
+  -webkit-text-stroke-color: var(--accent-cyan);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HORIZON — SECTOR 01 · OBSERVATION DECK
+   A navigational instrument instead of a paragraph. Every layer here is either
+   static paint or a compositor-only transform; the section already carries a
+   star-field canvas plus a WebGL cursor, so nothing below uses filter: blur()
+   or backdrop-filter.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.starchart {
+  --sc-size: clamp(440px, 82vh, 760px);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--sc-size);
+  height: var(--sc-size);
+  margin: calc(var(--sc-size) / -2) 0 0 calc(var(--sc-size) / -2);
+  z-index: 25;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+  transform: translateZ(15px);
+  isolation: isolate;
+}
+
+/* Fades out with its slide so it never bleeds into the flight record */
+.horizon-container:not([data-waypoint="0"]) .starchart {
+  opacity: 0;
+}
+
+.starchart-ring,
+.starchart-static {
+  position: absolute;
+  inset: 0;
+}
+
+.starchart-ring svg,
+.starchart-static svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.starchart-ring {
+  will-change: transform;
+}
+
+.starchart-ring--bezel {
+  animation: scSpin 240s linear infinite;
+}
+
+.starchart-ring--orbit {
+  animation: scSpin 96s linear infinite reverse;
+}
+
+/* Rotation only runs while the observation deck is the active waypoint */
+.horizon-container:not([data-waypoint="0"]) .starchart-ring {
+  animation-play-state: paused;
+}
+
+@keyframes scSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Core light — a gradient, deliberately not a blurred element */
+.starchart-core {
+  position: absolute;
+  inset: 10%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+      rgba(79, 184, 224, 0.12) 0%,
+      rgba(139, 124, 246, 0.05) 45%,
+      transparent 72%);
+}
+
+/* ── Star chart strokes — crisp, luminous, and rendered in front of nebulae ── */
+.sc-hairline {
+  stroke: rgba(255, 255, 255, 0.38);
+  stroke-width: 1.1;
+  filter: drop-shadow(0 0 3px rgba(79, 184, 224, 0.3));
+}
+
+.sc-faint {
+  stroke: rgba(255, 255, 255, 0.22);
+}
+
+.sc-tick {
+  stroke: rgba(255, 255, 255, 0.42);
+  stroke-width: 1.1;
+}
+
+.sc-tick--major {
+  stroke: rgba(79, 184, 224, 0.90);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 3px rgba(79, 184, 224, 0.55));
+}
+
+.sc-orbit-path {
+  stroke: rgba(255, 255, 255, 0.26);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+}
+
+.sc-orbit-arc {
+  stroke: rgba(79, 184, 224, 0.80);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 4px rgba(79, 184, 224, 0.45));
+}
+
+.sc-marker {
+  fill: #38bdf8;
+  filter: drop-shadow(0 0 6px #38bdf8);
+}
+
+.sc-marker-halo {
+  stroke: rgba(79, 184, 224, 0.75);
+  stroke-width: 1.2;
+  fill: none;
+}
+
+.sc-chord {
+  stroke: rgba(167, 139, 250, 0.50);
+  stroke-width: 1.1;
+  stroke-dasharray: 3 6;
+}
+
+.sc-lead {
+  stroke: rgba(255, 255, 255, 0.36);
+  stroke-width: 1;
+}
+
+.sc-reticle {
+  stroke: rgba(79, 184, 224, 0.85);
+  stroke-width: 1.4;
+}
+
+.sc-numeral {
+  font-family: var(--font-code);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  fill: rgba(255, 255, 255, 0.90);
+  filter: drop-shadow(0 0 6px rgba(79, 184, 224, 0.5));
+}
+
+.sc-label {
+  font-family: var(--font-code);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  fill: rgba(255, 255, 255, 0.90);
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.9));
+}
+
+.sc-node-dot {
+  fill: var(--accent-cyan);
+  filter: drop-shadow(0 0 5px var(--accent-cyan));
+}
+
+.sc-node-halo {
+  fill: none;
+  stroke: rgba(79, 184, 224, 0.65);
+  stroke-width: 1.2;
+}
+
+.sc-node--gold .sc-node-dot {
+  fill: var(--accent-gold);
+  filter: drop-shadow(0 0 5px var(--accent-gold));
+}
+
+.sc-node--gold .sc-node-halo {
+  stroke: rgba(240, 168, 104, 0.65);
+}
+
+.sc-node--violet .sc-node-dot {
+  fill: var(--accent-purple);
+  filter: drop-shadow(0 0 5px var(--accent-purple));
+}
+
+.sc-node--violet .sc-node-halo {
+  stroke: rgba(139, 124, 246, 0.65);
+}
+
+/* ── Sector badge with flanking rules ────────────────────────────────────── */
+.deck-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.62rem;
+  letter-spacing: 0.32em;
+  text-shadow: none;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.deck-badge-rule {
+  display: block;
+  width: 40px;
+  height: 1px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan));
+  opacity: 0.55;
+}
+
+.deck-badge-rule:last-child {
+  background: linear-gradient(90deg, var(--accent-cyan), transparent);
+}
+
+/* The flight-record slide is left-aligned, so it only needs the leading rule */
+.slide--cv .deck-badge-rule:last-child {
+  display: none;
+}
+
+/* ── Transit manifest — the strip that replaced the old description ──────── */
+/* The rules and the panel fill are painted as background layers so both fade
+   out at the ends — a hard-edged box would cut straight across the star chart
+   rings sitting behind it. */
+.transit-manifest {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 36px auto 0;
+  max-width: 800px;
+  padding: 17px 0;
+  background-image:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.11) 14%, rgba(255, 255, 255, 0.11) 86%, transparent),
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.11) 14%, rgba(255, 255, 255, 0.11) 86%, transparent),
+    linear-gradient(90deg, transparent, rgba(6, 8, 14, 0.78) 9%, rgba(6, 8, 14, 0.78) 91%, transparent);
+  background-size: 100% 1px, 100% 1px, 100% 100%;
+  background-position: 0 0, 0 100%, 0 0;
+  background-repeat: no-repeat;
+}
+
+.slide--kinetic .transit-manifest .manifest-cell {
+  text-align: left;
+}
+
+.manifest-cell {
+  flex: 1 1 0;
+  min-width: 150px;
+  padding: 2px 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.manifest-cell:first-child {
+  border-left: 0;
+}
+
+.manifest-cell dt {
+  font-family: var(--font-code);
+  font-size: 0.55rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.26);
+}
+
+.manifest-cell dd {
+  margin: 7px 0 0;
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.62);
+  white-space: nowrap;
+}
+
+.manifest-cell--signal dd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-cyan);
+}
+
+.manifest-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  flex-shrink: 0;
+  animation: manifestPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes manifestPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.18;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HORIZON HUD — the instrument frame that stays put while the slides travel
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.horizon-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  /* above .horizon-slide-content (30), .starchart (25), .horizon-wrapper (20), and the vignette (15) */
+  pointer-events: none;
+  font-family: var(--font-code);
+  user-select: none;
+}
+
+/* ── Corner brackets ── */
+.hud-bracket {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(79, 184, 224, 0.3);
+}
+
+.hud-bracket--tl {
+  top: 22px;
+  left: 22px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.hud-bracket--tr {
+  top: 22px;
+  right: 22px;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.hud-bracket--bl {
+  bottom: 22px;
+  left: 22px;
+  border-right: 0;
+  border-top: 0;
+}
+
+.hud-bracket--br {
+  bottom: 22px;
+  right: 22px;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* ── Top readouts — pushed clear of the floating navbar ── */
+.hud-readout {
+  position: absolute;
+  top: clamp(98px, 13vh, 134px);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.hud-readout--left {
+  left: 34px;
+}
+
+.hud-readout--right {
+  right: 34px;
+}
+
+.hud-key {
+  color: rgba(255, 255, 255, 0.24);
+}
+
+.hud-sep {
+  color: rgba(255, 255, 255, 0.14);
+}
+
+.hud-val {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.hud-val--num {
+  color: var(--accent-cyan);
+  font-variant-numeric: tabular-nums;
+  min-width: 4ch;
+  text-align: right;
+}
+
+.hud-progress {
+  display: block;
+  width: 56px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.hud-progress-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+  will-change: transform;
+}
+
+/* ── Vertical sector stamp on the right edge ── */
+.hud-sector {
+  position: absolute;
+  top: 50%;
+  right: 26px;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-size: 0.56rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.16);
+}
+
+.hud-sector span {
+  color: rgba(79, 184, 224, 0.7);
+}
+
+/* ── Waypoint rail — removed per user request ── */
+.hud-rail {
+  display: none !important;
+}
+
+.hud-waypoint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.hud-waypoint:hover {
+  color: rgba(255, 255, 255, 0.72);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.hud-waypoint-node {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  transform: rotate(45deg);
+  border: 1px solid currentColor;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hud-waypoint-code {
+  color: rgba(255, 255, 255, 0.22);
+  transition: color 0.3s ease;
+}
+
+.hud-waypoint.is-active {
+  color: #ffffff;
+  border-color: rgba(79, 184, 224, 0.32);
+  background-color: rgba(79, 184, 224, 0.06);
+}
+
+.hud-waypoint.is-active .hud-waypoint-node {
+  background-color: var(--accent-cyan);
+  box-shadow: 0 0 8px rgba(79, 184, 224, 0.6);
+}
+
+.hud-waypoint.is-active .hud-waypoint-code {
+  color: var(--accent-cyan);
+}
+
+/* ── Distance ruler — replaced by curved procedural telemetry arc in AccretionHorizonSeam ── */
+.hud-ruler {
+  display: none;
+}
+
+.hud-ruler-track {
+  display: none;
+}
+

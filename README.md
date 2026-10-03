@@ -21,7 +21,7 @@
 
 ## 🌟 Overview
 
-Welcome to the personal portfolio of **Ahmad Bilal**, an Informatics Engineering student at **Politeknik Elektronika Negeri Surabaya (PENS / EEPIS)** and a passionate **Creative Developer**.
+Welcome to the personal portfolio of **Bilal Sanayu Majid**, an Informatics Engineering student at **Politeknik Elektronika Negeri Surabaya (PENS / EEPIS)** and a passionate **Creative Developer**.
 
 This project bridges bleeding-edge 3D WebGL graphics, GSAP scroll-driven animations, high-precision UI engineering, and real-time AI capabilities into a cohesive, cyberpunk/sci-fi aesthetic portfolio.
 
@@ -143,9 +143,10 @@ lalsm/
    ```
 
 3. **Configure Environment Variables:**
-   Create a `.env` file in the root directory and add your Google Gemini API key:
-   ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
+   Copy `.env.example` to `.env` and fill in what you need. Everything is optional; with no
+   `GEMINI_API_KEY` the assistant answers from a built-in keyword simulation.
+   ```bash
+   cp .env.example .env
    ```
    *(You can obtain a free API key at [Google AI Studio](https://aistudio.google.com/))*
 
@@ -161,18 +162,52 @@ lalsm/
 
 ## 📦 Build for Production
 
-To create an optimized production build:
-
 ```bash
 npm run build
 npm run start
 ```
 
+Set `NEXT_PUBLIC_SITE_URL` to your real domain before building: it feeds the canonical URLs, sitemap,
+robots.txt, Open Graph tags and JSON-LD.
+
+---
+
+## ✅ Quality Checks
+
+| Command | What it does |
+| --- | --- |
+| `npm run lint` | ESLint (Next + TypeScript + React Compiler rules) |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | Vitest unit tests: chat validation, rate limiter, stream parser, action parser, CV, lite boot |
+| `npm run test:e2e` | Playwright smoke tests against a production build (`npm run build` first; `PW_CHANNEL=chrome` reuses an installed Chrome) |
+| `npm run check` | lint + typecheck + unit tests |
+
+CI (`.github/workflows/ci.yml`) runs all of the above on every push and pull request.
+
+---
+
+## 🧭 How the Newer Pieces Fit
+
+- **Content lives in `data/`**: `projects.ts`, `achievements.ts` and `profile.ts` feed the 3D gallery, the case-study pages,
+  the CV, the sitemap and the AI assistant's knowledge. Add a project once and it appears everywhere.
+- **Case studies**: `/projects` and `/projects/[slug]` (statically generated). The home page modal links to them.
+- **Blog**: MDX files in `content/blog/` export a `meta` object (title, description, date, tags); the file name is the slug.
+- **CV**: `/cv` is a printable page and `/cv.pdf` a PDF generated from the same data. Drop a designed PDF at
+  `public/cv/Bilal-Sanayu-Majid-CV.pdf` and `/cv.pdf` serves it instead, no code change.
+- **AI assistant**: `app/api/ai/chat/route.ts` streams NDJSON, validates input (`lib/chat/validate.ts`), rate-limits per IP
+  (`lib/chat/rateLimit.ts`, optional Upstash Redis), fails over between models with timeouts, and falls back to a local simulation.
+- **Lite mode**: `lib/liteBoot.ts` decides before first paint (reduced motion, Save-Data, weak device, or the visitor's choice via
+  the toggle bottom-left) and sets `<html data-lite>`. Lite drops the WebGL starfield, tube cursor, seam canvases, backdrop blur and
+  smooth-scroll, and swaps the 3D film strip for a plain card grid.
+- **Styles**: `app/styles/*.css` is the old single stylesheet split by section. Order matters (one flat cascade), so keep the numeric
+  prefixes and namespace new class names.
+- **Analytics**: off by default. Set `NEXT_PUBLIC_ANALYTICS_PROVIDER` (plausible, umami or vercel); see `.env.example`.
+
 ---
 
 ## 👤 Author
 
-**Ahmad Bilal**
+**Bilal Sanayu Majid**
 - **Institution**: Informatics Engineering, PENS (Politeknik Elektronika Negeri Surabaya)
 - **Role**: Creative Developer / Full-Stack Engineer
 - **Website**: [bilal-portfolio.vercel.app](http://localhost:3000)

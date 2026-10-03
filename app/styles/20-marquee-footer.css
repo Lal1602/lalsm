@@ -1,0 +1,161 @@
+/* --- FEATURE 1: KINETIC SCROLL MARQUEE --- */
+.kinetic-marquee-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 20px 0;
+  background: rgba(0, 0, 0, 0.01);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 5;
+  border-top: 1px solid rgba(0, 243, 255, 0.2);
+  border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+  /* margin-bottom: 20px; */
+  margin-top: 20px;
+  /* Tambahkan sedikit margin atas */
+}
+
+.marquee-wrapper {
+  display: flex;
+  white-space: nowrap;
+}
+
+.marquee-text {
+  font-family: var(--font-display);
+  font-size: 6vw;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+  padding-right: 50px;
+  will-change: transform;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .marquee-text {
+    font-size: 12vw;
+  }
+}
+
+/* --- FEATURE 2: HOLOGRAPHIC MEGA FOOTER --- */
+.mega-footer {
+  position: relative;
+  padding: 80px 0 30px;
+  background: #050505;
+  border-top: 1px solid var(--accent-cyan);
+  overflow: hidden;
+  margin-top: 100px;
+}
+
+.footer-grid-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+  pointer-events: none;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+}
+
+.footer-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.mega-link {
+  font-family: var(--font-display);
+  font-size: 12vw;
+  font-weight: 900;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--text-muted);
+  text-decoration: none;
+  transition: all 0.5s ease;
+  display: block;
+  margin-bottom: 60px;
+  letter-spacing: -5px;
+}
+
+.mega-link:hover,
+.mega-link.active {
+  color: var(--accent-cyan);
+  -webkit-text-stroke: 2px var(--accent-cyan);
+  text-shadow: 0 0 50px rgba(0, 243, 255, 0.5);
+  transform: scale(1.02);
+  letter-spacing: 0px;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.footer-nav ul,
+.footer-socials {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+.footer-link {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-family: var(--font-code);
+  font-size: 0.9rem;
+  transition: color 0.3s;
+}
+
+.footer-link:hover {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 10px var(--accent-cyan);
+}
+
+.time-display {
+  font-family: var(--font-code);
+  font-size: 1rem;
+  color: var(--accent-cyan);
+  border: 1px solid var(--glass-border);
+  padding: 10px 20px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.time-display ion-icon {
+  font-size: 1.2rem;
+  animation: pulse-gold 2s infinite;
+}
+
+@media (max-width: 768px) {
+  .mega-link {
+    font-size: 15vw;
+    margin-bottom: 40px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+

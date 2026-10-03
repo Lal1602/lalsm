@@ -1,0 +1,1128 @@
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN FALLBACKS (NO LAYOUT OVERFLOWS)
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 968px) {
+
+  /* ── Hide Creative Playground on mobile ── */
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  /* ── Horizon container: auto height, full bleed background ── */
+  .horizon-container {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    /* Pixel stars background still fills via position:absolute;inset:0 */
+  }
+
+  .horizon-wrapper {
+    flex-direction: column !important;
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+  }
+
+  .horizon-slide {
+    width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+    padding: 0 !important;
+    border-bottom: none;
+    overflow: visible !important;
+    /* No 3D transforms from GSAP */
+    transform: none !important;
+  }
+
+  /* ── Career Pathway mobile layout ── */
+
+  /* The slide itself becomes normal document flow */
+  .slide--cv {
+    display: block !important;
+    position: relative;
+    padding: 0 0 48px !important;
+    /* bottom breathing room */
+    background: transparent;
+    transform: none !important;
+  }
+
+  /* Sticky header wrapper — sits near the top of the section */
+  .cv-mobile-sticky-header {
+    position: relative;
+    /* NOT sticky on mobile — just flows naturally */
+    top: 0;
+    z-index: 10;
+    background: transparent;
+    padding: 56px 20px 16px;
+    /* top: push down from nav bar */
+  }
+
+  .cv-mobile-sticky-header .slide-badge {
+    font-size: 0.65rem;
+    margin-bottom: 6px;
+  }
+
+  .cv-mobile-sticky-header .slide-title {
+    font-size: clamp(1.6rem, 8vw, 2.6rem) !important;
+    line-height: 1.05;
+    margin-bottom: 6px;
+  }
+
+  .cv-mobile-sticky-header .slide-description {
+    font-size: 0.72rem !important;
+    color: var(--text-muted);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Horizontal swipe cards rail */
+  .cv-mobile-cards-rail {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    /* Push cards up slightly so they overlap with the header area */
+    padding: 16px 20px 40px;
+    scrollbar-width: none;
+  }
+
+  .cv-mobile-cards-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cv-mobile-cards-rail .cv-mobile-card {
+    flex: 0 0 80vw;
+    scroll-snap-align: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    /* Enough height to show all content without clipping */
+    min-height: 260px;
+  }
+
+  .cv-mobile-card-glow {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .cv-mobile-card-year {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--font-code);
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 6px;
+  }
+
+  .cv-mobile-card-badge {
+    display: inline-block;
+    font-family: var(--font-code);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 14px;
+  }
+
+  .cv-mobile-card-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.15), transparent);
+    margin-bottom: 14px;
+  }
+
+  .cv-mobile-card-role {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .cv-mobile-card-institution {
+    font-family: var(--font-code);
+    font-size: 0.7rem;
+    color: var(--accent-cyan);
+    margin: 0 0 12px;
+  }
+
+  .cv-mobile-card-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* CV download card at the end of the rail */
+  .cv-mobile-download-card {
+    flex: 0 0 68vw;
+    scroll-snap-align: center;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  /* Hide desktop timeline stuff on mobile */
+  .cv-timeline-area,
+  .cv-scroll-hint {
+    display: none !important;
+  }
+
+  /* ── KEY FIX: hide the desktop .horizon-slide-content on mobile ── */
+  /* This prevents the duplicate "CAREER PATHWAY" header from showing */
+  .slide--cv .horizon-slide-content {
+    display: none !important;
+  }
+
+  /* ── KEY FIX: reset 3D transforms that cause tilting ── */
+  /* GSAP applies rotationY on desktop; on mobile we force flat */
+  .horizon-slide,
+  .slide--cv {
+    transform: none !important;
+  }
+
+  /* Show mobile-only elements */
+  .cv-mobile-sticky-header,
+  .cv-mobile-cards-rail {
+    display: block;
+  }
+
+  .cv-mobile-cards-rail {
+    display: flex;
+  }
+
+  /* Removed swipe hint text, using interactive arrows instead */
+
+  /* 3D Projects mobile overrides */
+  .project-3d-canvas-wrap {
+    height: 320px;
+    margin-top: 10px;
+    touch-action: pan-y !important;
+  }
+
+  /* Projects overrides */
+  .project-slider .swiper-slide {
+    width: 280px !important;
+  }
+
+  .project-card {
+    height: 340px;
+  }
+
+  .project-title {
+    font-size: 1rem;
+  }
+
+  /* Achievements overrides */
+  .achievements-marquee-wrapper {
+    padding: 20px 0;
+  }
+
+  .marquee-card {
+    width: 220px;
+    min-width: 220px;
+    padding: 16px 18px;
+  }
+
+  .interactive-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-detail-modal {
+    padding: 12px;
+  }
+
+  .modal-content-card {
+    max-height: 80vh;
+    overflow: hidden;
+  }
+
+  .modal-body {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .modal-close-btn {
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    font-size: 1.15rem;
+    background: rgba(5, 5, 8, 0.82) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-image-wrap {
+    height: 200px;
+    min-height: 200px;
+  }
+
+  .modal-img-gradient {
+    background: linear-gradient(to top, rgba(10, 10, 14, 1) 15%, transparent 100%);
+  }
+
+  .modal-info {
+    padding: 24px 20px 30px;
+  }
+}
+
+/* --- WebGL Three.js Canvas Container --- */
+.three-webgl-canvas-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: auto;
+  overflow: hidden;
+  /* Flatten 3D context so parent slide rotateY + perspective never distorts the sphere size */
+  transform-style: flat;
+  /* Allow direct mouse drag interaction */
+}
+
+/* Ensure typography in Slide 1 sits cleanly in front of WebGL */
+.slide--kinetic .horizon-slide-content {
+  z-index: 10;
+  position: relative;
+  pointer-events: none;
+  /* Let pointer events bleed through to OrbitControls below */
+}
+
+/* Let headers have pointer-events to handle hovering but not block WebGL drags */
+.slide--kinetic h2,
+.slide--kinetic p,
+.slide--kinetic span {
+  pointer-events: auto;
+}
+
+/* Cyber HUD Interactive Status Capsule */
+.hud-interactive-status {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(10, 10, 14, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 8px 18px;
+  border-radius: 30px;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.hud-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  position: relative;
+  display: inline-block;
+  transition: background-color 0.4s ease;
+}
+
+/* Pulse animation when active (cyan) */
+.hud-pulse-dot.active {
+  background-color: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+  animation: active-pulse 1.2s infinite ease-in-out;
+}
+
+/* Pulse animation when idle (purple) */
+.hud-pulse-dot.idle {
+  background-color: var(--accent-purple);
+  box-shadow: 0 0 10px var(--accent-purple);
+  animation: idle-pulse 2s infinite ease-in-out;
+}
+
+.hud-status-text {
+  font-family: var(--font-code);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color 0.4s ease;
+}
+
+.hud-interactive-status:has(.hud-pulse-dot.active) {
+  border-color: rgba(0, 243, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 243, 255, 0.04);
+}
+
+.hud-interactive-status:has(.hud-pulse-dot.active) .hud-status-text {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes active-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 0px rgba(0, 243, 255, 0.6);
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 8px rgba(0, 243, 255, 0);
+  }
+}
+
+@keyframes idle-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+    box-shadow: 0 0 6px rgba(188, 19, 254, 0.4);
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(188, 19, 254, 0.8);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Comprehensive System Overrides
+   Primary breakpoints: 768px (tablet/mobile) | 480px (small phone)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Safe area support for notched phones ── */
+:root {
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ════════════════════════════════
+   BREAKPOINT: max-width 768px
+   ════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── CREATIVE PLAYGROUND & CAREER PATHWAY MOBILE ── */
+  .slide--kinetic {
+    display: none !important;
+  }
+
+  .horizon-slide {
+    min-height: 70vh !important;
+    padding: 60px 5% !important;
+  }
+
+  .kinetic-hero-title {
+    font-size: clamp(1.6rem, 9vw, 3.5rem) !important;
+  }
+
+  .glitch-card {
+    padding: 20px 16px;
+  }
+
+  /* ── PROJECTS MOBILE ── */
+  .project-slider .swiper-slide {
+    width: calc(100vw - 48px) !important;
+    max-width: 300px !important;
+  }
+
+  .project-card {
+    height: 300px;
+    border-radius: 14px;
+  }
+
+  .project-float-wrapper {
+    animation: none !important;
+  }
+
+  .btn-quick-view {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .modal-content-card {
+    border-radius: 16px;
+    max-height: 90vh;
+  }
+
+  .modal-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .modal-image-wrap {
+    height: 180px;
+    min-height: 180px;
+  }
+
+  .modal-info {
+    padding: 20px 16px 24px;
+  }
+
+  .modal-close-btn {
+    top: 10px;
+    right: 10px;
+  }
+
+  /* ── ACHIEVEMENTS MOBILE ── */
+  .achievements-marquee-wrapper {
+    overflow: hidden;
+  }
+
+  .marquee-track {
+    touch-action: pan-y;
+  }
+
+  .marquee-card {
+    width: 180px;
+    min-width: 180px;
+    padding: 14px 14px;
+    border-radius: 12px;
+  }
+
+  .marquee-card h3,
+  .marquee-card-title {
+    font-size: 0.85rem;
+  }
+
+  .achievement-card {
+    padding: 20px 16px;
+  }
+
+  /* ── NAVBAR ── */
+  .navbar {
+    top: 12px;
+    width: calc(100% - 24px);
+    padding: 12px 20px;
+    border-radius: 16px;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  /* Mobile navbar overrides */
+  .nav-links {
+    display: none !important;
+  }
+
+  .menu-toggle-btn {
+    display: flex !important;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding-top: 90px;
+    padding-bottom: 100px;
+    min-height: 100dvh;
+  }
+
+  .hero-wrapper {
+    flex-direction: column;
+    text-align: center;
+    gap: 32px;
+    padding-top: 0;
+  }
+
+  .hero-content {
+    text-align: center;
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-image-container {
+    order: 1;
+  }
+
+  .image-blob {
+    width: 220px;
+    height: 220px;
+  }
+
+  .glitch-text {
+    font-size: clamp(1.7rem, 7vw, 2.4rem);
+    line-height: 1.15;
+    word-break: break-word;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+    max-width: 36ch;
+    padding: 0;
+    margin: 0 auto 28px;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .btn-group .btn {
+    width: 100%;
+    max-width: 260px;
+    margin-left: 0 !important;
+    text-align: center;
+  }
+
+  .stats-badge {
+    bottom: -18px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    padding: 6px 14px;
+    gap: 10px;
+    white-space: nowrap;
+    width: max-content;
+    border-radius: 10px;
+  }
+
+  .stats-badge strong {
+    font-size: 1rem;
+  }
+
+  .stats-badge span {
+    font-size: 0.62rem !important;
+  }
+
+  .stats-badge ion-icon {
+    font-size: 1.6rem !important;
+  }
+
+  /* ── GLOBAL SECTIONS ── */
+  .section {
+    padding: 50px 0;
+  }
+
+  .section-title {
+    font-size: clamp(1.7rem, 5.5vw, 2.4rem);
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+
+  .ach-marquee-section .section-title {
+    white-space: nowrap;
+    font-size: clamp(1.6rem, 7vw, 2rem);
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  /* ── PARALLAX TEXT (hide on mobile — wastes space) ── */
+  .parallax-text {
+    display: none !important;
+  }
+
+  /* ── ABOUT — Spatial Hologram (responsive handled by its own @media block) ── */
+
+  /* ── WORKFLOW KINETIC TYPOGRAPHY ── */
+  .workflow-text-item {
+    font-size: clamp(1.5rem, 7vw, 3rem);
+    padding: 0.18em 16px 0.18em 0;
+    white-space: normal;
+    /* wrap long words */
+    word-break: break-word;
+  }
+
+  .workflow-text-item .num-prefix {
+    display: none;
+    /* hide numbers to save space */
+  }
+
+  .floating-workflow-card {
+    display: none;
+  }
+
+  /* ── SKILL BARS ── */
+  .skill-item:hover {
+    transform: none;
+    /* no horizontal shift on mobile */
+  }
+
+  /* ── PROJECTS SWIPER ── */
+  .project-slider .swiper-slide {
+    width: clamp(240px, 72vw, 300px);
+    height: 420px;
+  }
+
+  .project-float-wrapper {
+    animation: none;
+  }
+
+  .project-card {
+    filter: brightness(1) grayscale(0%);
+  }
+
+  /* ── PROJECT MODAL ── */
+  .modal-content {
+    max-width: 100%;
+    max-height: 90dvh;
+    border-radius: 14px;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+  }
+
+  /* ── ACHIEVEMENTS MARQUEE ── */
+  .ach-marquee-section {
+    padding-bottom: 60px;
+  }
+
+  .ach-list-header {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .achievements-marquee-wrapper {
+    transform: skewY(-1.5deg);
+    /* softer tilt on small screens */
+  }
+
+  .marquee-card {
+    width: 230px;
+  }
+
+  .marquee-card-img-wrap {
+    height: 130px;
+  }
+
+  .track-left {
+    animation-duration: 28s;
+  }
+
+  .track-right {
+    animation-duration: 24s;
+  }
+
+  .glass-card {
+    padding: 24px 20px;
+  }
+
+  /* ── FOOTER ── */
+  .footer-grid-bg {
+    opacity: 0.03;
+  }
+
+  .mega-link {
+    font-size: 14vw;
+    margin-bottom: 32px;
+    letter-spacing: -2px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    padding: 20px 5%;
+  }
+
+  .footer-nav ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 16px;
+  }
+
+  .footer-socials {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .footer-link {
+    font-size: 0.8rem;
+  }
+
+  .time-display {
+    font-size: 0.85rem;
+    padding: 8px 16px;
+  }
+
+  .mega-footer {
+    padding: 40px 5% 30px;
+    margin-top: 60px;
+  }
+
+  /* ── HORIZON PLAYGROUND — Stack vertically on mobile ── */
+  .horizon-container {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .horizon-wrapper {
+    width: 100% !important;
+    height: auto !important;
+    flex-direction: column !important;
+    transform: none !important;
+  }
+
+  .horizon-slide {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 85dvh !important;
+    padding: 70px 20px 60px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    overflow: hidden !important;
+    /* Prevent slide content from stretching container width */
+  }
+
+  /* Slide 1: Kinetic hero — center WebGL sphere, beautiful ambient visibility */
+  .slide--kinetic .three-webgl-canvas-wrap {
+    opacity: 0.75;
+    /* visible and extremely premium */
+    pointer-events: none;
+    /* let touch pass through for vertical scroll safety */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+  }
+
+  .slide--kinetic .horizon-slide-content {
+    max-width: 100% !important;
+    padding: 0 10px !important;
+    pointer-events: auto;
+  }
+
+  .kinetic-hero-title {
+    font-size: clamp(1.8rem, 8.5vw, 3.2rem) !important;
+    letter-spacing: -0.02em;
+    word-wrap: break-word;
+    margin-bottom: 12px;
+  }
+
+  .text-hollow {
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.18);
+  }
+
+  .slide-description {
+    font-size: 0.88rem;
+    max-width: 280px !important;
+    /* completely avoid horizontal overflow */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Slide 2, 3, and 4 overrides removed as they are no longer used */
+
+  /* ── CV Timeline: force-show all animated elements on mobile ──
+     On mobile the horizontal scroll (and thus IntersectionObserver with
+     threshold 0.4 inside a pinned container) may not fire reliably.
+     Override the initial hidden states so content is always visible on mobile. */
+  .cv-header-anim,
+  .cv-download-card {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Old timeline wrapper — no longer used but kept in case of partial renders */
+  .timeline-horizontal-wrapper {
+    flex-direction: column !important;
+    gap: 32px !important;
+  }
+
+  /* ── HUD Status Bar ── */
+  .hud-interactive-status {
+    bottom: 16px;
+    padding: 6px 14px;
+    max-width: calc(100% - 32px);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .hud-status-text {
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+  }
+
+  /* ── AI Chat Overlay ── */
+  .ai-chat-container {
+    bottom: calc(16px + var(--safe-bottom)) !important;
+    right: 16px !important;
+  }
+
+  /* ── Scroll indicator ── */
+  .scroll-indicator {
+    bottom: 20px;
+    font-size: 1.6rem;
+  }
+
+  /* ── Preloader ── */
+  .counter {
+    font-size: 5rem;
+  }
+
+  .loading-text {
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    margin-top: 16px;
+  }
+}
+
+/* ════════════════════════════════
+   BREAKPOINT: max-width 480px
+   (Small phones — iPhone SE, Galaxy A)
+   ════════════════════════════════ */
+@media (max-width: 480px) {
+
+  /* ── PROJECTS SMALL MOBILE ── */
+  .project-slider .swiper-slide {
+    width: calc(100vw - 32px) !important;
+  }
+
+  .project-card {
+    height: 260px;
+  }
+
+  .project-title {
+    font-size: 0.9rem;
+  }
+
+  /* ── ACHIEVEMENTS SMALL MOBILE ── */
+  .marquee-card {
+    width: 155px;
+    min-width: 155px;
+    padding: 12px;
+  }
+
+  .marquee-card-icon ion-icon {
+    font-size: 1.2rem;
+  }
+
+  /* ── FOOTER SMALL MOBILE ── */
+  .footer-nav ul {
+    gap: 8px 12px;
+  }
+
+  .footer-link {
+    font-size: 0.75rem;
+  }
+
+  .footer-bottom p,
+  .copyright,
+  .time-display {
+    font-size: 0.65rem;
+  }
+
+  /* Navbar */
+  .navbar {
+    top: 8px;
+    padding: 10px 16px;
+    border-radius: 12px;
+  }
+
+  .logo {
+    font-size: 1.15rem;
+  }
+
+  /* Hero */
+  .image-blob {
+    width: 180px;
+    height: 180px;
+  }
+
+  .glitch-text {
+    font-size: clamp(1.5rem, 8.5vw, 2rem);
+  }
+
+  .hero-subtitle {
+    font-size: 0.88rem;
+  }
+
+  /* Section typography */
+  .section-title {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+  }
+
+  .ach-marquee-section .section-title {
+    white-space: nowrap;
+    font-size: clamp(1.4rem, 8vw, 1.8rem);
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  /* About stack — spatial section handles responsiveness via its own @media block */
+
+  /* Workflow */
+  .workflow-text-item {
+    font-size: clamp(1.3rem, 8.5vw, 2.2rem);
+  }
+
+  /* Projects */
+  .project-slider .swiper-slide {
+    width: calc(100vw - 48px);
+    max-width: 300px;
+    height: 400px;
+  }
+
+  /* Horizon slides */
+  .horizon-slide {
+    min-height: 75dvh !important;
+    padding: 60px 16px 50px !important;
+  }
+
+  .kinetic-hero-title {
+    font-size: clamp(2rem, 12vw, 3.5rem);
+  }
+
+  .outro-title {
+    font-size: clamp(2rem, 11vw, 3.2rem);
+  }
+
+  .slide-badge {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+  }
+
+  /* Contact */
+  .glass-card {
+    padding: 20px 16px;
+  }
+
+  /* Footer */
+  .mega-link {
+    font-size: 16vw;
+    letter-spacing: -1px;
+    margin-bottom: 24px;
+  }
+
+  .footer-link {
+    font-size: 0.78rem;
+  }
+
+  /* Achievements cards */
+  .marquee-card {
+    width: 200px;
+  }
+
+  .marquee-card-img-wrap {
+    height: 110px;
+  }
+
+  /* Preloader */
+  .counter {
+    font-size: 4rem;
+  }
+
+  .loading-text {
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+  }
+
+  /* HUD status */
+  .hud-status-text {
+    max-width: 160px;
+    font-size: 0.5rem;
+  }
+}
+
+/* ── Performance: Reduce animations on low-end devices ── */
+@media (prefers-reduced-motion: reduce) {
+
+  .project-float-wrapper,
+  .stats-badge,
+  .image-blob,
+  .outro-arrow-wrap {
+    animation: none !important;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- Sleek Looping Animation Bar for Project Section --- */
+.project-loop-bar-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 10px auto 0;
+  padding: 0 10px;
+  position: relative;
+  z-index: 10;
+}
+
+.project-loop-bar-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.project-loop-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+  box-shadow: 0 0 10px var(--accent-cyan);
+  border-radius: 2px;
+  will-change: width;
+}
+
+.project-loop-bar-hud {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+

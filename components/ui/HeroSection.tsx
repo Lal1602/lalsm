@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { stats } from "@/data/profile";
 
 export default function HeroSection() {
   return (
@@ -16,14 +17,13 @@ export default function HeroSection() {
               <Image src="/mee.jpeg" alt="Bilal Profile" width={350} height={350} priority />
             </div>
             <div className="stats-badge">
-              {/* @ts-ignore */}
               <ion-icon suppressHydrationWarning
                 name="checkmark-done-circle"
                 style={{ color: "var(--accent-purple)", fontSize: "2.5rem" }}
                 aria-hidden="true"
               ></ion-icon>
               <div>
-                <strong style={{ fontSize: "1.4rem", display: "block", color: "white" }}>35+</strong>
+                <strong style={{ fontSize: "1.4rem", display: "block", color: "white" }}>{stats.projectsShipped}</strong>
                 <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", textTransform: "uppercase" }}>
                   Projects Done
                 </span>
@@ -57,7 +57,6 @@ export default function HeroSection() {
       </div>
 
       <a href="#about" className="scroll-indicator" aria-label="Scroll to About">
-        {/* @ts-ignore */}
         <ion-icon suppressHydrationWarning name="chevron-down-outline" aria-hidden="true"></ion-icon>
       </a>
     </section>

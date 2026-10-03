@@ -1,0 +1,380 @@
+/* ═══════════════════════════════════════════════════════════════
+   ACHIEVEMENTS — GIANT INTERACTIVE LIST & CURSOR IMAGE REVEAL
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACHIEVEMENTS — Skewed Infinite Dual-Marquee with 3D Pop
+   Zero GSAP · Pure CSS translate3d · GPU composited · 60fps guaranteed
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Section shell ── */
+.ach-marquee-section {
+  position: relative;
+  overflow: hidden;
+  /* clip the skewed edges */
+  padding-bottom: 120px;
+}
+
+/* ── Shared header (kept outside skew) ── */
+.ach-list-header {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+
+.ach-list-eyebrow {
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.ach-marquee-section .section-title {
+  margin-bottom: 0;
+}
+
+/* ── Skewed outer wrapper — the "edgy futuristic" tilt ── */
+.achievements-marquee-wrapper {
+  transform: skewY(-3deg);
+  /* Compensate so the section doesn't lose height */
+  margin: 30px 0;
+  /* Dim all cards when any one is hovered */
+}
+
+/* ── Each horizontal track ── */
+.marquee-track {
+  display: flex;
+  /* width will be sum of all cards — flex makes it natural */
+  width: max-content;
+  gap: 20px;
+  padding: 12px 0;
+  /* Performance: promote to its own GPU layer */
+  will-change: transform;
+}
+
+/* Track 1: scrolls left (negative direction) */
+.track-left {
+  animation: marqueeScrollLeft 38s linear infinite;
+}
+
+/* Track 2: scrolls right (positive direction, starts offset) */
+.track-right {
+  animation: marqueeScrollRight 32s linear infinite;
+  /* Slight vertical gap between rows */
+  margin-top: 20px;
+}
+
+/* ─────────────────────────────────────────────
+   KEYFRAMES — translate3d forces GPU layer.
+   We move by exactly -50% because each track
+   contains 2 identical copies of its items.
+   At -50% the second copy is perfectly aligned
+   with where the first copy started → seamless.
+   ───────────────────────────────────────────── */
+@keyframes marqueeScrollLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marqueeScrollRight {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ── Pause BOTH tracks only when a card itself is hovered or held ── */
+.achievements-marquee-wrapper:has(.marquee-card:hover) .marquee-track,
+.achievements-marquee-wrapper:active .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ── Individual card ── */
+.marquee-card {
+  /* Solid bg — NO backdrop-filter (GPU killer) */
+  background: rgba(15, 15, 20, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  width: 280px;
+  flex-shrink: 0;
+  overflow: hidden;
+  cursor: pointer;
+  /* Base 3D transform context */
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    opacity 0.3s ease;
+  will-change: transform, box-shadow;
+  position: relative;
+  z-index: 1;
+  /* Isolate stacking so ::before glare is clipped by overflow:hidden */
+  isolation: isolate;
+}
+
+/* ── Holographic Glare Sweep — pure CSS, no JS ── */
+/* A skewed white gradient stripe parked off the left edge.   */
+/* On hover it sweeps right across the card via left: 150%.   */
+/* overflow:hidden on .marquee-card clips it perfectly.       */
+.marquee-card::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -150%;
+  /* parked off-screen left */
+  width: 60%;
+  height: 120%;
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.11) 45%,
+      rgba(255, 255, 255, 0.18) 50%,
+      rgba(255, 255, 255, 0.11) 55%,
+      rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-20deg);
+  transition: left 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 2;
+  /* above image and body, below nothing */
+}
+
+/* Dim siblings when wrapper is hovered but this card is not */
+/* Dim only non-hovered siblings — :not(:hover) excludes the active card */
+.achievements-marquee-wrapper:has(.marquee-card:hover) .marquee-card:not(:hover) {
+  opacity: 0.45;
+}
+
+/* ── Magnetic Pop & Edge Lighting — cyan variant (odd cards) ── */
+.marquee-card:hover {
+  transform: translateY(-12px) scale(1.05) translate3d(0, 0, 0);
+  opacity: 1;
+  z-index: 10;
+  border-color: rgba(0, 243, 255, 0.5);
+  box-shadow:
+    /* Deep cinematic drop shadow for physical lift */
+    0 32px 64px rgba(0, 0, 0, 0.65),
+    0 16px 32px rgba(0, 0, 0, 0.4),
+    /* Soft ambient cyan glow */
+    0 0 40px rgba(0, 243, 255, 0.15),
+    0 0 80px rgba(0, 243, 255, 0.08),
+    /* Sharp glass edge — simulates holographic rim lighting */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+}
+
+/* ── Trigger holographic glare sweep on hover ── */
+.marquee-card:hover::before {
+  left: 150%;
+}
+
+/* ── Gold variant — every even card ── */
+.marquee-card:nth-child(even):hover {
+  border-color: rgba(255, 215, 0, 0.55);
+  box-shadow:
+    0 32px 64px rgba(0, 0, 0, 0.65),
+    0 16px 32px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(255, 215, 0, 0.18),
+    0 0 80px rgba(255, 215, 0, 0.09),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+}
+
+/* ── Certificate image at the top ── */
+.marquee-card-img-wrap {
+  position: relative;
+  /* required for next/image `fill` */
+  width: 100%;
+  height: 165px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.marquee-card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  /* Cinematic default: desaturated & dimmed — feels like a film still */
+  filter: grayscale(80%) brightness(0.7) contrast(1.1);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Cinematic Image Reveal on card hover ── */
+.marquee-card:hover .marquee-card-img-wrap img {
+  filter: grayscale(0%) brightness(1) contrast(1.05);
+  transform: scale(1.08);
+}
+
+/* ── Card text body ── */
+.marquee-card-body {
+  padding: 16px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.marquee-card-tag {
+  font-family: var(--font-code);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  opacity: 0.75;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.marquee-card:hover .marquee-card-tag {
+  opacity: 1;
+}
+
+.marquee-card:nth-child(even):hover .marquee-card-tag {
+  color: var(--accent-gold);
+}
+
+.marquee-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  line-height: 1.3;
+  color: var(--text-main);
+  margin: 0;
+  transition: color 0.2s ease;
+}
+
+.marquee-card-title em {
+  font-style: normal;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.marquee-card:hover .marquee-card-title {
+  color: #ffffff;
+}
+
+.marquee-card:hover .marquee-card-title em {
+  color: var(--accent-cyan);
+}
+
+.marquee-card:nth-child(even):hover .marquee-card-title em {
+  color: var(--accent-gold);
+}
+
+.marquee-card-meta {
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+/* ── View Cert button inside card ── */
+.marquee-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  background: rgba(0, 229, 255, 0.06);
+  color: var(--accent-cyan);
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  width: fit-content;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.marquee-card:nth-child(even) .marquee-card-btn {
+  border-color: rgba(255, 215, 0, 0.25);
+  background: rgba(255, 215, 0, 0.06);
+  color: var(--accent-gold);
+}
+
+.marquee-card-btn:hover {
+  background: rgba(0, 229, 255, 0.18);
+  border-color: rgba(0, 229, 255, 0.6);
+  transform: translateX(3px);
+}
+
+.marquee-card:nth-child(even) .marquee-card-btn:hover {
+  background: rgba(255, 215, 0, 0.18);
+  border-color: rgba(255, 215, 0, 0.6);
+}
+
+/* ── Accessibility: respect reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none !important;
+  }
+}
+
+/* ── Mobile adjustments ── */
+@media (max-width: 768px) {
+  .achievements-marquee-wrapper {
+    transform: skewY(-1.5deg);
+    /* softer tilt on small screens */
+  }
+
+  .marquee-card {
+    width: 230px;
+  }
+
+  .marquee-card-img-wrap {
+    height: 130px;
+  }
+
+  .track-left {
+    animation-duration: 28s;
+  }
+
+  .track-right {
+    animation-duration: 24s;
+  }
+}
+
+@keyframes ai-glow-pulse {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0, 243, 255, 0), 0 0 0 0px rgba(188, 19, 254, 0);
+    filter: brightness(1);
+  }
+
+  55% {
+    box-shadow: 0 0 40px 10px rgba(0, 243, 255, 0.45), 0 0 60px 15px rgba(188, 19, 254, 0.35);
+    filter: brightness(1.15);
+  }
+
+  30% {
+    box-shadow: 0 0 20px 4px rgba(0, 243, 255, 0.25), 0 0 30px 6px rgba(188, 19, 254, 0.2);
+    filter: brightness(1.05);
+  }
+
+  45% {
+    box-shadow: 0 0 35px 8px rgba(0, 243, 255, 0.4), 0 0 50px 12px rgba(188, 19, 254, 0.3);
+    filter: brightness(1.12);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0px rgba(0, 243, 255, 0), 0 0 0 0px rgba(188, 19, 254, 0);
+    filter: brightness(1);
+  }
+}
+

@@ -1,0 +1,1473 @@
+/* ══ HOW I WORK — the orbital deck ═════════════════════════════════════════
+   A process has a direction and a duration, so it is drawn as one trajectory
+   with four stations on it, running out past the last one because launch is
+   not the end of the work. The whole section is a single screen and never
+   pins: a four-stage answer should not cost four screens.
+
+   All four stages are legible at rest, with nothing behind a selection — an
+   earlier trajectory-chart version of this section failed exactly there. What
+   hover adds is emphasis, never information.
+
+   NAMESPACE. Every class below is `hiw-`. This file is 9,000 lines deep and
+   already owns .card-num, .cv-card-desc, .marquee-card-meta and .sc-orbit-arc;
+   an unprefixed .card-num further down quietly won on source order and rendered
+   the stage numerals at 0.72rem instead of 2.4. The prefix is a fix.
+
+   PERF CONTRACT. This page is compositing-bound, not CPU-bound, so the whole
+   sky is painted once and never animates: no canvas, no rAF, no blur and no
+   backdrop-filter appear anywhere below. Planet rims are inset box-shadows, the
+   nebula is a handful of rotated gradient ellipses, and the starfield is inert
+   SVG. The only looping thing is the drift, and it parks whenever the section
+   is offscreen or the pointer is engaged.
+
+   Element choice is load-bearing. The global transition rule near the foot of
+   this file matches div/span/p/headings and forces a 0.4s opacity transition
+   that no single-class rule outranks, so every decorative element here is an
+   <i> and every card is an <li> — neither is in that selector, and nor is SVG.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hiw-section {
+  position: relative;
+  z-index: 2;
+  /* The sky is full-bleed and wider than the page, so the section has to be
+     the thing that clips it. Without this the 100vw plate below would push a
+     horizontal scrollbar at every width. */
+  overflow: hidden;
+  padding: 96px 0 86px;
+  /* Harmonized cosmic gradient: smooth transition holding exact #0b0d30 seam tone */
+  background: linear-gradient(180deg,
+    #04060f 0%,
+    #050614 45%,
+    #06081c 68%,
+    #080a26 84%,
+    #0b0d30 95%,
+    #0b0d30 100%
+  );
+  /* Seamless contact into horizon-container */
+  margin-bottom: 0;
+}
+
+/* Ensure container and cards strictly layer IN FRONT OF the procedural nebula canvas */
+.hiw-section .container {
+  position: relative;
+  z-index: 10;
+}
+
+/* The section already has a sky; the global purple pulse would be a second,
+   animated one fighting it — and it is the only always-running animation on
+   this page that nothing was looking at. */
+.hiw-section::before {
+  content: none;
+}
+
+/* ── The sky ────────────────────────────────────────────────────────────────
+   One layer, painted once. It scrolls with the section, so after the first
+   paint it costs a composite and nothing else.
+
+   The base is very nearly black. Everything that is not cloud has to read as
+   empty space, or the nebula has nothing to be brighter than — the first pass
+   at this section washed the whole plate in purple and lost that contrast. */
+
+.hiw-sky {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -1;
+  overflow: hidden;
+  background:
+    radial-gradient(140% 120% at 50% 50%, rgba(9, 12, 26, 0.75), transparent 70%),
+    linear-gradient(180deg,
+      transparent 0%,
+      rgba(4, 6, 15, 0.4) 100px,
+      #04060f 220px,
+      #050614 55%,
+      #06081c 72%,
+      #080a26 88%,
+      #0b0d30 100%
+    );
+  /* Top: subtle blend with the About section above.
+     Bottom: gently dissolves into the solid #0b0d30 background over the last 60px
+     so both sections merge with identical #0b0d30 tone at the seam. */
+  -webkit-mask-image: linear-gradient(180deg,
+      transparent 0px,
+      rgba(0, 0, 0, 0.01) 30px,
+      rgba(0, 0, 0, 0.05) 60px,
+      rgba(0, 0, 0, 0.15) 100px,
+      rgba(0, 0, 0, 0.35) 140px,
+      rgba(0, 0, 0, 0.65) 180px,
+      rgba(0, 0, 0, 0.90) 230px,
+      #000 270px,
+      #000 calc(100% - 60px),
+      transparent 100%);
+  mask-image: linear-gradient(180deg,
+      transparent 0px,
+      rgba(0, 0, 0, 0.01) 30px,
+      rgba(0, 0, 0, 0.05) 60px,
+      rgba(0, 0, 0, 0.15) 100px,
+      rgba(0, 0, 0, 0.35) 140px,
+      rgba(0, 0, 0, 0.65) 180px,
+      rgba(0, 0, 0, 0.90) 230px,
+      #000 270px,
+      #000 calc(100% - 60px),
+      transparent 100%);
+  pointer-events: none;
+}
+
+/* <i> is the workhorse element here; none of it is ever italic type. */
+.hiw-section i {
+  font-style: normal;
+}
+
+/* ── Procedural Volumetric Cosmic Nebula Seam Canvas ───────────────────────
+   100% pure code procedural canvas rendering voluminous billowing clouds,
+   submerging the left planet, and drawing the anamorphic lens flare.
+   Mathematically split across upper (HIW) and lower (Horizon) halves. */
+.cosmic-nebula-seam-container {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.cosmic-nebula-seam-upper {
+  bottom: -1px;
+  height: 401px;
+  z-index: 1;
+}
+
+.cosmic-nebula-seam-lower {
+  top: 0;
+  height: 400px;
+  z-index: 12;
+}
+
+.cosmic-nebula-seam-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ── The starfield ──────────────────────────────────────────────────────────
+   Sliced to fill from a box sized near the band's real pixel dimensions, so a
+   radius written as 0.8 lands on screen at roughly 0.8px. The previous 100×100
+   box scaled by ~29× and turned every star into a blob. */
+
+.hiw-stars {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.hiw-star {
+  fill: #ffffff;
+}
+
+.hiw-star.is-warm {
+  fill: #ffd9b0;
+}
+
+.hiw-star.is-cold {
+  fill: #b6d5ff;
+}
+
+/* The few stars with a visible cross. Hand-placed HTML rather than more SVG,
+   because a cross wants two hairlines and a core, and drawing that in the
+   sliced star layer would stretch them. */
+.hiw-glint {
+  position: absolute;
+  left: var(--gx);
+  top: var(--gy);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.hiw-glint::before,
+.hiw-glint::after {
+  content: "";
+  position: absolute;
+  background: linear-gradient(90deg, transparent, rgba(226, 240, 255, 0.85), transparent);
+}
+
+.hiw-glint::before {
+  left: calc(var(--reach) * -1);
+  top: -0.5px;
+  width: calc(var(--reach) * 2);
+  height: 1px;
+}
+
+.hiw-glint::after {
+  left: -0.5px;
+  top: calc(var(--reach) * -0.55);
+  width: 1px;
+  height: calc(var(--reach) * 1.1);
+  background: linear-gradient(180deg, transparent, rgba(226, 240, 255, 0.85), transparent);
+}
+
+/* ── The planets ────────────────────────────────────────────────────────────
+   An opaque body plus a crisp lit limb. The limb is an inset box-shadow with
+   ZERO blur and a negative spread, which is what makes it a hard-edged crescent
+   rather than the diffuse smudge a blurred inset gives — that was the single
+   biggest reason the first pass read as a grey blob instead of a world. A
+   second, blurred inset behind it does the atmosphere, and one outer shadow
+   does the bloom. Still no filter. */
+
+.hiw-orb {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* The atmosphere: a thin annulus sitting just OUTSIDE the limb, masked so it
+   only exists on the lit side and dies away around the terminator. A limb with
+   nothing outside it is a stroke; a limb with air over it is a horizon.
+
+   closest-side matters here — a radial-gradient on a square box defaults to
+   farthest-corner, which would put the ring stops out at the corners instead of
+   on the circle and leave the annulus invisible. */
+.hiw-orb::after {
+  content: "";
+  position: absolute;
+  inset: -1.5%;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side,
+      transparent 0 95.4%,
+      rgba(132, 186, 255, 0.3) 98%,
+      rgba(150, 200, 255, 0.1) 99.4%,
+      transparent 100%);
+  -webkit-mask-image: linear-gradient(var(--lit), #000 0 26%, transparent 74%);
+  mask-image: linear-gradient(var(--lit), #000 0 26%, transparent 74%);
+}
+
+/* Fitted so the lit limb enters at the top edge around 80% width and leaves at
+   the right edge just above the card row — the arc the reference draws.
+
+   The body is NOT the same black as the sky. It was, and the result read as a
+   bright curved line with nothing behind it rather than as a world: with void on
+   both sides of the rim there is no sphere for the eye to close. A terminator
+   ramp — lit near the limb, falling to near-black away from it — is what turns
+   the same arc into an edge. It also occludes the starfield, because the orbs
+   paint after the stars. */
+.hiw-orb-a {
+  --lit: 135deg;
+  left: 80.5vw;
+  top: -31.8vw;
+  width: 63.6vw;
+  background: radial-gradient(circle at 20% 42%,
+      rgba(48, 68, 108, 0.62) 0%,
+      rgba(24, 35, 60, 0.72) 22%,
+      rgba(9, 14, 28, 0.86) 48%,
+      rgba(2, 4, 10, 0.96) 76%);
+  box-shadow:
+    inset 26px 16px 0 -19px rgba(216, 238, 255, 1),
+    inset 34px 22px 26px -26px rgba(160, 206, 255, 0.85),
+    0 0 34px -10px rgba(110, 168, 245, 0.35);
+}
+
+/* The second world, below and to the left. Its arc has to graze UNDER the card
+   row rather than through it. Lit on the upper-right limb: an inset offset
+   -x/+y drops the rim onto the right and top edges, so the two planets read as
+   one light source seen from either side of the frame. */
+.hiw-orb-b {
+  --lit: 225deg;
+  /* Raised slightly so top rim aligns with halfway up the Discover card */
+  left: -28vw;
+  top: 26.5vw;
+  width: 60.1vw;
+  background: radial-gradient(circle at 60% 22%,
+      rgba(52, 74, 116, 0.72) 0%,
+      rgba(28, 42, 72, 0.78) 18%,
+      rgba(11, 17, 34, 0.88) 42%,
+      rgba(3, 5, 12, 0.97) 72%);
+  box-shadow:
+    inset -12px 16px 0 -10px rgba(212, 236, 255, 0.95),
+    inset -18px 24px 22px -18px rgba(158, 204, 255, 0.75),
+    0 0 30px -8px rgba(104, 158, 235, 0.32);
+  /* Organic fade mask: crescent stays lit, bottom smoothly dissolves into nebula fog well before section bottom */
+  -webkit-mask-image: linear-gradient(180deg,
+      #000 0%,
+      #000 15%,
+      rgba(0, 0, 0, 0.6) 19%,
+      rgba(0, 0, 0, 0.15) 23%,
+      transparent 26%);
+  mask-image: linear-gradient(180deg,
+      #000 0%,
+      #000 15%,
+      rgba(0, 0, 0, 0.6) 19%,
+      rgba(0, 0, 0, 0.15) 23%,
+      transparent 26%);
+  z-index: 1;
+}
+
+.hiw-orb-b::after {
+  content: "";
+  position: absolute;
+  inset: -1.5%;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side,
+      transparent 0 95.4%,
+      rgba(132, 186, 255, 0.3) 98%,
+      rgba(150, 200, 255, 0.1) 99.4%,
+      transparent 100%);
+  -webkit-mask-image: linear-gradient(225deg, #000 0 26%, transparent 74%);
+  mask-image: linear-gradient(225deg, #000 0 26%, transparent 74%);
+}
+
+/* ── The header ─────────────────────────────────────────────────────────── */
+
+.ascent-eyebrow {
+  position: relative;
+}
+
+/* Leans up and to the right out of the eyebrow, into the gutter the header
+   grid leaves between the title and the lede. Absolute so it never becomes a
+   flex item of the eyebrow it hangs off. */
+.hiw-constellation {
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  width: 300px;
+  height: 170px;
+  margin-top: -46px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hiw-c-line {
+  stroke: rgba(164, 204, 246, 0.4);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* pathLength="1" on every stroke, so one dash of 1 covers any real length. */
+  stroke-dasharray: 1;
+}
+
+.hiw-c-line.is-faint {
+  stroke: rgba(164, 204, 246, 0.2);
+}
+
+.hiw-c-star {
+  fill: #e6f1ff;
+}
+
+.hiw-c-star[data-i="5"],
+.hiw-c-star[data-i="2"] {
+  fill: #ffffff;
+}
+
+/* The title is solid white here, not the global gradient fill. Two reasons:
+   the reference wants it that way, and the scroll glow in GSAPEffects writes an
+   inline color:#fff onto h2.section-title which has always fought the
+   -webkit-text-fill-color: transparent it inherits. Turning the clip off makes
+   the two agree instead of overriding each other. */
+.ascent-title {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: #f4f8ff;
+  font-size: clamp(2.2rem, 5.2vw, 3.35rem);
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  text-shadow: 0 0 22px rgba(120, 186, 255, 0.16);
+}
+
+.ascent-title::after {
+  bottom: -13px;
+  width: min(300px, 82%);
+  height: 2px;
+  background: linear-gradient(90deg, rgba(79, 184, 224, 0) 0%, #62d8f0 22%, #2ee6c8 52%, transparent 100%);
+  box-shadow: 0 0 14px rgba(64, 214, 216, 0.55);
+}
+
+/* An anamorphic streak behind the words — a long, thin, bright horizontal core
+   with a warm bloom at the left, the way a wide lens smears a point source.
+   Gradients only: a blur here would be a filter on a layer sitting under live
+   type. */
+.hiw-flare {
+  position: absolute;
+  left: -46%;
+  top: 50%;
+  width: 192%;
+  height: 260%;
+  transform: translateY(-50%);
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 46% 2.2% at 42% 50%, rgba(232, 246, 255, 0.62), transparent 76%),
+    radial-gradient(ellipse 30% 5% at 40% 50%, rgba(150, 206, 255, 0.34), transparent 74%),
+    radial-gradient(ellipse 16% 13% at 33% 50%, rgba(120, 180, 255, 0.22), transparent 72%),
+    radial-gradient(ellipse 7% 22% at 24% 50%, rgba(160, 206, 255, 0.18), transparent 72%),
+    radial-gradient(ellipse 10% 17% at 15% 52%, rgba(244, 158, 92, 0.3), transparent 74%);
+  pointer-events: none;
+}
+
+/* ── The deck ───────────────────────────────────────────────────────────── */
+
+.ascent {
+  /* A heat ramp: cool at the planning end, hot at launch. */
+  --stage-tone-0: #4fb8e0;
+  --stage-tone-0-rgb: 79, 184, 224;
+  --stage-tone-1: #8b7cf6;
+  --stage-tone-1-rgb: 139, 124, 246;
+  --stage-tone-2: #f0a868;
+  --stage-tone-2-rgb: 240, 168, 104;
+  --stage-tone-3: #e2603f;
+  --stage-tone-3-rgb: 226, 96, 63;
+
+  position: relative;
+}
+
+.ascent-deck {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ── The orbit band ─────────────────────────────────────────────────────────
+   A plane and a ring, not one bowed line. The plane is what the stations sit
+   on, so they stay level with each other and with the cards; the ring is what
+   makes the plane read as an orbit rather than as a rule. Any single ellipse
+   flat enough to hold four level stations is too flat to read as a ring, and
+   any ellipse curved enough to read as one drags its outer stations off the
+   line — which is exactly what the previous pass did. */
+
+.hiw-orbit {
+  position: relative;
+  height: clamp(96px, 10vw, 132px);
+  margin-bottom: 22px;
+}
+
+.hiw-plot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* The box is stretched with preserveAspectRatio="none", so strokes have to be
+   told not to stretch with it. */
+.hiw-plane,
+.hiw-ring {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+}
+
+.hiw-plane {
+  stroke: url(#hiw-plane-ramp);
+  stroke-width: 1.1;
+}
+
+.hiw-ring {
+  stroke: rgba(150, 190, 240, 0.26);
+  stroke-width: 1;
+}
+
+.hiw-ramp-0 {
+  stop-color: var(--stage-tone-0);
+}
+
+.hiw-ramp-1 {
+  stop-color: var(--stage-tone-1);
+}
+
+.hiw-ramp-2 {
+  stop-color: var(--stage-tone-2);
+}
+
+.hiw-ramp-3 {
+  stop-color: var(--stage-tone-3);
+}
+
+/* ── The stations ───────────────────────────────────────────────────────────
+   Zero-sized anchors, so the point itself is the position and the entry scale
+   has nothing to unpick. Each is a lens flare: a soft bloom, a long thin
+   horizontal spike, a shorter vertical one, and a small hot core. The previous
+   pass drew these as 18px outlined rings, which read as chart markers rather
+   than as stars and was the largest single difference from the reference. */
+
+.hiw-station {
+  position: absolute;
+  left: calc(var(--sx) + var(--nudge, 0px));
+  top: 62%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.hiw-bloom {
+  position: absolute;
+  left: -26px;
+  top: -26px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+      rgba(var(--tone-rgb), 0.5) 0%,
+      rgba(var(--tone-rgb), 0.14) 34%,
+      rgba(var(--tone-rgb), 0) 68%);
+  transition: transform 0.5s cubic-bezier(0.2, 1.35, 0.3, 1), opacity 0.35s ease;
+}
+
+.hiw-spike {
+  position: absolute;
+  transition: transform 0.5s cubic-bezier(0.2, 1.35, 0.3, 1);
+}
+
+.hiw-spike-h {
+  left: -34px;
+  top: -0.5px;
+  width: 68px;
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(var(--tone-rgb), 0.85) 32%,
+      #ffffff 50%,
+      rgba(var(--tone-rgb), 0.85) 68%,
+      transparent);
+}
+
+.hiw-spike-v {
+  left: -0.5px;
+  top: -13px;
+  width: 1px;
+  height: 26px;
+  background: linear-gradient(180deg,
+      transparent,
+      rgba(var(--tone-rgb), 0.7) 34%,
+      #ffffff 50%,
+      rgba(var(--tone-rgb), 0.7) 66%,
+      transparent);
+}
+
+.hiw-core {
+  position: absolute;
+  left: -2.5px;
+  top: -2.5px;
+  width: 5px;
+  height: 5px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 2px rgba(var(--tone-rgb), 0.85);
+  transition: transform 0.5s cubic-bezier(0.2, 1.35, 0.3, 1);
+}
+
+/* Design is the quiet waypoint — a station, not a beacon. */
+.hiw-station[data-i="1"] .hiw-spike-h {
+  left: -22px;
+  width: 44px;
+}
+
+.hiw-station[data-i="1"] .hiw-bloom {
+  opacity: 0.55;
+}
+
+/* Build is the eclipse: the heaviest stage by a wide margin, drawn as a dark
+   body with a lit rim rather than as a brighter version of the others. The
+   accretion ring is a ring-shaped gradient plus a hard 1px border, so it stays
+   crisp at any size. */
+.hiw-station[data-i="2"] .hiw-core {
+  left: -11px;
+  top: -11px;
+  width: 22px;
+  height: 22px;
+  background: #01030a;
+  border: 1px solid rgba(var(--tone-rgb), 0.95);
+  box-shadow:
+    0 0 14px 2px rgba(var(--tone-rgb), 0.75),
+    inset 0 0 8px 1px rgba(var(--tone-rgb), 0.35);
+}
+
+.hiw-station[data-i="2"] .hiw-bloom {
+  left: -34px;
+  top: -34px;
+  width: 68px;
+  height: 68px;
+}
+
+.hiw-station[data-i="2"] .hiw-spike-v {
+  top: -22px;
+  height: 44px;
+}
+
+/* The focused station. Written out per index because CSS cannot compare an
+   attribute to a sibling's, and four selectors read better than a class-per-
+   state scheme. */
+.ascent-deck[data-focus="0"] .hiw-station[data-i="0"] .hiw-bloom,
+.ascent-deck[data-focus="1"] .hiw-station[data-i="1"] .hiw-bloom,
+.ascent-deck[data-focus="2"] .hiw-station[data-i="2"] .hiw-bloom,
+.ascent-deck[data-focus="3"] .hiw-station[data-i="3"] .hiw-bloom {
+  transform: scale(1.5);
+  opacity: 1;
+}
+
+.ascent-deck[data-focus="0"] .hiw-station[data-i="0"] .hiw-spike-h,
+.ascent-deck[data-focus="1"] .hiw-station[data-i="1"] .hiw-spike-h,
+.ascent-deck[data-focus="2"] .hiw-station[data-i="2"] .hiw-spike-h,
+.ascent-deck[data-focus="3"] .hiw-station[data-i="3"] .hiw-spike-h {
+  transform: scaleX(1.45);
+}
+
+.ascent-deck[data-focus="0"] .hiw-station[data-i="0"] .hiw-core,
+.ascent-deck[data-focus="1"] .hiw-station[data-i="1"] .hiw-core,
+.ascent-deck[data-focus="2"] .hiw-station[data-i="2"] .hiw-core,
+.ascent-deck[data-focus="3"] .hiw-station[data-i="3"] .hiw-core {
+  transform: scale(1.3);
+}
+
+/* A hairline from each station down to the card it belongs to, so the row is
+   visibly hanging off the trajectory rather than merely sitting under it. */
+.hiw-drop {
+  position: absolute;
+  left: calc(var(--sx) + var(--nudge, 0px));
+  top: 62%;
+  bottom: 0;
+  width: 1px;
+  margin-left: -0.5px;
+  background: linear-gradient(180deg,
+      rgba(var(--tone-rgb), 0.4),
+      rgba(var(--tone-rgb), 0.02));
+  transform-origin: 50% 0;
+  transition: background 0.35s ease;
+  pointer-events: none;
+}
+
+.ascent-deck[data-focus="0"] .hiw-drop[data-i="0"],
+.ascent-deck[data-focus="1"] .hiw-drop[data-i="1"],
+.ascent-deck[data-focus="2"] .hiw-drop[data-i="2"],
+.ascent-deck[data-focus="3"] .hiw-drop[data-i="3"] {
+  background: linear-gradient(180deg,
+      rgba(var(--tone-rgb), 0.9),
+      rgba(var(--tone-rgb), 0.05));
+}
+
+/* How far into the whole job you are when this stage ends. Derived from the
+   same week counts the bar on the card is drawn from, so the two can never
+   disagree with the duration printed beside them. */
+.hiw-read {
+  position: absolute;
+  left: calc(var(--sx) + var(--nudge, 0px));
+  top: 62%;
+  transform: translate(-50%, -320%);
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.32);
+  transition: color 0.35s ease;
+  pointer-events: none;
+}
+
+.ascent-deck[data-focus="0"] .hiw-read[data-i="0"],
+.ascent-deck[data-focus="1"] .hiw-read[data-i="1"],
+.ascent-deck[data-focus="2"] .hiw-read[data-i="2"],
+.ascent-deck[data-focus="3"] .hiw-read[data-i="3"] {
+  color: rgba(var(--tone-rgb), 0.95);
+}
+
+/* Where the trajectory leaves, past the ring's right vertex. */
+.hiw-reticle {
+  position: absolute;
+  left: var(--sx);
+  top: 62%;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border: 1px solid rgba(var(--stage-tone-3-rgb), 0.45);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hiw-reticle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  background: var(--stage-tone-3);
+  border-radius: 50%;
+}
+
+/* ── The travelling light ───────────────────────────────────────────────────
+   A full-band track moved by transform, so nothing is ever measured and it is
+   correct at every width. The stations all sit on the plane, so this only ever
+   travels in x — the second, vertical track the bowed-ellipse version needed
+   is gone along with the bow. */
+
+.hiw-packet-x {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  transition: transform 0.58s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.hiw-packet {
+  position: absolute;
+  left: 0;
+  top: 62%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 1px rgba(255, 255, 255, 0.6);
+}
+
+/* The tail. Sits behind the head and points back the way it came. */
+.hiw-packet::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  top: 1.5px;
+  width: 38px;
+  height: 1px;
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0.6), transparent);
+}
+
+/* The idle drift. The only looping thing in the section, and it stops dead the
+   moment it cannot be seen or the pointer takes over. */
+.hiw-drift-x {
+  position: absolute;
+  inset: 0;
+  animation: hiwDrift 11s linear infinite;
+  pointer-events: none;
+}
+
+.hiw-drift {
+  position: absolute;
+  left: 0;
+  top: 62%;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  opacity: 0;
+  animation: hiwDriftFade 11s linear infinite;
+}
+
+@keyframes hiwDrift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+@keyframes hiwDriftFade {
+
+  0%,
+  4% {
+    opacity: 0;
+  }
+
+  14%,
+  74% {
+    opacity: 0.65;
+  }
+
+  88%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Offscreen, or the pointer is working: stop the frame. Fading it out as well
+   means it is never caught frozen mid-plane. */
+.hiw-section:not([data-live]) .hiw-drift-x,
+.hiw-section:not([data-live]) .hiw-drift,
+.ascent-deck[data-focus] .hiw-drift-x,
+.ascent-deck[data-focus] .hiw-drift {
+  animation-play-state: paused;
+}
+
+.ascent-deck[data-focus] .hiw-drift {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* ── The cards ──────────────────────────────────────────────────────────────
+   Real glass: the ground is translucent, so the nebula and the stars behind it
+   show through the card the way they do in the reference. The previous pass
+   made these near-opaque and the row went dead flat against a live sky.
+
+   Deliberately no backdrop-filter. A blurred panel has to be re-blurred every
+   time anything under it changes, and .cv-card further down this file already
+   carries the note explaining why that was the wrong trade. Transparency alone
+   costs nothing — there is no blur to recompute. */
+
+.hiw-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 13px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hiw-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 208px;
+  padding: 19px 19px 17px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 13px;
+  background:
+    linear-gradient(152deg,
+      rgba(var(--tone-rgb), 0.20) 0%,
+      rgba(var(--tone-rgb), 0.08) 28%,
+      rgba(7, 10, 24, 0.94) 60%,
+      rgba(4, 6, 16, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 30px -16px rgba(var(--tone-rgb), 0.4),
+    0 24px 52px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Scoped to [data-ready] so it cannot exist while the entry timeline is
+   writing opacity on these same elements — a transition and a tween on one
+   property is how motion turns to mush. */
+.ascent-deck[data-ready] .hiw-card {
+  transition: opacity 0.45s cubic-bezier(0.2, 1, 0.3, 1), border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.ascent-deck[data-ready][data-focus] .hiw-card:not([data-active]) {
+  opacity: 0.4;
+}
+
+.hiw-card[data-active] {
+  border-color: rgba(var(--tone-rgb), 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 46px -12px rgba(var(--tone-rgb), 0.8),
+    0 0 0 1px rgba(var(--tone-rgb), 0.2),
+    0 24px 56px rgba(0, 0, 0, 0.55),
+    0 0 54px -10px rgba(var(--tone-rgb), 0.55);
+}
+
+/* The lit corner. Present at rest so the card has depth without a pointer, and
+   it only comes up on focus rather than switching on. */
+.hiw-glow {
+  position: absolute;
+  left: -34%;
+  top: -68%;
+  width: 108%;
+  height: 160%;
+  background: radial-gradient(ellipse at 50% 50%, rgba(var(--tone-rgb), 0.36), transparent 66%);
+  opacity: 0.42;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+
+.hiw-card[data-active] .hiw-glow {
+  opacity: 1;
+}
+
+/* The cut corner. One gradient rather than a clip-path, so the card keeps its
+   border-radius and nothing has to be masked twice. */
+.hiw-notch {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(315deg, rgba(var(--tone-rgb), 0.5) 0 44%, transparent 44%);
+  transition: background 0.4s ease;
+  pointer-events: none;
+}
+
+.hiw-card[data-active] .hiw-notch {
+  background: linear-gradient(315deg, rgba(var(--tone-rgb), 0.95) 0 44%, transparent 44%);
+}
+
+/* One sweep of light down the focused card, restarted from JS on every entry. */
+.hiw-scan {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg,
+      rgba(var(--tone-rgb), 0) 0%,
+      rgba(var(--tone-rgb), 0.14) 45%,
+      rgba(var(--tone-rgb), 0) 100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hiw-scan.is-sweeping {
+  animation: hiwScan 0.9s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+@keyframes hiwScan {
+  from {
+    opacity: 1;
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+.hiw-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 8px;
+}
+
+/* Outline underneath, solid on top, wiped open left to right. clip-path is a
+   paint, not a composite — nothing can fill text on the compositor — so the
+   invalidation is fenced to the glyph box with `contain`, and the padding /
+   negative margin pair gives the stroke room inside that fence without moving
+   anything. Deliberately no will-change: it would force a layer that has to be
+   re-uploaded every frame and buy nothing.
+
+   Weight is 700, not 900: only 400-700 of Space Grotesk is loaded in
+   layout.tsx, and asking for 900 just bought a synthesised fake bold. */
+.hiw-num {
+  position: relative;
+  display: inline-block;
+  padding: 3px 5px;
+  margin: -3px -5px;
+  contain: paint;
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 0.82;
+  letter-spacing: -0.035em;
+}
+
+.hiw-num-base {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1.3px rgba(var(--tone-rgb), 0.85);
+}
+
+.hiw-num-fill {
+  position: absolute;
+  left: 5px;
+  top: 3px;
+  color: var(--tone);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.hiw-card[data-active] .hiw-num-fill {
+  clip-path: inset(0 0 0 0);
+}
+
+.hiw-time {
+  font-family: var(--font-code);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* The same glyph as the station on the plane, so the marker up there and the
+   badge down here read as one object rather than two decorations. Only shown
+   while the card is the active one, which is why it can sit in the heading
+   line's gutter without the layout ever moving for it. */
+.hiw-badge {
+  position: absolute;
+  right: 17px;
+  top: 52px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 20px auto;
+  column-gap: 7px;
+  align-items: center;
+  justify-items: end;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.hiw-card[data-active] .hiw-badge {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hiw-badge-ring {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(var(--tone-rgb), 0.6);
+  border-radius: 50%;
+}
+
+.hiw-badge-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 6px 1px rgba(var(--tone-rgb), 0.9);
+}
+
+.hiw-badge-spike::before,
+.hiw-badge-spike::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: linear-gradient(90deg, transparent, rgba(var(--tone-rgb), 0.8), transparent);
+}
+
+.hiw-badge-spike::before {
+  width: 30px;
+  height: 1px;
+  margin: -0.5px 0 0 -15px;
+}
+
+.hiw-badge-spike::after {
+  width: 1px;
+  height: 30px;
+  margin: -15px 0 0 -0.5px;
+  background: linear-gradient(180deg, transparent, rgba(var(--tone-rgb), 0.8), transparent);
+}
+
+.hiw-badge-read {
+  grid-column: 2;
+  grid-row: 1;
+  display: block;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hiw-badge-sub {
+  grid-column: 2;
+  grid-row: 2;
+  display: block;
+  font-family: var(--font-code);
+  font-size: 0.48rem;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.hiw-name {
+  position: relative;
+  z-index: 1;
+  /* Constant, not toggled: the badge parks in this gutter on hover and a
+     padding that appeared with it would shove the word sideways. */
+  padding-right: 86px;
+  margin: 0 0 9px;
+  font-family: var(--font-display);
+  font-size: clamp(1.12rem, 1.55vw, 1.32rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.hiw-char {
+  display: inline-block;
+  transform-origin: 50% 100%;
+}
+
+.hiw-desc {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  margin: 0 0 16px;
+  font-size: 0.845rem;
+  line-height: 1.6;
+  color: rgba(226, 232, 245, 0.72);
+}
+
+/* How much of the whole engagement this stage is — the duration named above,
+   drawn. Reads as the card's divider rule, but the lit part of it is the real
+   proportion. Scaled from a fixed width rather than animated as a width, so the
+   entry draw is a transform. */
+.hiw-load {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 1px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.hiw-load-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--share) * 100%);
+  height: 100%;
+  background: rgba(var(--tone-rgb), 0.6);
+  transform-origin: 0 50%;
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+}
+
+.hiw-card[data-active] .hiw-load-fill {
+  background: var(--tone);
+  box-shadow: 0 0 8px rgba(var(--tone-rgb), 0.8);
+}
+
+/* What you actually get to hold at the end of the stage */
+.hiw-out {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-family: var(--font-code);
+  font-size: 0.615rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.44);
+  transition: color 0.35s ease;
+}
+
+.hiw-out i {
+  color: rgba(var(--tone-rgb), 0.9);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hiw-card[data-active] .hiw-out {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hiw-card[data-active] .hiw-out i {
+  transform: translateX(4px);
+}
+
+/* A link dropped into a card later still lights it. */
+.hiw-card:focus-within {
+  opacity: 1 !important;
+}
+
+/* The swipe readout belongs to the rail, which only exists on narrow screens. */
+.hiw-swipe {
+  display: none;
+}
+
+/* ── Narrow layouts ─────────────────────────────────────────────────────────
+   Below 860px the deck becomes a snap rail rather than a stack: the point of
+   this section is that four stages cost one screen, and that has to stay true
+   on the device most first visits arrive on. The orbit band goes with the grid
+   — a packet cannot park at a station that scrolls away — and the counter below
+   the rail takes over its job of saying where you are.
+
+   The breakpoint is mirrored in ProcessSteps.tsx, which skips the entry
+   timeline down here. */
+
+/* The constellation hangs in the gap between the title column and the lede.
+   That gap closes long before the mobile breakpoint does, so it retires here
+   rather than colliding with the paragraph. */
+@media (max-width: 1040px) {
+  .hiw-constellation {
+    display: none;
+  }
+}
+
+@media (max-width: 1080px) {
+  .hiw-num {
+    font-size: 2rem;
+  }
+
+  .hiw-name {
+    padding-right: 62px;
+  }
+
+  .hiw-card {
+    min-height: 196px;
+    padding: 16px 15px 14px;
+  }
+
+  .hiw-desc {
+    font-size: 0.81rem;
+  }
+
+  /* Two lines of telemetry do not fit beside a narrower card, and the
+     percentage is the half that carries the information. */
+  .hiw-badge-sub {
+    display: none;
+  }
+
+  .hiw-badge {
+    top: 46px;
+    right: 14px;
+  }
+}
+
+@media (max-width: 860px) {
+  .hiw-section {
+    padding: 56px 0 68px;
+  }
+
+  /* Both planets are sized in vw, so on a narrow viewport the lower one grows
+     relative to the copy rather than shrinking with it — its limb ended up
+     drawn straight through the lede and the first card. Anchoring it to the
+     bottom edge instead keeps the arc in the corner where it belongs. */
+  /* Refitted for this frame too. vw sizing means the lower world grows relative
+     to the copy as the viewport narrows, so the desktop circle arrived here as a
+     bright band straight through the first card with no body behind it. */
+  .hiw-orb-b {
+    left: -54vw;
+    top: 120vw;
+    width: 118.5vw;
+    -webkit-mask-image: linear-gradient(180deg,
+        #000 0%,
+        #000 42%,
+        rgba(0, 0, 0, 0.85) 55%,
+        rgba(0, 0, 0, 0.48) 68%,
+        rgba(0, 0, 0, 0.15) 80%,
+        transparent 92%);
+    mask-image: linear-gradient(180deg,
+        #000 0%,
+        #000 42%,
+        rgba(0, 0, 0, 0.85) 55%,
+        rgba(0, 0, 0, 0.48) 68%,
+        rgba(0, 0, 0, 0.15) 80%,
+        transparent 92%);
+  }
+
+  .hiw-orb-a {
+    left: 74vw;
+    top: -26vw;
+    width: 58vw;
+  }
+
+  .hiw-orbit {
+    display: none;
+  }
+
+  .hiw-cards {
+    display: flex;
+    /* Bleeds by exactly the container's gutter so the first and last cards
+       carry the same inline padding as the middle ones while their type still
+       lines up with the section header. Matching the 20px gutter keeps the row
+       inside the viewport at every width, so the bleed can never introduce a
+       horizontal scrollbar. */
+    margin-inline: -20px;
+    padding-inline: 20px;
+    padding-block: 4px;
+    scroll-padding-inline: 20px;
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .hiw-cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hiw-card {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+    min-height: 0;
+    padding: 18px 16px 16px;
+  }
+
+  .hiw-badge {
+    display: none;
+  }
+
+  .hiw-name {
+    padding-right: 0;
+  }
+
+  .hiw-desc {
+    max-width: 60ch;
+  }
+
+  /* Where you are in a row you can only see one card of. */
+  .hiw-swipe {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0 0;
+    font-family: var(--font-code);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.34);
+  }
+
+  .hiw-dots {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .hiw-dot {
+    display: block;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+
+  .hiw-dot.is-active {
+    background: var(--tone);
+    transform: scale(1.5);
+  }
+
+  /* Reads "01 / 04  ····" on the left and the hint on the right. Ordered in
+     CSS rather than in the markup so the counter and its total stay adjacent
+     in the accessibility tree. */
+  .hiw-count {
+    order: 0;
+  }
+
+  .hiw-total {
+    order: 1;
+    opacity: 0.55;
+  }
+
+  .hiw-dots {
+    order: 2;
+    margin-left: 6px;
+  }
+
+  .hiw-total::before {
+    content: "/ ";
+  }
+
+  /* A one-time nudge that a rail is a rail; it retires on the first swipe. */
+  .hiw-swipe::after {
+    content: "SWIPE →";
+    order: 3;
+    margin-left: auto;
+    opacity: 0.5;
+    animation: hiwNudge 2.4s ease-in-out 3;
+  }
+
+  .hiw-swipe[data-touched]::after {
+    content: none;
+  }
+
+  @keyframes hiwNudge {
+
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+
+    50% {
+      transform: translate3d(5px, 0, 0);
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .hiw-card {
+    flex-basis: 86%;
+  }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+/* The GSAP half is already skipped in the component; this covers the CSS, and
+   hands every drawn-on element its finished state rather than its start. */
+@media (prefers-reduced-motion: reduce) {
+
+  .hiw-drift-x,
+  .hiw-drift,
+  .hiw-scan,
+  .hiw-swipe::after {
+    animation: none !important;
+  }
+
+  .hiw-drift {
+    opacity: 0;
+  }
+
+  .hiw-c-line,
+  .hiw-plane,
+  .hiw-ring {
+    stroke-dasharray: none;
+  }
+
+  .hiw-card,
+  .hiw-out,
+  .hiw-out i,
+  .hiw-load-fill,
+  .hiw-badge,
+  .hiw-glow,
+  .hiw-notch,
+  .hiw-bloom,
+  .hiw-spike,
+  .hiw-core,
+  .hiw-drop,
+  .hiw-read,
+  .hiw-packet-x {
+    transition-duration: 0.01ms;
+  }
+
+  /* The wipe would be the one thing left moving, and it is the slowest of the
+     lot — hand it over as a state instead of a gesture. */
+  .hiw-num-fill {
+    transition: none;
+    clip-path: inset(0 0 0 0);
+    opacity: 0.6;
+  }
+}
+
+
+/* Pointer events debounce */
+.scroll-disabled-interactions {
+  pointer-events: none !important;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+  width: 0;
+  /* Animated via GSAP */
+  transition: filter 0.3s ease;
+}
+
+.skill-item:hover .progress-fill {
+  filter: brightness(1.3) drop-shadow(0 0 5px var(--accent-cyan));
+}
+

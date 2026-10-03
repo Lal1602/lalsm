@@ -1,11 +1,13 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import BackgroundPixelStars from "./BackgroundPixelStars";
 import StarChart from "./StarChart";
 import HorizonHud from "./HorizonHud";
 import CosmicNebulaSeam from "./CosmicNebulaSeam";
+import AccretionHorizonSeam from "./AccretionHorizonSeam";
 import horizonScrollState from "@/lib/horizonScrollState";
+import { useLite } from "@/lib/lite";
 
 // Lazy-loaded — both use browser APIs, must be client-only
 const CvTimelineSlide = dynamic(() => import("./CvTimelineSlide"), { ssr: false });
@@ -31,28 +33,13 @@ const MANIFEST = [
 
 export default function HorizonShowcase() {
   const [mounted, setMounted] = useState(false);
-  // Tracks whether the mouse is inside the horizon section
-  const [tubesActive, setTubesActive] = useState(false);
+  const { lite } = useLite();
   const sectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-  }, []);
-
-  // ── Hide / restore portfolio custom cursor while inside horizon section ────
-  // The portfolio uses .cursor-dot and .cursor-outline (position: fixed, z-index 20000).
-  // When tubes are active we hide them so they don't fight with the WebGL cursor effect.
-  const hideCursor = useCallback(() => {
-    document
-      .querySelectorAll<HTMLElement>(".cursor-dot, .cursor-outline")
-      .forEach((el) => {
-        el.style.opacity = "0";
-        el.style.pointerEvents = "none";
-      });
-  }, []);
-
-  const showCursor = useCallback(() => {
+    // Ensure custom cursor elements remain visible
     document
       .querySelectorAll<HTMLElement>(".cursor-dot, .cursor-outline")
       .forEach((el) => {
@@ -60,23 +47,6 @@ export default function HorizonShowcase() {
         el.style.pointerEvents = "";
       });
   }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    setTubesActive(true);
-    hideCursor();
-  }, [hideCursor]);
-
-  const handleMouseLeave = useCallback(() => {
-    setTubesActive(false);
-    showCursor();
-  }, [showCursor]);
-
-  // Safety net: if component unmounts while mouse is inside, restore cursor
-  useEffect(() => {
-    return () => {
-      showCursor();
-    };
-  }, [showCursor]);
 
   // ── Publish the active waypoint onto the container ────────────────────────
   // CSS keys off data-waypoint to park the star chart's two rotating layers
@@ -105,8 +75,6 @@ export default function HorizonShowcase() {
       id="playground"
       data-waypoint="0"
       aria-label="Horizon Showcase Section"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       {/*
         ── PIXEL STARS BACKGROUND (z-index 5) ──────────────────────────────────
@@ -129,7 +97,7 @@ export default function HorizonShowcase() {
             backfaceVisibility: "hidden",
           }}
         >
-          <BackgroundPixelStars />
+          {!lite && <BackgroundPixelStars />}
         </div>
       )}
 
@@ -158,7 +126,7 @@ export default function HorizonShowcase() {
             backfaceVisibility: "hidden",
           }}
         >
-          <TubesCursor />
+          {!lite && <TubesCursor />}
         </div>
       )}
 
@@ -167,9 +135,12 @@ export default function HorizonShowcase() {
 
       {/* ── Seamless Cosmic-to-Cyber Transition Bridge (Procedural Nebula Continuation + Cyber Grid) ── */}
       <div className="horizon-top-transition" aria-hidden="true">
-        <CosmicNebulaSeam part="lower" />
+        {!lite && <CosmicNebulaSeam part="lower" />}
         <div className="horizon-top-cyber-grid" />
       </div>
+
+      {/* ── Seamless Accretion Wave & Horizon Seam (Upper Half, renders behind cards) ── */}
+      {mounted && !lite && <AccretionHorizonSeam part="upper" />}
 
       {/* Slides wrapper — GSAP translates this horizontally for scroll */}
       <div className="horizon-wrapper">

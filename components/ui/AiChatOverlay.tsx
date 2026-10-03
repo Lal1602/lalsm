@@ -1,44 +1,69 @@
 "use client";
 
-import { useChatStore } from "@/stores";
+import { useChatStore, type Message } from "@/stores";
 import { useEffect, useRef, useState } from "react";
+import { profile } from "@/data/profile";
+import { MAX_MESSAGE_CHARS } from "@/lib/chat/validate";
+import { track } from "@/lib/analytics";
+
+/** Opens the visitor's mail app with the conversation so far, ready to send to Bilal. */
+function buildMailtoSummary(messages: Message[]): string {
+  const turns = messages
+    .filter((m) => !m.welcome && m.text)
+    .slice(-8)
+    .map((m) => `${m.role === "user" ? "Me" : "B.I.L.A.L."}: ${m.text}`)
+    .join("\n\n");
+
+  const body = [
+    "Hi Bilal,",
+    "",
+    "I was chatting with your portfolio assistant and would like to follow up.",
+    "",
+    "--- Conversation ---",
+    turns || "(no messages yet)",
+  ].join("\n");
+
+  // Mail clients choke on very long mailto URLs, so keep the body bounded.
+  const trimmed = body.length > 1500 ? `${body.slice(0, 1500)}…` : body;
+  return `mailto:${profile.email}?subject=${encodeURIComponent("Following up from your portfolio")}&body=${encodeURIComponent(trimmed)}`;
+}
 
 const TypingBubble = ({ text }: { text: string }) => {
-  const [displayedText, setDisplayedText] = useState("");
+  const [length, setLength] = useState(0);
   const spanRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const id = window.setTimeout(() => setLength(text.length), 0);
+      return () => window.clearTimeout(id);
+    }
+
     let i = 0;
-    setDisplayedText("");
     const interval = setInterval(() => {
       i += 1;
-      setDisplayedText(text.slice(0, i));
-      
-      if (spanRef.current) {
-        const scrollContainer = spanRef.current.closest('.ai-chat-messages');
-        if (scrollContainer) {
-          scrollContainer.scrollTop = scrollContainer.scrollHeight;
-        }
-      }
+      setLength(i);
 
-      if (i >= text.length) {
-        clearInterval(interval);
-      }
+      const scrollContainer = spanRef.current?.closest(".ai-chat-messages");
+      if (scrollContainer) scrollContainer.scrollTop = scrollContainer.scrollHeight;
+
+      if (i >= text.length) clearInterval(interval);
     }, 15);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [text]);
 
   return (
     <span ref={spanRef}>
-      {displayedText}
-      {displayedText.length < text.length && <span className="ai-chat-typing-cursor" />}
+      {text.slice(0, length)}
+      {length < text.length && <span className="ai-chat-typing-cursor" />}
     </span>
   );
 };
 
 export default function AiChatOverlay() {
   const [isOpen, setIsOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { messages, isLoading, sendMessage, clearHistory } = useChatStore();
   const [input, setInput] = useState("");
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -53,6 +78,22 @@ export default function AiChatOverlay() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isOpen, isLoading]);
+
+  // Escape closes the panel and hands focus back to the toggle; opening focuses the input.
+  useEffect(() => {
+    if (!isOpen) return;
+    const toggle = toggleRef.current;
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 480);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener("keydown", onKey);
+      toggle?.focus();
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -78,7 +119,13 @@ export default function AiChatOverlay() {
   return (
     <>
       {/* Docked Sidebar Panel — always rendered, visibility via CSS transform */}
-      <div className={`ai-chat-sidebar ${isOpen ? "open" : ""}`}>
+      <div
+        className={`ai-chat-sidebar ${isOpen ? "open" : ""}`}
+        role="dialog"
+        aria-label="B.I.L.A.L. AI assistant"
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+      >
         {/* ── CREATIVE BACKGROUND LAYERS (ENHANCED & INTRICATE) ── */}
         <div className="ai-chat-bg-pattern"></div>
         
@@ -160,12 +207,21 @@ export default function AiChatOverlay() {
               <h3 className="ai-chat-title">
                 B.I.L.A.L. <span style={{ fontSize: '0.65em', opacity: 0.7, fontWeight: 'normal', fontFamily: 'var(--font-code)' }}>(Model: BIL-01)</span>
               </h3>
-              <p className="ai-chat-eyebrow">// ONLINE • AI POWERED</p>
+              <p className="ai-chat-eyebrow">{"// ONLINE • AI POWERED"}</p>
             </div>
           </div>
           
           <div className="ai-chat-header-actions">
-            <button 
+            <a
+              href={buildMailtoSummary(messages)}
+              onClick={() => track("chat_email_summary")}
+              title="Email this conversation to Bilal"
+              aria-label="Email this conversation to Bilal"
+              className="ai-chat-btn-reset"
+            >
+              Email
+            </a>
+            <button
               onClick={clearHistory}
               title="Reset Chat"
               className="ai-chat-btn-reset"
@@ -174,6 +230,7 @@ export default function AiChatOverlay() {
             </button>
             <button
               onClick={() => setIsOpen(false)}
+              aria-label="Close assistant"
               className="ai-chat-btn-close"
             >
               &times;
@@ -182,7 +239,14 @@ export default function AiChatOverlay() {
         </div>
 
         {/* Messages Area */}
-        <div ref={messagesContainerRef} className="ai-chat-messages custom-scrollbar" data-lenis-prevent>
+        <div
+          ref={messagesContainerRef}
+          className="ai-chat-messages custom-scrollbar"
+          data-lenis-prevent
+          role="log"
+          aria-live="polite"
+          aria-busy={isLoading}
+        >
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -195,10 +259,13 @@ export default function AiChatOverlay() {
 
               {/* Message Bubble */}
               <div className={`ai-chat-bubble ${msg.role === "user" ? "user" : "ai"}`}>
-                {msg.role === "ai" && idx === messages.length - 1 ? (
+                {msg.role === "ai" && msg.typewriter && idx === messages.length - 1 ? (
                   <TypingBubble text={msg.text} />
                 ) : (
-                  msg.text
+                  <>
+                    {msg.text}
+                    {msg.streaming && <span className="ai-chat-typing-cursor" />}
+                  </>
                 )}
               </div>
             </div>
@@ -238,7 +305,10 @@ export default function AiChatOverlay() {
         {/* Input Area */}
         <div className="ai-chat-input-area">
           <input
+            ref={inputRef}
             type="text"
+            maxLength={MAX_MESSAGE_CHARS}
+            aria-label="Message to B.I.L.A.L."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
@@ -249,6 +319,7 @@ export default function AiChatOverlay() {
           <button
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
+            aria-label="Send message"
             className="ai-chat-btn-send"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -261,8 +332,13 @@ export default function AiChatOverlay() {
 
       {/* Floating Toggle Button — Custom "AI" SVG Icon */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={toggleRef}
+        onClick={() => {
+          if (!isOpen) track("chat_open");
+          setIsOpen(!isOpen);
+        }}
         aria-label="Toggle AI Assistant"
+        aria-expanded={isOpen}
         className={`ai-chat-toggle-btn ${isOpen ? "active" : ""}`}
       >
         <span className="ai-chat-toggle-btn-glow"></span>

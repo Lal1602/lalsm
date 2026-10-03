@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -62,3 +63,7 @@ test_ai.js
 # Whitelist: Safeguard application chatbot API & components from being ignored
 !app/api/ai/**
 !components/ui/AiChatOverlay.tsx
+
+# test output
+/playwright-report/
+/test-results/

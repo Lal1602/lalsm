@@ -221,7 +221,7 @@ export default function ThreeBackground() {
         if (renderer && containerRef.current) {
           try {
             containerRef.current.removeChild(renderer.domElement);
-          } catch (e) {}
+          } catch {}
           renderer.dispose();
         }
       };

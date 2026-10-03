@@ -1,0 +1,809 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACCRETION HORIZON SEAM (CREATIVE PLAYGROUND <-> PROJECTS SEAM TRANSITION)
+   Procedural dual-tone volumetric accretion flow + curved telemetry arc
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.accretion-horizon-seam-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  pointer-events: none;
+  overflow: visible;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.accretion-horizon-seam-upper {
+  bottom: -1px;
+  height: 261px;
+  z-index: 17;
+}
+
+.accretion-horizon-seam-lower {
+  top: 0;
+  height: 260px;
+  z-index: 6;
+}
+
+.accretion-horizon-seam-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+
+  .starchart-ring,
+  .manifest-pulse {
+    animation: none !important;
+  }
+}
+
+/* ── Mobile: the section unrolls into normal document flow, so the console
+      frame has nothing left to frame and the observation deck is hidden. ── */
+@media (max-width: 968px) {
+
+  .horizon-hud,
+  .starchart {
+    display: none !important;
+  }
+
+  .transit-manifest {
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 0;
+  }
+
+  .manifest-cell {
+    border-left: 0;
+    padding: 0;
+  }
+
+  .deck-badge {
+    letter-spacing: 0.22em;
+    gap: 10px;
+  }
+
+  .deck-badge-rule {
+    width: 22px;
+  }
+}
+
+/* ── Light mode ──────────────────────────────────────────────────────────
+   Nothing here. The Horizon section is a viewport onto deep space and keeps
+   its dark ground in both themes — the TubesCursor WebGL canvas paints that
+   background, and there is no light variant of it. Overrides that recolour
+   this section's text for a light page would land dark-on-dark.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* ─── SLIDE 2 (CV): Career Pathway — Sequential Story Animation ─────────────
+/* ═══════════════════════════════════════════════════════════════════════════
+   CAREER PATHWAY — Scroll-Driven Stacked Card Reveal
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Header elements: GSAP controls opacity/y — CSS just sets initial FOUC guard */
+.cv-header-anim {
+  opacity: 0;
+  transform: translateY(22px);
+  will-change: transform, opacity;
+}
+
+/* ── CV download card — same dossier language as the waypoint cards ──────── */
+/* GSAP owns opacity/x; the initial values here are the FOUC guard. */
+.cv-download-card {
+  opacity: 0;
+  transform: translateX(32px);
+  will-change: transform, opacity;
+
+  position: relative;
+  flex-shrink: 0;
+  align-self: center;
+  width: 210px;
+  padding: 20px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(180deg, rgba(16, 20, 32, 0.6) 0%, rgba(7, 9, 16, 0.7) 100%);
+}
+
+/* Dashed bracket accents, mirroring the landed waypoint cards */
+.cv-download-card::before,
+.cv-download-card::after {
+  content: "";
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border: 1px solid transparent;
+  pointer-events: none;
+}
+
+.cv-download-card::before {
+  top: -1px;
+  left: -1px;
+  border-top-color: rgba(255, 255, 255, 0.18);
+  border-left-color: rgba(255, 255, 255, 0.18);
+}
+
+.cv-download-card::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom-color: rgba(255, 255, 255, 0.18);
+  border-right-color: rgba(255, 255, 255, 0.18);
+}
+
+.cv-download-kicker {
+  font-family: var(--font-code);
+  font-size: 0.55rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.26);
+  margin: 0;
+}
+
+.cv-download-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+  margin: 11px 0 6px;
+}
+
+.cv-download-desc {
+  font-family: var(--font-body);
+  font-size: 0.77rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.cv-download-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(79, 184, 224, 0.3);
+  border-radius: 2px;
+  background: rgba(79, 184, 224, 0.07);
+  font-family: var(--font-code);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--accent-cyan);
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.cv-download-link:hover {
+  background: rgba(79, 184, 224, 0.16);
+  border-color: rgba(79, 184, 224, 0.6);
+  color: #ffffff;
+}
+
+/* Mobile-only Career Pathway elements — hidden by default (shown only in @media ≤ 968px) */
+.cv-mobile-sticky-header,
+.cv-mobile-cards-rail {
+  display: none;
+}
+
+
+/* ── Card stack container ─────────────────────────────────────────────────── */
+/* Cards are positioned absolute inside this; size must match ~4 × card width */
+.cv-card-stack {
+  position: relative;
+  width: 1000px;
+  /* 4 × 220px + 3 × 40px gap = 1000px */
+  height: 280px;
+  /* tall enough for card content */
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+/* ── Individual card — a flight-record dossier ───────────────────────────── */
+/* No backdrop-filter here on purpose: these four cards are transformed on every
+   scroll frame, and blurring live pixels behind a moving element is the single
+   most expensive thing this GPU-bound section could ask for. A near-opaque fill
+   over the star field reads the same and composites for free. */
+.cv-card {
+  position: absolute;
+  width: 220px;
+  min-height: 250px;
+  /* prevents content shifting the stack container height */
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(16, 20, 32, 0.98) 0%, rgba(7, 9, 16, 0.99) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  overflow: visible;
+  box-shadow:
+    0 18px 55px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  z-index: 10;
+}
+
+/* Corner brackets — two L-shapes drawn with borders, no extra DOM */
+.cv-card::before,
+.cv-card::after {
+  content: "";
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border: 1px solid transparent;
+  pointer-events: none;
+  transition: border-color 0.5s ease;
+}
+
+.cv-card::before {
+  top: -1px;
+  left: -1px;
+  border-top-color: rgba(255, 255, 255, 0.16);
+  border-left-color: rgba(255, 255, 255, 0.16);
+}
+
+.cv-card::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom-color: rgba(255, 255, 255, 0.16);
+  border-right-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Once the card has landed on the trajectory its brackets take the card accent */
+.cv-card.is-landed::before,
+.cv-card.is-landed::after {
+  border-color: transparent;
+}
+
+.cv-card.is-landed::before {
+  border-top-color: var(--card-color, var(--accent-cyan));
+  border-left-color: var(--card-color, var(--accent-cyan));
+}
+
+.cv-card.is-landed::after {
+  border-bottom-color: var(--card-color, var(--accent-cyan));
+  border-right-color: var(--card-color, var(--accent-cyan));
+}
+
+/* CSS initial stack positions — match STACK_POS in CvTimelineSlide.tsx.    */
+/* GSAP overrides on mount; these are FOUC guards only.                      */
+/* opacity: 0 prevents bleed into previous slide before JS sets visibility.  */
+.cv-card:nth-child(1) {
+  transform: translate(390px, 0px) scale(1.00);
+  z-index: 4;
+  opacity: 0;
+}
+
+.cv-card:nth-child(2) {
+  transform: translate(395px, 9px) scale(0.97);
+  z-index: 3;
+  opacity: 0;
+}
+
+.cv-card:nth-child(3) {
+  transform: translate(400px, 18px) scale(0.94);
+  z-index: 2;
+  opacity: 0;
+}
+
+.cv-card:nth-child(4) {
+  transform: translate(405px, 27px) scale(0.91);
+  z-index: 1;
+  opacity: 0;
+}
+
+
+/* ── Trajectory node — the marker each card docks to ─────────────────────── */
+.cv-card-connector-dot {
+  width: 11px;
+  height: 11px;
+  background: var(--bg-color, #080810);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  transition: border-color 0.45s ease, box-shadow 0.45s ease, background 0.45s ease;
+  z-index: 10;
+}
+
+.cv-card.is-landed .cv-card-connector-dot {
+  border-color: var(--card-color, var(--accent-cyan));
+  background: color-mix(in srgb, var(--card-color, var(--accent-cyan)) 22%, #080810);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--card-color, var(--accent-cyan)) 55%, transparent);
+}
+
+/* ── Card inner content ───────────────────────────────────────────────────── */
+.cv-card-inner {
+  padding: 20px 18px 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.cv-card-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 11px;
+}
+
+/* Waypoint designation — the card's index on the trajectory */
+.cv-card-index {
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  color: var(--card-color, var(--accent-cyan));
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.cv-card-index i {
+  font-style: normal;
+  opacity: 0.5;
+  margin: 0 1px;
+}
+
+.cv-card-year {
+  font-family: var(--font-code);
+  font-size: 0.63rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* Badge moved to the card footer so every card ends on the same baseline */
+.cv-card-foot {
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cv-card-badge {
+  font-family: var(--font-code);
+  font-size: 0.55rem;
+  letter-spacing: 0.07em;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--card-color, var(--accent-cyan)) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--card-color, var(--accent-cyan)) 28%, transparent);
+  color: var(--card-color, var(--accent-cyan));
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cv-card-divider {
+  height: 1px;
+  background: linear-gradient(90deg,
+      color-mix(in srgb, var(--card-color, var(--accent-cyan)) 35%, transparent),
+      transparent);
+  margin-bottom: 13px;
+}
+
+.cv-card-role {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.22;
+  margin: 0 0 5px 0;
+  letter-spacing: 0.01em;
+}
+
+.cv-card-institution {
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.32);
+  margin: 0 0 10px 0;
+  letter-spacing: 0.08em;
+}
+
+.cv-card-desc {
+  font-family: var(--font-body);
+  font-size: 0.77rem;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Timeline connector line segments ────────────────────────────────────── */
+/* 3 segments span center-to-center between adjacent landed cards             */
+/* Card centers at x=110, 370, 630, 890 (card_w=220, gap=40, step=260)       */
+.cv-line-seg {
+  position: absolute;
+  top: 0px;
+  height: 1px;
+  width: 260px;
+  /* = CARD_W(220) + CARD_GAP(40) */
+  background: linear-gradient(90deg,
+      var(--accent-cyan) 0%,
+      color-mix(in srgb, var(--accent-purple) 70%, transparent) 65%,
+      color-mix(in srgb, var(--accent-purple) 20%, transparent) 100%);
+  box-shadow: 0 0 7px color-mix(in srgb, var(--accent-cyan) 35%, transparent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* ── Scroll hint ─────────────────────────────────────────────────────────── */
+.cv-scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  /* was 22px — tighter to heading */
+  margin-bottom: 16px;
+  /* was 32px — brings cards much closer to text */
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+  color: rgba(255, 255, 255, 0.26);
+  user-select: none;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* Mouse scroll-wheel icon */
+.cv-hint-wheel {
+  width: 20px;
+  height: 32px;
+  border: 1.5px solid rgba(0, 243, 255, 0.32);
+  border-radius: 10px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Animated dot inside the wheel */
+.cv-hint-dot {
+  width: 3px;
+  height: 6px;
+  border-radius: 100px;
+  background: rgba(0, 243, 255, 0.55);
+  position: absolute;
+  left: 50%;
+  top: 5px;
+  transform: translateX(-50%);
+  animation: cvHintScrollBounce 1.7s ease-in-out infinite;
+}
+
+@keyframes cvHintScrollBounce {
+
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 0.65;
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(10px);
+    opacity: 0.12;
+  }
+}
+
+/* Triple arrow — depth-of-field fade */
+.cv-hint-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1;
+  font-size: 0.6rem;
+}
+
+.cv-hint-arrows span:nth-child(1) {
+  opacity: 0.65;
+}
+
+.cv-hint-arrows span:nth-child(2) {
+  opacity: 0.35;
+}
+
+.cv-hint-arrows span:nth-child(3) {
+  opacity: 0.12;
+}
+
+.cv-hint-text {
+  font-size: 0.67rem;
+  letter-spacing: 0.2em;
+}
+
+/* ── Mobile fallback ─────────────────────────────────────────────────────── */
+@media (max-width: 968px) {
+  .cv-card-stack {
+    /* On mobile, cards are stacked vertically — not absolutely positioned */
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cv-card {
+    position: relative !important;
+    width: 100% !important;
+    transform: none !important;
+  }
+
+  .cv-line-seg {
+    display: none;
+  }
+
+  .cv-scroll-hint {
+    display: none;
+  }
+
+  .cv-timeline-area {
+    flex-direction: column !important;
+  }
+}
+
+
+
+/* SLIDE 2: PHYSICS LAB */
+.physics-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.lab-grid-layout {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  align-items: center;
+  gap: 60px;
+  width: 100%;
+}
+
+.lab-terminal {
+  background: rgba(10, 10, 14, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 30px;
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+}
+
+.lab-terminal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+}
+
+.terminal-title {
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.terminal-readouts {
+  margin: 25px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-bottom: 20px;
+}
+
+.readout-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+}
+
+.readout-label {
+  color: var(--text-muted);
+}
+
+.readout-value {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.readout-value.active {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+}
+
+.terminal-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btn-terminal {
+  flex: 1 1 calc(50% - 12px);
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.btn-terminal:hover {
+  background: rgba(0, 243, 255, 0.06);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.15);
+}
+
+.btn-terminal.active {
+  background: rgba(188, 19, 254, 0.1);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+.btn-terminal.active:hover {
+  box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
+}
+
+/* SLIDE 3: GLITCH CARDS */
+.glitch-cards-wrapper {
+  display: flex;
+  gap: 40px;
+  margin-top: 40px;
+  width: 100%;
+}
+
+.glitch-card {
+  flex: 1;
+  background: rgba(10, 10, 14, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 24px;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+}
+
+.glitch-card-image-wrap {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.glitch-card-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  filter: grayscale(40%) contrast(1.1);
+}
+
+.glitch-overlay-noise {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.6)),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='glitch'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23glitch)'/%3E%3C/svg%3E");
+  opacity: 0.15;
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.glitch-card:hover {
+  box-shadow: 0 30px 60px rgba(0, 243, 255, 0.08);
+}
+
+.glitch-card:hover .glitch-card-image-wrap img {
+  transform: scale(1.06);
+  filter: grayscale(0%) contrast(1.05);
+}
+
+.glitch-card:hover .glitch-overlay-noise {
+  opacity: 0.35;
+  animation: static-flicker 0.15s infinite;
+}
+
+@keyframes static-flicker {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-2px, 1px);
+  }
+
+  100% {
+    transform: translate(1px, -2px);
+  }
+}
+
+.glitch-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-num {
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  color: var(--accent-purple);
+}
+
+.card-heading {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.card-text {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* SLIDE 4: OUTRO MATRIX */
+.outro-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 25px;
+}
+
+.outro-arrow-wrap {
+  margin-top: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce-vertical 2s infinite ease-in-out;
+}
+
+.outro-arrow {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 10px var(--accent-cyan);
+}
+
+@keyframes bounce-vertical {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(8px);
+  }
+}
+

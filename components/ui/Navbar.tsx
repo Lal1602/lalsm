@@ -127,27 +127,27 @@ export default function Navbar() {
         <ul className="mobile-nav-links-list" ref={mobileLinksRef}>
           <li>
             <a href="#home" className="mobile-nav-link">
-              <span className="link-num">// 01</span> Home
+              <span className="link-num">{"// 01"}</span> Home
             </a>
           </li>
           <li>
             <a href="#about" className="mobile-nav-link">
-              <span className="link-num">// 02</span> About
+              <span className="link-num">{"// 02"}</span> About
             </a>
           </li>
           <li>
             <a href="#projects" className="mobile-nav-link">
-              <span className="link-num">// 03</span> Projects
+              <span className="link-num">{"// 03"}</span> Projects
             </a>
           </li>
           <li>
             <a href="#achievements" className="mobile-nav-link mobile-btn-achievements">
-              <span className="link-num">// 04</span> Achievements
+              <span className="link-num">{"// 04"}</span> Achievements
             </a>
           </li>
           <li>
             <a href="#contact" className="mobile-nav-link">
-              <span className="link-num">// 05</span> Contact
+              <span className="link-num">{"// 05"}</span> Contact
             </a>
           </li>
         </ul>

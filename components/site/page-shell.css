@@ -1,0 +1,494 @@
+/*
+  Secondary pages. Every class here is prefixed (ps-, blog-, case-, cvp-) because
+  portfolio.css is one flat sheet where generic names silently lose on source
+  order. Colours come from the theme variables so light mode works unchanged.
+*/
+
+.ps-root,
+.ps-root * {
+  cursor: auto;
+}
+.ps-root a,
+.ps-root button,
+.ps-root summary {
+  cursor: pointer;
+}
+
+.ps-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.ps-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px clamp(16px, 4vw, 48px);
+  border-bottom: 1px solid var(--glass-border);
+}
+.ps-logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 0.12em;
+  color: var(--text-main);
+  text-decoration: none;
+}
+.ps-logo span {
+  color: var(--accent-cyan);
+}
+.ps-nav {
+  display: flex;
+  gap: clamp(12px, 3vw, 28px);
+  list-style: none;
+}
+.ps-nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+.ps-nav a:hover {
+  color: var(--accent-cyan);
+}
+
+.ps-main {
+  flex: 1;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(32px, 6vw, 72px) clamp(16px, 4vw, 32px);
+  outline: none;
+}
+.ps-main--reading {
+  max-width: 760px;
+}
+.ps-main--wide {
+  max-width: 1080px;
+}
+
+.ps-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 24px clamp(16px, 4vw, 48px);
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.ps-footer a {
+  color: inherit;
+}
+.ps-footer a:hover {
+  color: var(--accent-cyan);
+}
+
+.ps-eyebrow {
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 14px;
+}
+.ps-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+.ps-lede {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  max-width: 62ch;
+}
+.ps-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 0;
+  list-style: none;
+}
+.ps-tag {
+  padding: 4px 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--glass-bg);
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.ps-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border: 1px solid var(--accent-cyan);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent-cyan);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.ps-btn:hover {
+  background: var(--accent-cyan);
+  color: var(--bg-color);
+}
+.ps-btn--ghost {
+  border-color: var(--glass-border);
+  color: var(--text-main);
+}
+.ps-btn--ghost:hover {
+  border-color: var(--accent-cyan);
+  background: transparent;
+  color: var(--accent-cyan);
+}
+.ps-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+/* ── Blog list ─────────────────────────────────────────────────────────── */
+.blog-list {
+  list-style: none;
+  margin-top: 40px;
+  display: grid;
+  gap: 16px;
+}
+.blog-card {
+  display: block;
+  padding: 24px 26px;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  background: var(--glass-bg);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.blog-card:hover {
+  border-color: var(--accent-cyan);
+  transform: translateY(-2px);
+}
+.blog-card-meta {
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.blog-card-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin: 8px 0;
+  line-height: 1.25;
+}
+.blog-card-desc {
+  color: var(--text-muted);
+}
+
+/* ── Blog post prose ───────────────────────────────────────────────────── */
+.blog-prose {
+  margin-top: 40px;
+}
+.blog-prose > * + * {
+  margin-top: 1.1em;
+}
+.blog-prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  margin-top: 2em;
+  line-height: 1.2;
+}
+.blog-prose h3 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  margin-top: 1.6em;
+}
+.blog-prose a {
+  color: var(--accent-cyan);
+  text-underline-offset: 3px;
+}
+.blog-prose ul,
+.blog-prose ol {
+  padding-left: 1.4em;
+}
+.blog-prose li + li {
+  margin-top: 0.4em;
+}
+.blog-prose strong {
+  color: var(--text-main);
+}
+.blog-prose blockquote {
+  padding: 4px 0 4px 18px;
+  border-left: 3px solid var(--accent-purple);
+  color: var(--text-muted);
+}
+.blog-prose code {
+  font-family: var(--font-code);
+  font-size: 0.85em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+}
+.blog-prose pre {
+  overflow-x: auto;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+.blog-prose pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.blog-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.blog-prose th,
+.blog-prose td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--glass-border);
+  text-align: left;
+}
+.blog-prose th {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Project case study ────────────────────────────────────────────────── */
+.case-hero {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin-top: 32px;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+}
+.case-hero img {
+  object-fit: cover;
+}
+.case-section {
+  margin-top: 40px;
+}
+.case-section h2 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+.case-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 56px;
+}
+.case-pager a {
+  display: block;
+  padding: 16px 18px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+.case-pager a:hover {
+  border-color: var(--accent-cyan);
+}
+.case-pager small {
+  display: block;
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.case-pager .is-next {
+  text-align: right;
+}
+.case-index {
+  list-style: none;
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.case-index a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--glass-bg);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.case-index a:hover {
+  border-color: var(--accent-cyan);
+  transform: translateY(-2px);
+}
+.case-index-thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+.case-index-thumb img {
+  object-fit: cover;
+}
+.case-index-body {
+  padding: 14px 16px 16px;
+}
+.case-index-body strong {
+  display: block;
+  font-family: var(--font-display);
+}
+.case-index-body span {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ── CV page (screen + print) ──────────────────────────────────────────── */
+.cvp-sheet {
+  padding: clamp(20px, 5vw, 48px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  background: var(--glass-bg);
+}
+.cvp-name {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.cvp-role {
+  color: var(--accent-cyan);
+  font-family: var(--font-code);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  margin-top: 8px;
+}
+.cvp-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin-top: 14px;
+  list-style: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.cvp-contact a {
+  color: inherit;
+}
+.cvp-h {
+  margin-top: 28px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--glass-border);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+}
+.cvp-item {
+  margin-top: 14px;
+}
+.cvp-item-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+}
+.cvp-item-head strong {
+  font-family: var(--font-display);
+}
+.cvp-item-head span {
+  color: var(--text-muted);
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+}
+.cvp-item p {
+  color: var(--text-muted);
+  font-size: 0.98rem;
+}
+.cvp-skill {
+  margin-top: 8px;
+}
+.cvp-skill b {
+  font-family: var(--font-display);
+  margin-right: 8px;
+}
+
+@media (max-width: 560px) {
+  .ps-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .case-pager {
+    grid-template-columns: 1fr;
+  }
+  .case-pager .is-next {
+    text-align: left;
+  }
+}
+
+@media print {
+  .ps-header,
+  .ps-footer,
+  .ps-actions,
+  .cvp-no-print,
+  .grain-overlay,
+  .skip-link {
+    display: none !important;
+  }
+  body,
+  html,
+  .ps-root {
+    background: #fff !important;
+    color: #111 !important;
+  }
+  body::before {
+    display: none !important;
+  }
+  .ps-main {
+    max-width: none;
+    padding: 0;
+  }
+  .cvp-sheet {
+    border: 0;
+    background: none;
+    padding: 0;
+  }
+  .cvp-role,
+  .cvp-h {
+    color: #0a5c7a !important;
+  }
+  .cvp-item p,
+  .cvp-contact,
+  .cvp-item-head span {
+    color: #333 !important;
+  }
+}

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 
-// ── Type stubs for the threejs-components CDN module ─────────────────────────
+// ── Type stubs for the self-hosted threejs-components module ─────────────────────────
 interface TubesInstance {
   tubes: {
     setColors: (colors: string[]) => void;
@@ -38,7 +38,7 @@ function randomColors(count: number): string[] {
 /**
  * TubesCursor
  *
- * WebGL cursor-following tube animation via threejs-components CDN library.
+ * WebGL cursor-following tube animation via the self-hosted threejs-components build.
  * Scoped to the Horizon Showcase section only (canvas is absolute, not fixed).
  * Click to randomize colors.
  */
@@ -47,7 +47,6 @@ export default function TubesCursor() {
   const appRef = useRef<TubesInstance | null>(null);
 
   useEffect(() => {
-    let initTimer: ReturnType<typeof setTimeout>;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -66,14 +65,14 @@ export default function TubesCursor() {
     const ro = new ResizeObserver(syncSize);
     if (canvas.parentElement) ro.observe(canvas.parentElement);
 
-    const CDN_URL =
-      "https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js";
+    // Self-hosted copy (see public/vendor/README.txt). Typed as string, not a
+    // literal, so TypeScript treats this as a runtime import rather than trying
+    // to resolve a module.
+    const MODULE_URL: string = "/vendor/tubes1.min.js";
 
-    initTimer = setTimeout(() => {
+    const initTimer = setTimeout(() => {
       syncSize(); // re-sync just before init in case layout shifted
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore — TypeScript cannot resolve CDN URLs statically; this is intentional.
-      (import(/* webpackIgnore: true */ CDN_URL) as Promise<{ default: TubesFactory }>)
+      (import(/* webpackIgnore: true */ MODULE_URL) as Promise<{ default: TubesFactory }>)
         .then(({ default: factory }) => {
           if (!canvasRef.current) return;
           const app = factory(canvasRef.current, {

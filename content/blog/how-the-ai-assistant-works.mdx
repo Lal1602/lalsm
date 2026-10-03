@@ -1,0 +1,50 @@
+export const meta = {
+  title: "Di balik B.I.L.A.L.: asisten AI yang aman, cepat, dan tidak pernah buntu",
+  description:
+    "Arsitektur chat di portofolio ini: streaming NDJSON, failover model dengan timeout, rate limit, validasi input, dan fallback lokal supaya percakapan tidak pernah berakhir di halaman error.",
+  date: "2026-10-03",
+  tags: ["ai", "gemini", "nextjs", "architecture"],
+};
+
+Asisten di pojok kanan bawah situs ini, B.I.L.A.L., bukan sekadar kotak teks yang diteruskan ke model. Endpoint-nya publik, dan setiap panggilan memakai token. Jadi sebagian besar pekerjaannya ada di sekeliling model, bukan di model itu sendiri.
+
+## Satu endpoint, empat lapis pertahanan
+
+Route `POST /api/ai/chat` memproses setiap permintaan dengan urutan berikut:
+
+1. **Cek origin.** Browser dari origin lain ditolak dengan 403; request dari origin yang sama dan alat seperti curl tetap lolos.
+2. **Validasi body.** Pesan dibatasi 500 karakter, riwayat dipangkas ke 10 pesan terakhir, tiap item dipotong 1.500 karakter, dan role hanya boleh `user` atau `ai`. Body yang tidak valid mendapat 400 yang jelas, bukan jawaban acak.
+3. **Rate limit.** Dua jendela geser per IP: 6 permintaan per menit dan 40 per jam. Tanpa konfigurasi tambahan, penghitung ada di memori proses; dengan Upstash Redis, batas yang sama berlaku global.
+4. **Prompt yang tahan injeksi.** Pesan pengguna diperlakukan sebagai data tidak tepercaya, dan prompt sistem tidak berisi rahasia yang pantas dijaga, karena model tidak bisa menjaga rahasia yang ada di dalam konteksnya sendiri.
+
+## Streaming tanpa JSON setengah jadi
+
+Model diminta menjawab dalam dua bagian: teks balasan, lalu penanda khusus, lalu array JSON berisi tiga saran dialog.
+
+```text
+Halo! Aku B.I.L.A.L., pemandu portofolio Bilal. [ACTION:SCROLL_AND_HIGHLIGHT:projects]
+<<<SUGGESTIONS>>>
+["[Penasaran] ...", "[Santai] ...", "[Serius] ..."]
+```
+
+Server mengalirkan bagian balasan sebagai baris NDJSON `delta`, dan hanya mengirim `done` setelah penanda tiba. Detail yang membuatnya benar: penanda bisa terbelah di antara dua chunk (`<<<SUGG` + `ESTIONS>>>`), jadi pemisah menahan ekor yang mungkin menjadi awal penanda sampai terbukti bukan. Tag aksi yang baru setengah tiba, misalnya `[ACTION:SCRO`, juga disembunyikan di klien agar pengunjung tidak melihatnya berkedip.
+
+## Failover yang tahu kapan harus berhenti
+
+Daftar model dicoba berurutan, tetapi dengan dua aturan:
+
+- Model yang belum menghasilkan token pertama dalam **10 detik** dilewati, dan seluruh jawaban dibatasi **30 detik**.
+- **Begitu teks sudah sampai ke pengunjung, tidak ada restart ke model lain.** Jawaban diselesaikan dengan apa yang sudah ada. Menampilkan dua jawaban yang berbeda lebih buruk daripada jawaban yang terpotong.
+
+Jika semua model gagal, server menjawab dari mesin simulasi lokal berbasis kata kunci. Aturannya memakai batas kata ("hi" tidak boleh cocok dengan "this"), jadi fallback pun terasa masuk akal. Hasilnya: pengunjung tidak pernah melihat percakapan yang mati.
+
+## Aksi navigasi
+
+Balasan boleh memuat tag seperti `[ACTION:OPEN_PROJECT:MindPoint]`. Klien menguraikannya menjadi aksi bertipe dan hanya menjalankan yang valid: id section dicocokkan ke daftar putih, dan judul proyek dicocokkan dengan data proyek yang sama yang dipakai film strip. Karena film strip digambar di WebGL dan tidak punya kartu DOM untuk diklik, aksi "buka proyek" dikirim sebagai event jendela, dan section proyek yang membuka modalnya sendiri.
+
+## Hal kecil yang menjaga pengalaman
+
+- Tombol **Email** merangkum percakapan ke `mailto:` supaya pengunjung bisa langsung menindaklanjuti ke Bilal.
+- **Reset** juga membatalkan permintaan yang sedang berjalan.
+- Riwayat yang disimpan di localStorage dibatasi, dan balasan lama tidak mengetik ulang diri mereka saat halaman dimuat ulang.
+- Saat terkena rate limit, pengunjung mendapat pesan ramah dengan hitungan mundur, bukan error mentah.

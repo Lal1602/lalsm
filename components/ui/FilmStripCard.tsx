@@ -26,7 +26,6 @@ interface FilmStripCardProps {
 }
 
 export default function FilmStripCard({
-  title,
   image,
   index,
   totalItems,
@@ -43,9 +42,12 @@ export default function FilmStripCard({
   const [localHovered, setLocalHovered] = useState(false);
 
   // Load project texture using Drei's useTexture utility
-  const texture = useTexture(`/_next/image?url=${encodeURIComponent(image)}&w=640&q=75`);
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.generateMipmaps = true;
+  // The onLoad callback is where drei expects texture settings to be applied.
+  const texture = useTexture(`/_next/image?url=${encodeURIComponent(image)}&w=640&q=75`, (loaded) => {
+    loaded.minFilter = THREE.LinearMipmapLinearFilter;
+    loaded.generateMipmaps = true;
+    loaded.needsUpdate = true;
+  });
 
   // Cylindrical curve parameters matching the cosmic orbit
   const R = 7.5; // Radius of the curved cosmic carousel
@@ -144,7 +146,7 @@ export default function FilmStripCard({
     `
   };
 
-  useFrame((state, delta) => {
+  useFrame(() => {
     if (!meshRef.current) return;
 
     // 1. Calculate cylindrical coordinate based on scrolling (infinite loop)

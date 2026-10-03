@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import horizonScrollState from "@/lib/horizonScrollState";
 
 /**
@@ -18,7 +18,6 @@ export default function HorizonHud({ waypoints }: { waypoints: Waypoint[] }) {
   const pctRef = useRef<HTMLSpanElement>(null);
   const rulerRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLSpanElement>(null);
-  const railRef = useRef<HTMLDivElement>(null);
   const sectorRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -45,12 +44,6 @@ export default function HorizonHud({ waypoints }: { waypoints: Waypoint[] }) {
         if (sectorRef.current) {
           sectorRef.current.textContent = String(active + 1).padStart(2, "0");
         }
-        const nodes = railRef.current?.children;
-        if (nodes) {
-          for (let i = 0; i < nodes.length; i++) {
-            (nodes[i] as HTMLElement).classList.toggle("is-active", i === active);
-          }
-        }
       }
     };
 
@@ -59,42 +52,12 @@ export default function HorizonHud({ waypoints }: { waypoints: Waypoint[] }) {
     return unsubscribe;
   }, [waypoints.length]);
 
-  // Jump to a waypoint by mapping its index onto the pinned ScrollTrigger range.
-  const jumpTo = useCallback(
-    (index: number) => {
-      const { start, end } = horizonScrollState;
-      if (end <= start) return;
-      const target = start + ((end - start) * index) / Math.max(1, waypoints.length - 1);
-      // Go through Lenis when it is running — a native scrollTo would be
-      // overwritten by Lenis' own target on the very next frame.
-      if (window.__lenis) window.__lenis.scrollTo(target, { duration: 1 });
-      else window.scrollTo({ top: target, behavior: "smooth" });
-    },
-    [waypoints.length]
-  );
-
   return (
     <div className="horizon-hud">
       {/* ── Right edge sector stamp ── */}
       <div className="hud-sector" aria-hidden="true">
         SECTOR <span ref={sectorRef}>01</span> / {String(waypoints.length).padStart(2, "0")}
       </div>
-
-      {/* ── Waypoint rail (interactive) ── */}
-      <nav className="hud-rail" ref={railRef} aria-label="Horizon section waypoints">
-        {waypoints.map((w, i) => (
-          <button
-            key={w.code}
-            type="button"
-            className={`hud-waypoint${i === 0 ? " is-active" : ""}`}
-            onClick={() => jumpTo(i)}
-          >
-            <span className="hud-waypoint-node" aria-hidden="true" />
-            <span className="hud-waypoint-code">{w.code}</span>
-            <span className="hud-waypoint-label">{w.label}</span>
-          </button>
-        ))}
-      </nav>
 
       {/* ── Distance ruler along the bottom edge ── */}
       <div className="hud-ruler" aria-hidden="true">

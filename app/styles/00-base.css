@@ -1,0 +1,329 @@
+:root {
+  --bg-color: #050505;
+  --text-main: #e0e0e0;
+  --text-muted: #8892b0;
+  /*
+    Palette refined off the original pure neon cyan/magenta/gold triad
+    (#00f3ff / #bc13fe / #ffd700) — same three-accent structure so every
+    existing var(--accent-*) usage keeps working, but pulled back from
+    the stock "AI cyberpunk template" look toward something a bit more
+    considered. Variable names kept as-is on purpose (renaming would mean
+    touching every call site across the codebase).
+  */
+  --accent-cyan: #4fb8e0;
+  --accent-purple: #8b7cf6;
+  --accent-gold: #f0a868;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+  --font-code: 'Roboto Mono', monospace;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --concave-center: rgba(15, 12, 30, 0.25);
+  --concave-edge: rgba(5, 5, 5, 0.95);
+  --concave-shadow: rgba(0, 0, 0, 0.95);
+
+  /* Top-of-stack scale — replaces the old 99,999 / 999,999 / 1,999,999 /
+     2,000,000 "just go higher" z-index values with a small, readable set. */
+  --z-scrollbar: 9000;
+  --z-project-modal: 9050;
+  --z-grain: 9100;
+  --z-preloader: 9500;
+  --z-cursor: 9999;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  cursor: none;
+  /* Custom cursor defaults */
+}
+
+html,
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  /* FIX 1: Prevent Horizontal Scroll caused by 100vw */
+  width: 100%;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Scroll Progress Bar --- */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+  width: 0%;
+  z-index: var(--z-scrollbar);
+  box-shadow: 0 0 10px var(--accent-cyan);
+  transition: width 0.1s;
+}
+
+/* --- Grain Overlay --- */
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  pointer-events: none;
+  /* Sits just below cursor, above all modals/overlays */
+  z-index: var(--z-grain);
+}
+
+/* --- Custom Cursor --- */
+/* z-index: 2,000,000 — always the topmost element, above every modal,
+   overlay, preloader, and any dynamically injected UI layer */
+.cursor-dot,
+.cursor-outline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  z-index: var(--z-cursor);
+  pointer-events: none;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--accent-cyan);
+  transition: transform 0.2s, background-color 0.2s, opacity 0.2s;
+}
+
+.cursor-outline {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  mix-blend-mode: difference;
+  transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    height 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    background-color 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+.cursor-text {
+  font-family: var(--font-code);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #000;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+/* Clickable Elements Hover State */
+.cursor-outline.cursor-active-hover {
+  width: 48px;
+  height: 48px;
+  background-color: rgba(0, 243, 255, 0.12);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+}
+
+.cursor-dot.cursor-active-hover {
+  background-color: var(--accent-purple);
+  transform: translate(-50%, -50%) scale(1.4);
+}
+
+/* Text Context Hover State (e.g. data-cursor-text) */
+.cursor-outline.cursor-active-text {
+  width: 64px;
+  height: 64px;
+  background-color: #ffffff;
+  border-color: #ffffff;
+}
+
+.cursor-outline.cursor-active-text .cursor-text {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cursor-dot.cursor-active-text {
+  opacity: 0;
+}
+
+/* Text Input Fields (Hide custom cursor & show native text I-beam) */
+body:has(input:hover, textarea:hover, [contenteditable="true"]:hover) .cursor-outline,
+body:has(input:hover, textarea:hover, [contenteditable="true"]:hover) .cursor-dot {
+  opacity: 0 !important;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  cursor: text !important;
+}
+
+a,
+button,
+[role="button"],
+.btn {
+  cursor: pointer !important;
+}
+
+/* Horizon Showcase — hide native cursor so custom cursor + TubesCursor WebGL take over */
+.horizon-container,
+.horizon-container * {
+  cursor: none !important;
+}
+
+/* Disable Custom Cursor on Touch Devices & Mobile */
+@media (hover: none) and (pointer: coarse),
+(max-width: 968px) {
+  * {
+    cursor: auto !important;
+  }
+
+  .cursor-dot,
+  .cursor-outline {
+    display: none !important;
+  }
+
+  .grain-overlay {
+    opacity: 0.02;
+    /* Reduce grain opacity on mobile for performance */
+  }
+}
+
+/* --- Particle Burst --- */
+.burst-particle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: var(--z-project-modal);
+}
+
+/* --- Background --- */
+#canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* FIX: Set z-index to 0 so it sits on top of body bg, but below content */
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Ensure content sits above the canvas */
+main,
+footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Parallax Decoration --- */
+.parallax-text {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: 15vw;
+  color: rgba(255, 255, 255, 0.02);
+  white-space: nowrap;
+  z-index: -1;
+  pointer-events: none;
+  font-weight: 900;
+  line-height: 0.8;
+}
+
+/* --- Typography & Utilities --- */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.section-title {
+  font-size: 3rem;
+  margin-bottom: 3rem;
+  background: linear-gradient(90deg, #fff, var(--text-muted));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  overflow-x: visible;
+  /* Ganti jadi 'clip' atau 'hidden' untuk memotong elemen yang keluar */
+}
+
+.btn {
+  padding: 12px 30px;
+  font-family: var(--font-code);
+  font-weight: 700;
+  text-decoration: none;
+  color: white;
+  border: 1px solid var(--accent-cyan);
+  background: rgba(0, 243, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: 0.5s;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:hover {
+  background: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 20px var(--accent-cyan);
+}
+

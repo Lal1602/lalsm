@@ -3,15 +3,8 @@ import { Suspense, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import FilmStripCard from "./FilmStripCard";
-
-interface Project {
-  title: string;
-  desc: string;
-  fullDesc: string;
-  tech: string;
-  image: string;
-  link: string;
-}
+import { mulberry32 } from "@/lib/seededRandom";
+import type { Project } from "@/data/projects";
 
 interface FilmSceneProps {
   projects: Project[];
@@ -91,28 +84,29 @@ function RelativisticStreaks3D({
   const count = 130;
 
   const [positions, colors, velocities] = useMemo(() => {
+    const rand = mulberry32(20260);
     const pos = new Float32Array(count * 3);
     const col = new Float32Array(count * 3);
     const vel = new Float32Array(count);
 
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 26;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 8 - 0.4;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 8 - 1.2;
+      pos[i * 3] = (rand() - 0.5) * 26;
+      pos[i * 3 + 1] = (rand() - 0.5) * 8 - 0.4;
+      pos[i * 3 + 2] = (rand() - 0.5) * 8 - 1.2;
 
       // Warm amber stars near bottom & mid-left, cyan-white elsewhere
-      const isWarm = pos[i * 3 + 1] < 0 && Math.random() > 0.45;
+      const isWarm = pos[i * 3 + 1] < 0 && rand() > 0.45;
       if (isWarm) {
         col[i * 3] = 1.0;
-        col[i * 3 + 1] = 0.78 + Math.random() * 0.18;
+        col[i * 3 + 1] = 0.78 + rand() * 0.18;
         col[i * 3 + 2] = 0.48;
       } else {
-        col[i * 3] = 0.52 + Math.random() * 0.4;
-        col[i * 3 + 1] = 0.85 + Math.random() * 0.15;
+        col[i * 3] = 0.52 + rand() * 0.4;
+        col[i * 3 + 1] = 0.85 + rand() * 0.15;
         col[i * 3 + 2] = 1.0;
       }
 
-      vel[i] = 0.06 + Math.random() * 0.14;
+      vel[i] = 0.06 + rand() * 0.14;
     }
 
     return [pos, col, vel];

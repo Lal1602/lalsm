@@ -16,7 +16,7 @@ interface Props {
   onClose: () => void;
 }
 
-export default function ProjectModal({ data, cardRect, onClose }: Props) {
+export default function ProjectModal({ data, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -92,13 +92,13 @@ export default function ProjectModal({ data, cardRect, onClose }: Props) {
           aria-label="Close"
           onClick={handleClose}
         >
-          {/* @ts-ignore */}
           <ion-icon suppressHydrationWarning name="close-outline" aria-hidden="true" />
         </button>
 
         {/* ── Image pane ───────────────────────────────────────────── */}
         {data.image && (
           <div className="ach-modal-img-pane">
+            {/* eslint-disable-next-line @next/next/no-img-element -- runtime URL from the clicked card; sized by .ach-modal-img */}
             <img
               src={data.image}
               alt={data.title}
@@ -112,7 +112,7 @@ export default function ProjectModal({ data, cardRect, onClose }: Props) {
         {/* ── Info pane ────────────────────────────────────────────── */}
         <div className="ach-modal-info">
           {/* Eyebrow */}
-          <p className="ach-modal-eyebrow">// Certificate &amp; Achievement</p>
+          <p className="ach-modal-eyebrow">{"// Certificate &amp; Achievement"}</p>
 
           {/* Title */}
           <h3 id="achModalTitle" className="ach-modal-title">
@@ -139,7 +139,6 @@ export default function ProjectModal({ data, cardRect, onClose }: Props) {
             className="ach-modal-cta"
             aria-label={`View full certificate for ${data.title}`}
           >
-            {/* @ts-ignore */}
             <ion-icon suppressHydrationWarning name="open-outline" aria-hidden="true" />
             View Full Certificate
           </a>

@@ -7,6 +7,9 @@ import AchievementsSection from "@/components/ui/AchievementsSection";
 import ContactSection from "@/components/ui/ContactSection";
 import Footer from "@/components/ui/Footer";
 import ClientShell from "@/components/ui/ClientShell";
+import { stats } from "@/data/profile";
+
+const MARQUEE_TEXT = `NEXT.JS • THREE.JS • GSAP • ${stats.projectsShipped} PROJECTS SHIPPED • PENS SURABAYA •`;
 
 export default function Home() {
   return (
@@ -19,16 +22,16 @@ export default function Home() {
 
       {/* Navigation placeholder (rendered by ClientShell/Navbar) */}
 
-      <main>
+      <main id="content" tabIndex={-1}>
         <HeroSection />
 
         {/* Kinetic Marquee */}
         <div className="kinetic-marquee-container">
           <div className="marquee-wrapper">
-            <span className="marquee-text">NEXT.JS • THREE.JS • GSAP • 35+ PROJECTS SHIPPED • PENS SURABAYA •</span>
-            <span className="marquee-text">NEXT.JS • THREE.JS • GSAP • 35+ PROJECTS SHIPPED • PENS SURABAYA •</span>
-            <span className="marquee-text">NEXT.JS • THREE.JS • GSAP • 35+ PROJECTS SHIPPED • PENS SURABAYA •</span>
-            <span className="marquee-text">NEXT.JS • THREE.JS • GSAP • 35+ PROJECTS SHIPPED • PENS SURABAYA •</span>
+            <span className="marquee-text">{MARQUEE_TEXT}</span>
+            <span className="marquee-text">{MARQUEE_TEXT}</span>
+            <span className="marquee-text">{MARQUEE_TEXT}</span>
+            <span className="marquee-text">{MARQUEE_TEXT}</span>
           </div>
         </div>
 

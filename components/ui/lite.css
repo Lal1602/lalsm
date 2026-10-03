@@ -1,0 +1,175 @@
+/*
+  Lite mode. Everything is prefixed lite- or keyed off html[data-lite="1"], which
+  the inline boot script sets before first paint (see lib/liteBoot.ts).
+*/
+
+/* ── The toggle ───────────────────────────────────────────────────────────── */
+.lite-root {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--font-code);
+}
+.lite-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.78);
+  color: var(--text-main);
+  font: 600 0.68rem/1 var(--font-code);
+  letter-spacing: 0.14em;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+html[data-theme="light"] .lite-btn {
+  background: rgba(255, 255, 255, 0.85);
+}
+.lite-btn:hover,
+.lite-btn:focus-visible {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+.lite-btn.is-lite {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.lite-menu,
+.lite-suggest {
+  width: min(280px, calc(100vw - 32px));
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  background: rgba(10, 10, 10, 0.92);
+  color: var(--text-main);
+  padding: 8px;
+}
+html[data-theme="light"] .lite-menu,
+html[data-theme="light"] .lite-suggest {
+  background: rgba(255, 255, 255, 0.96);
+}
+.lite-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+.lite-menu button:hover,
+.lite-menu button:focus-visible {
+  background: var(--glass-bg);
+}
+.lite-menu button.is-active {
+  outline: 1px solid var(--accent-cyan);
+}
+.lite-menu strong {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+}
+.lite-menu span {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.lite-suggest {
+  padding: 14px;
+}
+.lite-suggest p {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.lite-suggest-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.lite-suggest-actions button {
+  padding: 7px 12px;
+  border: 1px solid var(--accent-cyan);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent-cyan);
+  font: 600 0.68rem/1 var(--font-code);
+}
+.lite-suggest-actions button.is-quiet {
+  border-color: var(--glass-border);
+  color: var(--text-muted);
+}
+
+/* ── What lite turns off ──────────────────────────────────────────────────── */
+html[data-lite="1"] *,
+html[data-lite="1"] *::before,
+html[data-lite="1"] *::after {
+  /* Blurring an animated backdrop re-blurs every frame; this is the single
+     biggest GPU saver after the canvases themselves. */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html[data-lite="1"] .grain-overlay {
+  display: none !important;
+}
+html[data-lite="1"] {
+  scroll-behavior: auto;
+}
+
+/* ── Lite project gallery (replaces the 3D film strip) ────────────────────── */
+.lite-projects {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 28px 0 8px;
+  padding: 0;
+}
+.lite-project-card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--glass-bg);
+  color: var(--text-main);
+  text-align: left;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.lite-project-card:hover,
+.lite-project-card:focus-visible {
+  border-color: var(--accent-cyan);
+  transform: translateY(-2px);
+}
+.lite-project-thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+.lite-project-thumb img {
+  object-fit: cover;
+}
+.lite-project-body {
+  padding: 12px 14px 14px;
+}
+.lite-project-body strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+.lite-project-body span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}

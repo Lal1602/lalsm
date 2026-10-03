@@ -1,0 +1,63 @@
+export const meta = {
+  title: "Menjaga portfolio WebGL tetap mulus: tiga biaya yang tidak terlihat",
+  description:
+    "Hasil profiling situs ini: frame budget ternyata habis di GPU dan compositing, bukan di JavaScript, dan tiga kebiasaan kecil di efek pointer ternyata paling mahal.",
+  date: "2026-10-03",
+  tags: ["performance", "webgl", "profiling", "css"],
+};
+
+Situs ini penuh lapisan yang bergerak: starfield Three.js, kursor tabung WebGL, film strip proyek di React Three Fiber, dan grain overlay satu layar penuh. Wajar kalau pertanyaan pertama adalah "kenapa terasa berat?" — dan jawaban pertama saya hampir selalu salah: saya menyalahkan JavaScript.
+
+## Frame budget ternyata dihabiskan GPU
+
+Saat saya profil build produksi (7 September 2026), trace devtools saat scroll menunjukkan sekitar **17,5 detik di Commit** dan **14,9 detik di GPUTask**, dibanding hanya **0,6 detik layout** dan **1,1 detik style**. Profil CPU sepakat: 74,7% sampel ada di `(program)`, yaitu render engine, bukan kode aplikasi.
+
+Penyebabnya struktural. Beberapa layer satu layar penuh beranimasi bersamaan, dan di atasnya ada puluhan aturan `backdrop-filter` dan `filter: blur`. Setiap redraw canvas adalah upload tekstur satu viewport penuh, dan panel yang diburamkan harus diburamkan ulang setiap kali latar yang bergerak di bawahnya berubah.
+
+Ada efek samping yang membingungkan: setelah saya memangkas kerja main thread lebih dari 80%, FPS mentah di mesin cepat malah terlihat **lebih rendah**. Itu karena frame sudah terikat GPU, jadi FPS dibatasi waktu GPU per frame, bukan CPU. Pelajarannya: nilai perubahan dari run dengan CPU di-throttle 4x dan dari kategori trace, bukan dari angka FPS di layar refresh tinggi.
+
+## Tiga biaya efek pointer
+
+Saat membangun parabola di bagian Contact, saya mengisolasi tiap biaya dengan A/B yang hanya menukar `pointer-events` pada container, sehingga DOM dan state paint identik di kedua sisi. Urutan ronde diacak, karena sweep pertama setelah menyuntik style selalu lebih lambat dan membuat atribusi salah. Dua kesimpulan saya sempat keliru sebelum diacak.
+
+### 1. Jangan menulis custom property yang diwariskan pada container tiap frame
+
+Menulis `--x` di panel membuat style semua keturunannya tidak valid: sekitar **7 ms per frame**. Tulis properti konkret langsung pada satu elemen daun yang memakainya.
+
+### 2. Jangan memutar atau menggeser `<g>` SVG tiap frame
+
+Transform pada anak SVG tidak di-composite, sehingga seluruh gambar di-rasterize ulang. p95 frame time **27,8 ms**, dibanding 21,0 ms ketika gambarnya tidak dipaint sama sekali.
+
+Solusinya: pisahkan gambar menjadi satu SVG statis dan satu SVG kedua di dalam wrapper HTML ber-`position: absolute`, lalu transformasikan wrapper itu dengan `will-change: transform`. Satu perubahan ini membawa panel dari p95 **27,8 ms ke 7,4 ms** dibanding kontrol 7,1 ms — halaman pindah dari setengah refresh rate ke refresh rate penuh.
+
+### 3. Jangan memakai CSS transition sebagai easing untuk nilai yang berubah tiap frame
+
+Transition yang targetnya bergerak terus-menerus memulai ulang mesin animasi tanpa henti, dan itu menyumbang sekitar 6 ms di ekor distribusi. Lakukan lerp di `requestAnimationFrame` yang sudah berjalan, dan berhenti menjadwalkan frame begitu nilainya settle.
+
+```ts
+// Ease in JS, and stop scheduling once the value has settled.
+function step() {
+  current += (target - current) * 0.16;
+  el.style.transform = `rotate(${current}deg)`;
+  frame = Math.abs(target - current) > 0.01 ? requestAnimationFrame(step) : 0;
+}
+```
+
+Ketiganya berlaku untuk semua efek hover, tilt, dan spotlight di situs ini, bukan hanya panel Contact. Satu hal lagi: lapisan "cahaya yang mengikuti pointer" ukuran tetap tetap mengecat ulang panel di belakangnya tiap frame. Efek itu saya buang karena biayanya lebih besar daripada yang terlihat.
+
+## Dua optimasi yang gagal
+
+- **Meng-unmount canvas tabung saat di luar layar.** Terdengar hemat, tapi menyebabkan hitch re-init 150–250 ms di tengah scroll.
+- **Mengganti fungsi `render` library dengan no-op.** Loop internalnya malah berputar sekitar 4x lebih cepat sebagai busy loop.
+
+## Jank scroll pertama adalah masalah yang berbeda
+
+Stutter yang hanya muncul pada lintasan pertama halaman bukan biaya per frame, melainkan kerja satu kali. Ukur dengan perbandingan scroll pertama dan kedua, bukan rata-rata FPS. Penyebab yang saya konfirmasi: byte yang di-decode di tengah scroll, dan kompilasi pipeline WebGL yang ditunda Chrome sampai canvas mendekati viewport.
+
+Canvas tabung membayar sekitar **700 ms** saat bagian Horizon pertama kali didekati. Itu waktu kompilasi, bukan waktu piksel: memangkas resolusinya 4x tidak mengubah apa pun. Memaksa kompilasi lebih awal dengan me-resize wrapper memang menghilangkan stall, tapi resize setelah init membuat library menghitung geometri NaN, sehingga tabung bisa hilang di beberapa GPU. Karena itu perbaikan tersebut saya cabut. Percobaan berikutnya harus punya jalur warm-up yang tidak pernah me-resize canvas setelah init.
+
+## Yang saya ambil dari ini
+
+1. Ukur dulu, baru percaya pada intuisi. Intuisi saya bilang JavaScript; trace bilang GPU.
+2. Optimasi tidak selalu menang. Dua dari yang saya coba harus dibatalkan.
+3. Cara paling jujur untuk mempercepat situs seperti ini adalah **mengurangi jumlah layer layar penuh yang bergerak bersamaan** — dan itu keputusan desain, bukan sekadar teknis.

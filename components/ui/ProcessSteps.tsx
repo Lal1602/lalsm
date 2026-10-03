@@ -12,6 +12,7 @@ import {
   SkyStars,
 } from "./ascentSky";
 import CosmicNebulaSeam from "./CosmicNebulaSeam";
+import { useLite } from "@/lib/lite";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -138,6 +139,7 @@ function reducedMotion() {
 }
 
 export default function ProcessSteps() {
+  const { lite } = useLite();
   const sectionRef = useRef<HTMLElement>(null);
   const deckRef = useRef<HTMLDivElement>(null);
   const packetXRef = useRef<HTMLElement>(null);
@@ -469,7 +471,7 @@ export default function ProcessSteps() {
       </div>
 
       {/* 100% Pure Code Procedural Volumetric Nebula Cloudscape Seam (Upper Half) */}
-      <CosmicNebulaSeam part="upper" />
+      {!lite && <CosmicNebulaSeam part="upper" />}
 
       <div className="container">
         <header className="ascent-head">

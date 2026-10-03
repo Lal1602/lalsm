@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { profile } from "@/data/profile";
+import { PREFILL_CONTACT_EVENT, type PrefillContactDetail } from "@/lib/events";
+import { track } from "@/lib/analytics";
 
 /*
   CONTACT — Ground Station SUB-1
@@ -19,7 +22,11 @@ import { useEffect, useRef, useState } from "react";
   Everything that moves here is a transform, an opacity, or a text node.
 */
 
-const WEB3FORMS_KEY = "25ba6941-8e69-4b9f-b267-15d2cd90f679";
+// Web3Forms access keys are public by design (they ship in the page either way).
+// Restrict the key to this site's domain in the Web3Forms dashboard, and set
+// NEXT_PUBLIC_WEB3FORMS_KEY to rotate it without touching the code.
+const WEB3FORMS_KEY =
+  process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "25ba6941-8e69-4b9f-b267-15d2cd90f679";
 
 // Surabaya, in DMS — 7.2575°S, 112.7521°E.
 const STATION_LAT = "07°15′27″ S";
@@ -91,6 +98,21 @@ export default function ContactSection() {
   const [packetId, setPacketId] = useState("");
   const [clock, setClock] = useState("");
   const [visitorTime, setVisitorTime] = useState("");
+  const [honeypot, setHoneypot] = useState(false);
+
+  // Other sections (the project estimator) can pre-fill the message. They cannot
+  // write to the textarea directly: it is controlled, so React would never see it.
+  useEffect(() => {
+    const onPrefill = (event: Event) => {
+      const { message: prefill } = (event as CustomEvent<PrefillContactDetail>).detail ?? {};
+      if (typeof prefill === "string" && prefill) {
+        setMessage(prefill);
+        setStatus((current) => (current === "sent" ? "idle" : current));
+      }
+    };
+    window.addEventListener(PREFILL_CONTACT_EVENT, onPrefill);
+    return () => window.removeEventListener(PREFILL_CONTACT_EVENT, onPrefill);
+  }, []);
 
   // Station clock — the station keeps Jakarta time whoever is looking at it.
   useEffect(() => {
@@ -243,6 +265,12 @@ export default function ContactSection() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (status === "sending") return;
+
+    // A bot filled the hidden field: report success and send nothing.
+    if (honeypot) {
+      setStatus("sent");
+      return;
+    }
     setStatus("sending");
 
     try {
@@ -256,11 +284,13 @@ export default function ContactSection() {
           name,
           email,
           message,
+          botcheck: honeypot,
         }),
       });
       const result = await response.json();
       if (!response.ok || !result?.success) throw new Error(result?.message ?? "rejected");
 
+      track("contact_submit");
       setPacketId(makePacketId());
       setStatus("sent");
       setName("");
@@ -433,6 +463,17 @@ export default function ContactSection() {
                 >
                   {/* Kept so the form still submits if the script never runs. */}
                   <input type="hidden" name="access_key" value={WEB3FORMS_KEY} />
+                  {/* Honeypot: invisible to people, tempting to bots. */}
+                  <input
+                    type="checkbox"
+                    name="botcheck"
+                    checked={honeypot}
+                    onChange={(e) => setHoneypot(e.target.checked)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+                  />
 
                   <div className="composer-head">
                     <span className="composer-title">Payload Composer</span>
@@ -454,6 +495,7 @@ export default function ContactSection() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
+                        maxLength={100}
                         autoComplete="name"
                         placeholder=" "
                       />
@@ -490,6 +532,7 @@ export default function ContactSection() {
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         required
+                        maxLength={5000}
                         placeholder=" "
                       />
                       <label htmlFor="contact-message">Message</label>
@@ -530,7 +573,7 @@ export default function ContactSection() {
                       role="status"
                     >
                       {status === "error"
-                        ? "Uplink refused the packet. Mail me directly at bilal.lalsm@gmail.com."
+                        ? `Uplink refused the packet. Mail me directly at ${profile.email}.`
                         : "Typical response ≤ 24h"}
                     </p>
                   </div>

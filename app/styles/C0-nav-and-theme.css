@@ -1,0 +1,1453 @@
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM CUSTOM HAMBURGER MENU NAV & OVERLAY STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Toggle Button (Hidden by default on Desktop) */
+.menu-toggle-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  z-index: 200;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  outline: none;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.hamburger-line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--accent-cyan);
+  border-radius: 2px;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+  box-shadow: 0 0 6px rgba(0, 243, 255, 0.35);
+}
+
+.menu-toggle-btn:hover .hamburger-line {
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* Open/Close transform mechanics */
+.menu-toggle-btn.active .line-1 {
+  transform: translateY(7px) rotate(45deg);
+  background-color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.menu-toggle-btn.active .line-2 {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.menu-toggle-btn.active .line-3 {
+  transform: translateY(-7px) rotate(-45deg);
+  background-color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+/* Fullscreen Responsive Mobile Drawer Overlay */
+.nav-overlay-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  background: rgba(4, 4, 6, 0.94);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 40px 60px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-30px);
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    pointer-events 0s linear 0.4s;
+  overflow: hidden;
+}
+
+.nav-overlay-panel.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    pointer-events 0s linear 0s;
+}
+
+.overlay-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 25px 25px;
+  pointer-events: none;
+  z-index: 1;
+  mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
+}
+
+.overlay-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.glow-cyan {
+  width: 250px;
+  height: 250px;
+  background-color: var(--accent-cyan);
+  top: -30px;
+  left: -30px;
+  animation: float-glow-1 10s infinite alternate ease-in-out;
+}
+
+.glow-purple {
+  width: 270px;
+  height: 270px;
+  background-color: var(--accent-purple);
+  bottom: -30px;
+  right: -30px;
+  animation: float-glow-2 12s infinite alternate ease-in-out;
+}
+
+.mobile-nav-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  z-index: 5;
+  perspective: 800px;
+}
+
+.mobile-nav-link {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 6.5vw, 2.3rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--text-main);
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  display: inline-block;
+  transition: color 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mobile-nav-link .link-num {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+@media (max-width: 380px) {
+  .mobile-nav-link {
+    font-size: clamp(1.2rem, 5.8vw, 1.6rem);
+  }
+
+  .mobile-nav-link .link-num {
+    right: calc(100% + 8px);
+    font-size: 0.65rem;
+  }
+}
+
+.mobile-btn-achievements {
+  color: var(--accent-gold) !important;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.15);
+}
+
+.mobile-btn-achievements .link-num {
+  color: rgba(255, 215, 0, 0.3) !important;
+}
+
+.mobile-nav-link:hover {
+  color: var(--accent-cyan);
+  transform: translateX(6px) scale(1.04);
+}
+
+.mobile-nav-link:hover .link-num {
+  color: var(--accent-cyan);
+}
+
+.mobile-btn-achievements:hover {
+  color: var(--accent-gold) !important;
+  text-shadow: 0 0 16px var(--accent-gold);
+}
+
+.overlay-hud-footer {
+  position: absolute;
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.01);
+  z-index: 5;
+}
+
+.overlay-hud-footer .hud-code-label {
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.overlay-hud-footer .hud-pulse-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  animation: neon-pulse 1.4s infinite ease-in-out;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THEME TOGGLE SWITCH & DYNAMIC LIGHT MODE SYSTEM
+   ═══════════════════════════════════════════════════════════ */
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 101;
+}
+
+/* Theme Toggle Capsule Button */
+.theme-toggle-switch {
+  position: relative;
+  width: 58px;
+  height: 28px;
+  background: rgba(15, 15, 20, 0.7);
+  /* Charcoal transparan */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+}
+
+.theme-toggle-switch:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Icons */
+.theme-icon {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  z-index: 2;
+  transition: color 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.theme-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.theme-toggle-switch.dark .moon-icon {
+  color: #00f3ff;
+  /* Active cyan glow for dark mode moon */
+  transform: scale(1.1);
+}
+
+.theme-toggle-switch.light .sun-icon {
+  color: #ffd700;
+  /* Active gold glow for light mode sun */
+  transform: scale(1.1);
+}
+
+/* Slider Knob */
+.theme-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  z-index: 1;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+  box-shadow: 0 0 6px rgba(188, 19, 254, 0.4);
+}
+
+/* Dark mode knob position (left) */
+.theme-toggle-switch.dark .theme-toggle-knob {
+  transform: translateX(0);
+}
+
+/* Light mode knob position (right) */
+.theme-toggle-switch.light .theme-toggle-knob {
+  transform: translateX(30px);
+  background: linear-gradient(135deg, #8A6AB0, #bc13fe);
+  /* Muted purple to purple */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6), 0 0 14px rgba(188, 19, 254, 0.3);
+  /* warm yellow-purple glow */
+}
+
+/* ── SMOOTH THEME TRANSITION SYSTEM ── */
+
+/* Smoothly animate background and text transitions for all component structures */
+html,
+body,
+header,
+footer,
+nav,
+main,
+section,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+button,
+input,
+textarea,
+span:not(.cursor-text):not(.hamburger-line):not(.bay-scan):not(.bay-divider),
+div:not(.cursor-dot):not(.cursor-outline):not(.burst-particle):not(#canvas-container):not(.three-webgl-canvas-wrap):not(.physics-canvas):not(.bay-body) {
+  transition: background-color 0.4s ease,
+    color 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease,
+    text-shadow 0.4s ease,
+    opacity 0.4s ease;
+}
+
+/* Why .bay-scan / .bay-divider / .bay-body are excluded above: this rule's
+   property list has no `transform`, and it outranks their own declarations on
+   both specificity and source order. Left in, the scanner would jump between
+   bays instead of sliding and the active bay would snap up rather than dock —
+   the same reason the cursor and the canvases are carved out. Their colours
+   still cross-fade, on the transitions declared with the rest of the bay CSS. */
+
+/* Ensure mouse follow outlines, canvases, and special animations are completely isolated from CSS transitions to keep mouse interaction ultra-responsive */
+.cursor-dot,
+.cursor-outline {
+  transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    height 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    background-color 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s !important;
+}
+
+.cursor-text,
+.burst-particle,
+#canvas-container,
+#canvas-container canvas,
+.three-webgl-canvas-wrap,
+.three-webgl-canvas-wrap canvas,
+.physics-canvas,
+.physics-canvas canvas {
+  transition: none !important;
+}
+
+/* Base HTML transition to keep page background shifts smooth */
+html {
+  background-color: #050505;
+  transition: background-color 0.4s ease;
+}
+
+html[data-theme="light"] {
+  background-color: #EAEAEF;
+  --bg-color: #EAEAEF;
+  --text-main: #1a1a2e;
+  --text-muted: #555577;
+  --accent-cyan: #007acc;
+  --accent-purple: #8a6ab0;
+  --accent-gold: #b58900;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --concave-center: rgba(220, 220, 230, 0.4);
+  --concave-edge: rgba(234, 234, 239, 0.98);
+  --concave-shadow: rgba(0, 0, 0, 0.15);
+}
+
+/* Body dynamic background layers to avoid page transition gaps and flashing */
+body {
+  position: relative;
+  background-color: #050505;
+}
+
+/* Pseudo element hosts light gradient layer, fading in smoothly */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, #F5F5F0 0%, #EAEAEF 100%) no-repeat fixed;
+  background-color: #EAEAEF;
+  z-index: -2;
+  /* Sits behind Three.js canvas and content */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* Make light background layer fully visible in light mode */
+html[data-theme="light"] body::before {
+  opacity: 1;
+}
+
+/* ── LIGHT MODE STYLING SYSTEM ── */
+html[data-theme="light"] {
+  --bg-color: #eaeaef;
+  --text-main: #2c2c2c;
+  /* Abu-abu arang sangat gelap */
+  --text-muted: #555555;
+  /* Abu-abu medium */
+  --accent-cyan: #608080;
+  /* Slate teal */
+  --accent-purple: #8a6ab0;
+  /* Dusty purple */
+  --glass-bg: rgba(0, 0, 0, 0.02);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --concave-center: rgba(255, 255, 255, 0.6);
+  --concave-edge: rgba(220, 220, 225, 0.95);
+  --concave-shadow: rgba(180, 180, 190, 0.4);
+}
+
+html[data-theme="light"] body {
+  background-color: #eaeaef !important;
+  color: #2c2c2c !important;
+}
+
+/* Specific Light Mode Overrides */
+
+/* Preloader */
+html[data-theme="light"] .preloader {
+  background-color: #fbfbf9 !important;
+  color: #8a6ab0 !important;
+}
+
+html[data-theme="light"] .preloader .loading-bar-fill {
+  background: linear-gradient(90deg, #608080, #8a6ab0) !important;
+}
+
+/* Navbar styles */
+html[data-theme="light"] .navbar {
+  background: rgba(245, 245, 240, 0.82) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+html[data-theme="light"] .logo {
+  color: #2c2c2c !important;
+  text-shadow: none !important;
+}
+
+html[data-theme="light"] .nav-link {
+  color: #555555 !important;
+}
+
+html[data-theme="light"] .nav-link:hover {
+  color: #8a6ab0 !important;
+}
+
+html[data-theme="light"] .btn-achievements {
+  border-color: rgba(212, 175, 55, 0.4) !important;
+  color: #b58900 !important;
+  /* readable amber gold */
+  background: rgba(212, 175, 55, 0.06) !important;
+  animation: pulse-gold-light 2.5s infinite !important;
+}
+
+@keyframes pulse-gold-light {
+  0% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.2);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+}
+
+/* Glitch typography */
+html[data-theme="light"] .glitch-text {
+  color: #2c2c2c !important;
+}
+html[data-theme="light"] .glitch-text::before {
+  text-shadow: -1px 0 rgba(138, 106, 176, 0.55) !important;
+}
+html[data-theme="light"] .glitch-text::after {
+  text-shadow: -1px 0 rgba(96, 128, 128, 0.55) !important;
+}
+
+/* Sections & Title */
+html[data-theme="light"] .section-title {
+  background: linear-gradient(90deg, #2c2c2c, #555555) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+html[data-theme="light"] .section-title::after {
+  background: #608080 !important;
+  box-shadow: 0 0 10px rgba(96, 128, 128, 0.4) !important;
+}
+
+/* Hero elements styling */
+html[data-theme="light"] .image-blob {
+  border-color: rgba(150, 220, 230, 0.8) !important;
+  box-shadow: 0 0 35px rgba(150, 220, 230, 0.5) !important;
+}
+html[data-theme="light"] .stats-badge {
+  background: #4A3A4A !important; /* Aubrey/dark eggplant focal point */
+  border-color: #8A6AB0 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 25px rgba(74, 58, 74, 0.35) !important;
+}
+html[data-theme="light"] .stats-badge * {
+  color: #FFFFFF !important;
+}
+
+/* General Button Styles */
+html[data-theme="light"] .btn {
+  color: #2c2c2c !important;
+  border-color: #608080 !important;
+  background: rgba(96, 128, 128, 0.08) !important;
+}
+html[data-theme="light"] .btn:hover {
+  background: #608080 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(96, 128, 128, 0.4) !important;
+}
+html[data-theme="light"] .btn-group a[href="#projects"] {
+  background: #8a6ab0 !important;
+  border-color: #8a6ab0 !important;
+  color: #ffffff !important;
+}
+html[data-theme="light"] .btn-group a[href="#projects"]:hover {
+  background: #735496 !important;
+  border-color: #735496 !important;
+  box-shadow: 0 0 20px rgba(138, 106, 176, 0.4) !important;
+}
+html[data-theme="light"] .scroll-indicator {
+  color: #8a6ab0 !important;
+}
+
+/* About (What I Build) + Process (How I Work) — light mode.
+   Only the values that assume a dark ground need restating; the tone ramps
+   are re-pitched darker so they still carry on white. */
+html[data-theme="light"] .bays-eyebrow,
+html[data-theme="light"] .ascent-eyebrow {
+  color: rgba(0, 0, 0, 0.42);
+}
+
+/* The scrim inverts: on white, the job is to lift the bays off the field
+   rather than to darken it behind them. */
+html[data-theme="light"] .bay-deck::before {
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.72) 12%,
+      rgba(255, 255, 255, 0.72) 88%,
+      rgba(255, 255, 255, 0) 100%);
+}
+
+html[data-theme="light"] .bay-stack {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="light"] .bay-deck {
+  --row-tone-rgb: 0, 0, 0;
+}
+
+html[data-theme="light"] .bay--cyan,
+html[data-theme="light"] .bay-deck[data-tone="cyan"] {
+  --tone: #1c86b4;
+  --tone-rgb: 28, 134, 180;
+  --row-tone: #1c86b4;
+  --row-tone-rgb: 28, 134, 180;
+}
+
+html[data-theme="light"] .bay--violet,
+html[data-theme="light"] .bay-deck[data-tone="violet"] {
+  --tone: #6248d6;
+  --tone-rgb: 98, 72, 214;
+  --row-tone: #6248d6;
+  --row-tone-rgb: 98, 72, 214;
+}
+
+html[data-theme="light"] .bay--gold,
+html[data-theme="light"] .bay-deck[data-tone="gold"] {
+  --tone: #b0741c;
+  --tone-rgb: 176, 116, 28;
+  --row-tone: #b0741c;
+  --row-tone-rgb: 176, 116, 28;
+}
+
+/* A tinted wash that carried on black all but disappears on white, so the
+   scanner leans on its lit edge and its hotspot instead of on the fill. */
+html[data-theme="light"] .bay-scan {
+  border-left-color: rgba(var(--row-tone-rgb), 0.55);
+  background: linear-gradient(180deg,
+      rgba(var(--row-tone-rgb), 0) 0%,
+      rgba(var(--row-tone-rgb), 0.06) 26%,
+      rgba(var(--row-tone-rgb), 0.028) 72%,
+      rgba(var(--row-tone-rgb), 0) 100%);
+}
+
+html[data-theme="light"] .bay-rail-id,
+html[data-theme="light"] .bays-hint {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="light"] .bay-rail-line {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.05));
+}
+
+html[data-theme="light"] .bay-rail-out,
+html[data-theme="light"] .bay-swipe {
+  color: rgba(0, 0, 0, 0.42);
+}
+
+html[data-theme="light"] .bay-deck[data-scanning] .bay-rail-out {
+  color: rgba(0, 0, 0, 0.72);
+}
+
+html[data-theme="light"] .bay-chip:focus-visible {
+  outline-color: var(--tone);
+}
+
+html[data-theme="light"] .bay-divider {
+  background-color: rgba(0, 0, 0, 0.11);
+}
+
+html[data-theme="light"] .mt-ring {
+  stroke: rgba(0, 0, 0, 0.16);
+}
+
+html[data-theme="light"] .mt-tick {
+  stroke: rgba(0, 0, 0, 0.24);
+}
+
+html[data-theme="light"] .mt-dash {
+  stroke: rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="light"] .bay-glyph {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="light"] .bay-code {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="light"] .bay[data-active] .bay-code {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+html[data-theme="light"] .bay-name {
+  color: #1a1a2e;
+}
+
+html[data-theme="light"] .bay-name em {
+  color: rgba(0, 0, 0, 0.42);
+}
+
+html[data-theme="light"] .bay-brief {
+  color: rgba(0, 0, 0, 0.58);
+}
+
+html[data-theme="light"] .bay[data-active] .bay-brief {
+  color: rgba(0, 0, 0, 0.76);
+}
+
+html[data-theme="light"] .bay-stack li {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="light"] .bay[data-active] .bay-stack li {
+  color: rgba(0, 0, 0, 0.78);
+}
+
+/* ── The orbital deck at dawn ───────────────────────────────────────────────
+   The section is a stretch of sky, so the light theme does not delete it — it
+   moves it to a few hours later. The nebula becomes the last of the night
+   burning off into peach and lavender, the stars invert to the specks you can
+   still just see, and the planets turn to lit silhouettes. Only the values that
+   assume a dark ground are restated; the tone ramp below is already re-pitched
+   for this theme.
+
+   Nothing here shares a selector with .bay* — those four shared rules further
+   up are the only reason this block is fiddly to edit, so no new ones are
+   added. */
+
+html[data-theme="light"] .ascent {
+  --stage-tone-0: #1c86b4;
+  --stage-tone-0-rgb: 28, 134, 180;
+  --stage-tone-1: #6248d6;
+  --stage-tone-1-rgb: 98, 72, 214;
+  --stage-tone-2: #b0741c;
+  --stage-tone-2-rgb: 176, 116, 28;
+  --stage-tone-3: #c2411f;
+  --stage-tone-3-rgb: 194, 65, 31;
+}
+
+html[data-theme="light"] .hiw-sky {
+  background:
+    radial-gradient(140% 120% at 50% 50%, rgba(255, 255, 255, 0.5), transparent 70%),
+    linear-gradient(175deg, #eff2f9 0%, #e7ecf7 38%, #eaeef7 66%, #f1f3f9 100%);
+}
+
+/* The clouds keep their shapes and lose their luminosity: on a pale ground a
+   nebula reads as tint, not as light. */
+html[data-theme="light"] .hiw-cloud {
+  background: radial-gradient(ellipse at 42% 46%,
+      rgba(var(--c), calc(var(--a) * 1.15)) 0%,
+      rgba(var(--c), calc(var(--a) * 0.5)) 38%,
+      rgba(var(--c), 0) 72%);
+  mix-blend-mode: multiply;
+}
+
+html[data-theme="light"] .cosmic-nebula-seam-container {
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+
+html[data-theme="light"] .horizon-top-nebula-glow {
+  mix-blend-mode: multiply;
+  opacity: 0.4;
+}
+
+html[data-theme="light"] .horizon-top-cyber-grid {
+  background-image:
+    linear-gradient(rgba(98, 72, 214, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28, 134, 180, 0.06) 1px, transparent 1px);
+}
+
+/* Faint dark specks rather than white ones. No filter is used to get there —
+   the fill is simply restated, which is why the star layer is CSS-coloured
+   rather than carrying its colour as an attribute. */
+html[data-theme="light"] .hiw-star {
+  fill: #333d5c;
+}
+
+html[data-theme="light"] .hiw-star.is-warm {
+  fill: #6b4a32;
+}
+
+html[data-theme="light"] .hiw-star.is-cold {
+  fill: #2c4570;
+}
+
+html[data-theme="light"] .hiw-glint::before {
+  background: linear-gradient(90deg, transparent, rgba(60, 74, 110, 0.5), transparent);
+}
+
+html[data-theme="light"] .hiw-glint::after {
+  background: linear-gradient(180deg, transparent, rgba(60, 74, 110, 0.5), transparent);
+}
+
+/* Lit bodies, not dark ones: the crescent stays but the disc comes up out of
+   the background instead of sinking into it. */
+/* At dawn the worlds are lit from the same side but the contrast inverts: the
+   body has to be DARKER than the sky rather than lighter, or it vanishes into
+   the white the same way it vanished into the black before. Rim goes warm,
+   because the light source at this hour is low and orange. */
+html[data-theme="light"] .hiw-orb::after {
+  background: radial-gradient(circle closest-side,
+      transparent 0 95.4%,
+      rgba(255, 198, 142, 0.42) 98%,
+      rgba(255, 214, 170, 0.14) 99.4%,
+      transparent 100%);
+}
+
+html[data-theme="light"] .hiw-orb-a {
+  background: radial-gradient(circle at 20% 42%,
+      rgba(206, 200, 228, 0.82) 0%,
+      rgba(180, 186, 214, 0.86) 24%,
+      rgba(156, 166, 198, 0.9) 52%,
+      rgba(138, 150, 186, 0.94) 80%);
+  box-shadow:
+    inset 26px 16px 0 -19px rgba(255, 244, 224, 1),
+    inset 34px 22px 26px -26px rgba(255, 216, 176, 0.9),
+    0 0 34px -10px rgba(226, 190, 236, 0.5);
+}
+
+html[data-theme="light"] .hiw-orb-b {
+  background: radial-gradient(circle at 60% 22%,
+      rgba(210, 202, 230, 0.82) 0%,
+      rgba(184, 188, 216, 0.86) 22%,
+      rgba(158, 168, 200, 0.9) 50%,
+      rgba(140, 152, 188, 0.94) 80%);
+  box-shadow:
+    inset -12px 16px 0 -10px rgba(255, 246, 228, 1),
+    inset -18px 24px 22px -18px rgba(255, 214, 176, 0.85),
+    0 0 30px -8px rgba(220, 186, 232, 0.45);
+}
+
+html[data-theme="light"] .hiw-c-line {
+  stroke: rgba(70, 86, 128, 0.45);
+}
+
+html[data-theme="light"] .hiw-c-line.is-faint {
+  stroke: rgba(70, 86, 128, 0.24);
+}
+
+html[data-theme="light"] .hiw-c-star {
+  fill: #3a4668;
+}
+
+html[data-theme="light"] .hiw-c-star[data-i="5"],
+html[data-theme="light"] .hiw-c-star[data-i="2"] {
+  fill: #1a2138;
+}
+
+/* A white streak on white is nothing, so the flare drops to a warm haze that
+   only has to suggest where the light is coming from. */
+html[data-theme="light"] .ascent-title {
+  color: #17182c;
+  text-shadow: none;
+}
+
+html[data-theme="light"] .hiw-flare {
+  background:
+    radial-gradient(ellipse 40% 4.5% at 40% 50%, rgba(255, 206, 158, 0.5), transparent 74%),
+    radial-gradient(ellipse 22% 15% at 34% 50%, rgba(214, 194, 255, 0.34), transparent 72%),
+    radial-gradient(ellipse 13% 20% at 12% 52%, rgba(242, 156, 92, 0.3), transparent 74%);
+}
+
+html[data-theme="light"] .hiw-ring {
+  stroke: rgba(60, 80, 130, 0.28);
+}
+
+/* A white core is invisible here; the tone has to carry the station. */
+html[data-theme="light"] .hiw-core {
+  background: var(--tone);
+  box-shadow: 0 0 10px 2px rgba(var(--tone-rgb), 0.55);
+}
+
+html[data-theme="light"] .hiw-spike-h {
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(var(--tone-rgb), 0.85) 32%,
+      rgba(var(--tone-rgb), 1) 50%,
+      rgba(var(--tone-rgb), 0.85) 68%,
+      transparent);
+}
+
+html[data-theme="light"] .hiw-spike-v {
+  background: linear-gradient(180deg,
+      transparent,
+      rgba(var(--tone-rgb), 0.7) 34%,
+      rgba(var(--tone-rgb), 1) 50%,
+      rgba(var(--tone-rgb), 0.7) 66%,
+      transparent);
+}
+
+/* The eclipse keeps its dark body — it is the one thing in the section that is
+   meant to be a hole in the sky at any hour. */
+html[data-theme="light"] .hiw-station[data-i="2"] .hiw-core {
+  background: #1a2138;
+  box-shadow:
+    0 0 14px 2px rgba(var(--tone-rgb), 0.55),
+    inset 0 0 8px 1px rgba(var(--tone-rgb), 0.3);
+}
+
+html[data-theme="light"] .hiw-read {
+  color: rgba(0, 0, 0, 0.42);
+}
+
+/* White is not a light on white. Both markers take the last stage's ember so
+   they still read as one travelling thing. */
+html[data-theme="light"] .hiw-packet {
+  background: var(--stage-tone-3);
+  box-shadow: 0 0 10px 1px rgba(var(--stage-tone-3-rgb), 0.45);
+}
+
+html[data-theme="light"] .hiw-packet::after {
+  background: linear-gradient(270deg, rgba(var(--stage-tone-3-rgb), 0.7), transparent);
+}
+
+html[data-theme="light"] .hiw-drift {
+  background: rgba(var(--stage-tone-3-rgb), 0.8);
+}
+
+/* Glass on a pale sky: the tint stays, the ground under it flips. The card has
+   to gain opacity here — a translucent panel over a bright sky loses its text,
+   which is the opposite of the problem it solves at night. */
+html[data-theme="light"] .hiw-card {
+  border-color: rgba(0, 0, 0, 0.1);
+  background:
+    linear-gradient(152deg,
+      rgba(var(--tone-rgb), 0.2) 0%,
+      rgba(var(--tone-rgb), 0.08) 30%,
+      rgba(255, 255, 255, 0.82) 62%,
+      rgba(255, 255, 255, 0.9) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 34px -14px rgba(var(--tone-rgb), 0.35),
+    0 16px 38px rgba(58, 70, 104, 0.15);
+}
+
+html[data-theme="light"] .hiw-card[data-active] {
+  border-color: rgba(var(--tone-rgb), 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 44px -14px rgba(var(--tone-rgb), 0.5),
+    0 0 0 1px rgba(var(--tone-rgb), 0.18),
+    0 20px 44px rgba(58, 70, 104, 0.2),
+    0 0 44px -14px rgba(var(--tone-rgb), 0.5);
+}
+
+html[data-theme="light"] .hiw-glow {
+  opacity: 0.42;
+}
+
+html[data-theme="light"] .hiw-num-base {
+  -webkit-text-stroke-width: 1.4px;
+  -webkit-text-stroke-color: rgba(var(--tone-rgb), 0.85);
+}
+
+html[data-theme="light"] .hiw-time {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="light"] .hiw-name {
+  color: #1a1a2e;
+}
+
+html[data-theme="light"] .hiw-desc {
+  color: rgba(28, 34, 54, 0.78);
+}
+
+html[data-theme="light"] .hiw-badge-core {
+  background: var(--tone);
+}
+
+html[data-theme="light"] .hiw-badge-read {
+  color: rgba(0, 0, 0, 0.75);
+}
+
+html[data-theme="light"] .hiw-badge-sub {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="light"] .hiw-load {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="light"] .hiw-out {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="light"] .hiw-card[data-active] .hiw-out {
+  color: rgba(0, 0, 0, 0.75);
+}
+
+/* The rail — the one override the CV rail never got, so it is written here
+   rather than left to be discovered on a phone in daylight. */
+@media (max-width: 860px) {
+  html[data-theme="light"] .hiw-swipe {
+    color: rgba(0, 0, 0, 0.45);
+  }
+
+  html[data-theme="light"] .hiw-dot {
+    background: rgba(0, 0, 0, 0.18);
+  }
+}
+
+
+
+/* Process Dashboard & physics lab */
+html[data-theme="light"] .lab-terminal {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.04) !important;
+}
+
+html[data-theme="light"] .terminal-title,
+html[data-theme="light"] .readout-label {
+  color: #555555 !important;
+}
+
+html[data-theme="light"] .readout-value {
+  color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .readout-value.active {
+  color: #608080 !important;
+  text-shadow: 0 0 10px rgba(96, 128, 128, 0.2) !important;
+}
+
+html[data-theme="light"] .btn-terminal {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .btn-terminal:hover {
+  background: rgba(96, 128, 128, 0.06) !important;
+  border-color: #608080 !important;
+  color: #608080 !important;
+}
+
+html[data-theme="light"] .btn-terminal.active {
+  background: rgba(138, 106, 176, 0.1) !important;
+  border-color: #8a6ab0 !important;
+  color: #8a6ab0 !important;
+}
+
+/* Glitch cards showcase */
+html[data-theme="light"] .glitch-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+}
+
+html[data-theme="light"] .glitch-card:hover {
+  box-shadow: 0 30px 60px rgba(96, 128, 128, 0.08) !important;
+}
+
+html[data-theme="light"] .card-num {
+  color: #8a6ab0 !important;
+}
+
+html[data-theme="light"] .card-heading {
+  color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .card-text {
+  color: #555555 !important;
+}
+
+html[data-theme="light"] .outro-title {
+  color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .outro-arrow-wrap {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-theme="light"] .outro-arrow {
+  color: #608080 !important;
+  text-shadow: none !important;
+}
+
+/* Projects Cylindrical details modal */
+html[data-theme="light"] .modal-backdrop {
+  background: rgba(230, 230, 235, 0.8) !important;
+}
+
+html[data-theme="light"] .modal-content-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
+
+html[data-theme="light"] .modal-close-btn {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .modal-close-btn:hover {
+  background: rgba(96, 128, 128, 0.08) !important;
+  color: #608080 !important;
+  border-color: #608080 !important;
+}
+
+html[data-theme="light"] .modal-title {
+  color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .modal-desc {
+  color: #555555 !important;
+}
+
+html[data-theme="light"] .modal-img-gradient {
+  background: linear-gradient(to right, transparent 50%, rgba(255, 255, 255, 1) 100%) !important;
+}
+
+@media (max-width: 968px) {
+  html[data-theme="light"] .modal-img-gradient {
+    background: linear-gradient(to top, rgba(255, 255, 255, 1) 15%, transparent 100%) !important;
+  }
+}
+
+html[data-theme="light"] .tech-badge {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  color: #555555 !important;
+}
+
+html[data-theme="light"] .project-hud-instruction {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+html[data-theme="light"] .project-hud-instruction .hud-text {
+  color: #555555 !important;
+}
+
+html[data-theme="light"] .project-loop-bar-track {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+html[data-theme="light"] .project-loop-bar-fill {
+  background: linear-gradient(90deg, #608080, #8a6ab0) !important;
+  box-shadow: 0 0 6px rgba(96, 128, 128, 0.4) !important;
+}
+
+/* Achievements section marquees */
+html[data-theme="light"] .marquee-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+}
+
+html[data-theme="light"] .marquee-card-title {
+  color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .marquee-card-desc {
+  color: #555555 !important;
+}
+
+/* HUD Interactive Status bar */
+html[data-theme="light"] .hud-interactive-status {
+  background: rgba(255, 255, 255, 0.75) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+}
+
+html[data-theme="light"] .hud-interactive-status:has(.hud-pulse-dot.active) {
+  border-color: rgba(96, 128, 128, 0.15) !important;
+  box-shadow: 0 10px 30px rgba(96, 128, 128, 0.04) !important;
+}
+
+html[data-theme="light"] .hud-interactive-status:has(.hud-pulse-dot.active) .hud-status-text {
+  color: #2c2c2c !important;
+}
+
+/* Shared glass cards (CV download card, project estimator) */
+html[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Contact — Ground Station console */
+html[data-theme="light"] .uplink-console {
+  --line: rgba(0, 0, 0, 0.1);
+  --line-soft: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.66) !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.04);
+}
+
+html[data-theme="light"] .uplink-console::before {
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(96, 128, 128, 0.55) 18%,
+      rgba(138, 106, 176, 0.4) 54%,
+      rgba(181, 137, 0, 0.35) 78%,
+      transparent) !important;
+}
+
+html[data-theme="light"] .rail-live {
+  background: #12996b !important;
+  box-shadow: 0 0 0 3px rgba(18, 153, 107, 0.14) !important;
+}
+
+html[data-theme="light"] .station-dish {
+  color: rgba(0, 0, 0, 0.42) !important;
+}
+
+html[data-theme="light"] .dish-bowl-fill {
+  fill: rgba(96, 128, 128, 0.1) !important;
+}
+
+html[data-theme="light"] .composer-progress i {
+  background: rgba(0, 0, 0, 0.14);
+}
+
+html[data-theme="light"] .composer-progress i.is-set {
+  background: var(--live);
+}
+
+html[data-theme="light"] .field-body input,
+html[data-theme="light"] .field-body textarea {
+  border-bottom-color: rgba(0, 0, 0, 0.18) !important;
+  color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .field-body input:focus,
+html[data-theme="light"] .field-body textarea:focus {
+  border-bottom-color: transparent !important;
+}
+
+html[data-theme="light"] .field-body input:-webkit-autofill,
+html[data-theme="light"] .field-body input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #f2f2f5 inset !important;
+  -webkit-text-fill-color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .field-body label {
+  color: #555555 !important;
+}
+
+html[data-theme="light"] .uplink-scope {
+  background: rgba(255, 255, 255, 0.55) !important;
+}
+
+html[data-theme="light"] .scope-axis {
+  stroke: rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-theme="light"] .uplink-send {
+  border-color: rgba(181, 137, 0, 0.5) !important;
+}
+
+html[data-theme="light"] .ack-mark svg {
+  stroke: #12996b !important;
+}
+
+html[data-theme="light"] .uplink-note--error {
+  color: #c0392b !important;
+}
+
+/* Horizon Showcase Grid Backdrop */
+html[data-theme="light"] .horizon-grid-backdrop {
+  background-color: rgba(234, 234, 239, 0.9) !important;
+  background-image:
+    linear-gradient(rgba(96, 128, 128, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 128, 128, 0.05) 1px, transparent 1px) !important;
+}
+
+/* Mega Footer */
+html[data-theme="light"] .mega-footer {
+  background: #eaeaea !important;
+  border-top-color: #608080 !important;
+}
+
+html[data-theme="light"] .footer-grid-bg {
+  background-image:
+    linear-gradient(rgba(96, 128, 128, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 128, 128, 0.025) 1px, transparent 1px) !important;
+}
+
+html[data-theme="light"] .mega-link {
+  -webkit-text-stroke-color: #555555 !important;
+}
+
+html[data-theme="light"] .mega-link:hover,
+html[data-theme="light"] .mega-link.active {
+  color: #608080 !important;
+  -webkit-text-stroke-color: #608080 !important;
+  text-shadow: 0 0 50px rgba(96, 128, 128, 0.3) !important;
+}
+
+html[data-theme="light"] .footer-link {
+  color: #555555 !important;
+}
+
+html[data-theme="light"] .footer-link:hover {
+  color: #608080 !important;
+  text-shadow: none !important;
+}
+
+html[data-theme="light"] .time-display {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #608080 !important;
+}
+
+/* Custom Cursor in Light Mode */
+html[data-theme="light"] .cursor-dot {
+  background-color: #608080 !important;
+}
+
+html[data-theme="light"] .cursor-outline {
+  border-color: #608080 !important;
+}
+
+html[data-theme="light"] .cursor-outline.cursor-active-hover {
+  background-color: rgba(96, 128, 128, 0.12) !important;
+  border-color: #608080 !important;
+  box-shadow: 0 0 15px rgba(96, 128, 128, 0.3) !important;
+}
+
+/* Scroll progress bar */
+html[data-theme="light"] .scroll-progress-bar {
+  background: linear-gradient(90deg, #608080, #8a6ab0) !important;
+  box-shadow: 0 0 10px rgba(96, 128, 128, 0.4) !important;
+}
+
+/* ── REVISI MODE TERANG & MODE GELAP KONTRAST ── */
+
+/* 1. Mencegah background watermark parallax teks (giant text) tidak kelihatan di mode terang */
+html[data-theme="light"] .parallax-text {
+  color: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* 2. Slide Hero horizontal scroller — deliberately NOT re-coloured for light
+   mode. The Horizon section keeps its dark ground in both themes, so the old
+   dark-text overrides here rendered black on black. They were written against
+   .horizon-grid-backdrop, which the pixel-stars canvas replaced. */
+
+/* 5. Achievements marquee cards di mode terang */
+html[data-theme="light"] .marquee-card {
+  border-color: rgba(0, 0, 0, 0.09) !important;
+}
+
+html[data-theme="light"] .marquee-card:hover .marquee-card-title {
+  color: #2c2c2c !important;
+}
+
+html[data-theme="light"] .marquee-card:hover .marquee-card-title em {
+  color: #8a6ab0 !important;
+}
+
+html[data-theme="light"] .marquee-card:nth-child(even):hover .marquee-card-title em {
+  color: #b58900 !important;
+}
+
+html[data-theme="light"] .marquee-card-btn {
+  border-color: rgba(96, 128, 128, 0.3) !important;
+  background: rgba(96, 128, 128, 0.06) !important;
+  color: #608080 !important;
+}
+
+html[data-theme="light"] .marquee-card:nth-child(even) .marquee-card-btn {
+  border-color: rgba(212, 175, 55, 0.35) !important;
+  background: rgba(212, 175, 55, 0.06) !important;
+  color: #b58900 !important;
+}
+
+html[data-theme="light"] .marquee-card-btn:hover {
+  background: rgba(96, 128, 128, 0.12) !important;
+  border-color: rgba(96, 128, 128, 0.6) !important;
+}
+
+html[data-theme="light"] .marquee-card:nth-child(even) .marquee-card-btn:hover {
+  background: rgba(212, 175, 55, 0.15) !important;
+  border-color: rgba(212, 175, 55, 0.6) !important;
+}
+
+/* 7. Modal detail project eyebrow shadow removal */
+html[data-theme="light"] .modal-eyebrow {
+  text-shadow: none !important;
+}
+
+/* ── DARK MODE BORDER SOFTENING (PERGELAP AGAR TIDAK TERLALU TERANG) ── */
+.lab-terminal {
+  border-color: rgba(255, 255, 255, 0.05);
+  /* softened from 0.06 */
+}
+
+.glitch-card {
+  border-color: rgba(255, 255, 255, 0.05);
+  /* softened from 0.06 */
+}
+
+.modal-content-card {
+  border-color: rgba(255, 255, 255, 0.06);
+  /* softened from 0.08 */
+}
+
+.marquee-card {
+  border-color: rgba(255, 255, 255, 0.06);
+  /* softened from 0.08 */
+}
+
+/* --- Light Mode Navbar Overlay --- */
+html[data-theme="light"] .nav-overlay-panel {
+  background: rgba(245, 245, 248, 0.96);
+}
+
+html[data-theme="light"] .overlay-grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+html[data-theme="light"] .overlay-hud-footer {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+html[data-theme="light"] .menu-toggle-btn:hover .hamburger-line {
+  background-color: var(--text-main);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Light Mode Career Mobile Cards --- */
+html[data-theme="light"] .cv-mobile-cards-rail .cv-mobile-card {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="light"] .cv-mobile-card-year {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="light"] .cv-mobile-card-badge {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="light"] .cv-mobile-card-divider {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.15), transparent);
+}
+
+html[data-theme="light"] .cv-mobile-card-role {
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .cv-mobile-download-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}

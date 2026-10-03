@@ -3,39 +3,13 @@ import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
 import horizonScrollState from "@/lib/horizonScrollState";
 import { useThemeStore } from "@/stores";
+import { timeline } from "@/data/profile";
+import { track } from "@/lib/analytics";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
-// Ordered OLDEST → NEWEST  (index 0 = first to fly out)
-const TIMELINE_DATA = [
-  {
-    year: "2023 – 2024",
-    role: "Game & Android Graduate",
-    institution: "Timedoor Academy",
-    desc: "Completed advanced training in JavaScript game development (Phaser 3) and mobile app development (Android Studio).",
-    badge: "Academy Graduate",
-  },
-  {
-    year: "2024",
-    role: "Certified Junior Programmer",
-    institution: "BNSP Indonesia",
-    desc: "National competency certificate validating expertise in programming, databases, and software design standards.",
-    badge: "National Cert",
-  },
-  {
-    year: "2024",
-    role: "Juara Harapan 2 — Web Tech",
-    institution: "LKS Competition Surabaya",
-    desc: "Won 2nd Runner-up Merit Prize at city level in Web Technologies, building modular frontends under competitive time constraints.",
-    badge: "Competition",
-  },
-  {
-    year: "2024 – Present",
-    role: "Informatics Engineering Student",
-    institution: "EPIS / PENS Surabaya",
-    desc: "Focusing on software architecture, algorithms, dynamic web applications, and immersive 3D/WebGL experiences.",
-    badge: "Current",
-  },
-];
+// Ordered OLDEST → NEWEST  (index 0 = first to fly out). Lives in data/profile.ts
+// so the CV page and the generated PDF read the same entries.
+const TIMELINE_DATA = timeline;
 
 // ─── Stack positions (before any card flies) ─────────────────────────────────
 // Cards start stacked at x≈390 (center of the 1000px container) so they're
@@ -370,13 +344,13 @@ export default function CvTimelineSlide() {
               CURRICULUM VITAE
             </h4>
             <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>
-              Download professional resume summary (PDF, ~180 KB).
+              Download my resume as a PDF, always in sync with this site.
             </p>
           </div>
           <a
-            href="https://drive.google.com/file/d/16mvFW569lf6yUzMRpEQUMY-NVJ4t41kZ/view?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/cv.pdf"
+            download="Bilal-Sanayu-Majid-CV.pdf"
+            onClick={() => track("cv_download", { source: "career-mobile" })}
             className="btn"
             style={{ fontSize: "0.72rem", padding: "8px 12px", textAlign: "center", display: "block" }}
           >
@@ -510,13 +484,13 @@ export default function CvTimelineSlide() {
               <p className="cv-download-kicker">{`PAYLOAD · DOSSIER`}</p>
               <h4 className="cv-download-title">CURRICULUM VITAE</h4>
               <p className="cv-download-desc">
-                Full resume summary, PDF, ~180 KB.
+                Resume as PDF, always in sync with this site.
               </p>
             </div>
             <a
-              href="https://drive.google.com/file/d/16mvFW569lf6yUzMRpEQUMY-NVJ4t41kZ/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/cv.pdf"
+              download="Bilal-Sanayu-Majid-CV.pdf"
+              onClick={() => track("cv_download", { source: "career-desktop" })}
               className="cv-download-link"
             >
               Download

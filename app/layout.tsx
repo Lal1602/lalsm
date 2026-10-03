@@ -1,19 +1,85 @@
 import type { Metadata, Viewport } from "next";
-import "./portfolio.css";
+// Site styles, split by section. ORDER MATTERS: one flat cascade, later files
+// override earlier ones. Namespace the class names of anything you add.
+import "./styles/00-base.css";
+import "./styles/10-navbar-hero.css";
+import "./styles/20-marquee-footer.css";
+import "./styles/30-about.css";
+import "./styles/40-process.css";
+import "./styles/50-gallery-and-modals.css";
+import "./styles/60-contact.css";
+import "./styles/70-preloader-and-spotlight.css";
+import "./styles/80-achievements.css";
+import "./styles/90-horizon.css";
+import "./styles/95-seam-and-career.css";
+import "./styles/A0-projects.css";
+import "./styles/B0-responsive.css";
+import "./styles/C0-nav-and-theme.css";
 import "./globals.css";
+import Analytics from "@/components/ui/Analytics";
+import { profile } from "@/data/profile";
+import { LITE_BOOT_SCRIPT } from "@/lib/liteBoot";
+import { siteDescription, siteName, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "BILAL | Creative Developer",
-  description:
-    "Bilal - Creative Developer & Full Stack Engineer Portfolio. Showcasing immersive web experiences and modern tech stacks.",
+  metadataBase: new URL(siteUrl),
+  title: { default: siteName, template: "%s | Bilal" },
+  description: siteDescription,
+  applicationName: "Bilal Portfolio",
+  authors: [{ name: profile.name, url: siteUrl }],
+  creator: profile.name,
+  keywords: [
+    "Bilal Sanayu Majid",
+    "creative developer",
+    "full stack developer",
+    "Next.js",
+    "Three.js",
+    "GSAP",
+    "WebGL",
+    "portfolio",
+    "Surabaya",
+    "PENS",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName,
+    title: siteName,
+    description: siteDescription,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteName,
+    description: siteDescription,
+  },
+  robots: { index: true, follow: true },
+  icons: { icon: "/b-logo.jpg" },
 };
 
+// Pinch-zoom stays enabled: locking the viewport scale fails WCAG 1.4.4.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: "#050505",
+};
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: profile.name,
+  url: siteUrl,
+  image: `${siteUrl}/mee.jpeg`,
+  jobTitle: profile.role,
+  email: `mailto:${profile.email}`,
+  address: { "@type": "PostalAddress", addressLocality: "Surabaya", addressCountry: "ID" },
+  alumniOf: [
+    { "@type": "CollegeOrUniversity", name: "Politeknik Elektronika Negeri Surabaya" },
+    { "@type": "HighSchool", name: "SMKN 10 Surabaya" },
+  ],
+  knowsAbout: ["Next.js", "React", "Three.js", "GSAP", "WebGL", "TypeScript", "Node.js", "Laravel"],
+  sameAs: [profile.github, profile.instagram],
 };
 
 export default function RootLayout({
@@ -29,16 +95,18 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         {/*
-          The Horizon showcase pulls a ~757KB WebGL module from this CDN. Left to
+          The Horizon showcase pulls a ~757KB WebGL module (self-hosted in
+          public/vendor, so it no longer depends on a third-party CDN). Left to
           its own import it finished downloading around the time the user was
           already scrolling toward the section, so the parse landed as a stall
           right on the transition. Fetching it up front moves that cost to the
-          hero, where there is idle time to absorb it.
+          hero, where there is idle time to absorb it. (jsdelivr stays
+          preconnected because ionicons still loads from there.)
         */}
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         <link
           rel="modulepreload"
-          href="https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js"
+          href="/vendor/tubes1.min.js"
           crossOrigin="anonymous"
         />
         {/*
@@ -48,11 +116,12 @@ export default function RootLayout({
           for Space Grotesk to move away from the stock "cyberpunk template"
           look while keeping a distinct, technical display voice.
         */}
+        {/* eslint-disable-next-line @next/next/no-page-custom-font -- root layout: the font loads for every route */}
         <link
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Rajdhani:wght@300;500;700&family=Roboto+Mono:wght@300;500&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" href="/b-logo.jpg" type="image/jpg" />
+        <link rel="icon" href="/b-logo.jpg" type="image/jpeg" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -69,6 +138,8 @@ export default function RootLayout({
             `,
           }}
         />
+        {/* Lite mode flag (data-lite on <html>), set before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: LITE_BOOT_SCRIPT }} />
         <script
           type="module"
           src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
@@ -81,6 +152,14 @@ export default function RootLayout({
         ></script>
       </head>
       <body>
+        <a className="skip-link" href="#content">
+          Skip to main content
+        </a>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c") }}
+        />
+        <Analytics />
         <div id="main-content-wrapper">
           <div className="grain-overlay" aria-hidden="true"></div>
           {children}
