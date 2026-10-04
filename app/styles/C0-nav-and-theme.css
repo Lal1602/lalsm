@@ -597,7 +597,7 @@ html[data-theme="light"] .ascent {
 
 html[data-theme="light"] .hiw-sky {
   background: radial-gradient(140% 120% at 50% 50%, rgba(var(--p0-rgb), 0.5), transparent 70%),
-    linear-gradient(175deg, #eff2f9 0%, #e7ecf7 38%, #eaeef7 66%, #f1f3f9 100%);
+    linear-gradient(175deg, var(--p1) 0%, var(--p1) 38%, var(--p1) 66%, var(--p1) 100%);
 }
 
 /* The clouds keep their shapes and lose their luminosity: on a pale ground a
@@ -641,42 +641,37 @@ html[data-theme="light"] .hiw-glint::after {
   background: linear-gradient(180deg, transparent, rgba(var(--teal-rgb), 0.5), transparent);
 }
 
-/* Lit bodies, not dark ones: the crescent stays but the disc comes up out of
-   the background instead of sinking into it. */
-/* At dawn the worlds are lit from the same side but the contrast inverts: the
-   body has to be DARKER than the sky rather than lighter, or it vanishes into
-   the white the same way it vanished into the black before. Rim goes warm,
-   because the light source at this hour is low and orange. */
+/* The worlds on paper are washes: a sphere painted in one pigment, the lit limb left as bare paper and the
+   shadow side the deepest, with a warm rim where the low sun catches it. (They were a saturated disc of
+   teal, which was the loudest thing on the page: the eye went to it, and the section read as glare.) */
 html[data-theme="light"] .hiw-orb::after {
   background: radial-gradient(circle closest-side,
       transparent 0 95.4%,
-      rgba(255, 198, 142, 0.42) 98%,
-      rgba(255, 214, 170, 0.14) 99.4%,
+      rgba(var(--amber-rgb), 0.3) 98%,
+      rgba(var(--amber-rgb), 0.1) 99.4%,
       transparent 100%);
 }
 
 html[data-theme="light"] .hiw-orb-a {
   background: radial-gradient(circle at 20% 42%,
-      rgba(206, 200, 228, 0.82) 0%,
-      rgba(var(--teal-rgb), 0.86) 24%,
-      rgba(var(--teal-rgb), 0.9) 52%,
-      rgba(var(--teal-rgb), 0.94) 80%);
+      rgba(var(--p0-rgb), 0.95) 0%,
+      rgba(var(--teal-rgb), 0.26) 36%,
+      rgba(var(--teal-rgb), 0.4) 76%,
+      rgba(var(--teal-rgb), 0.5) 100%);
   box-shadow:
-    inset 26px 16px 0 -19px rgba(255, 244, 224, 1),
-    inset 34px 22px 26px -26px rgba(255, 216, 176, 0.9),
-    0 0 34px -10px rgba(226, 190, 236, 0.5);
+    inset 26px 16px 0 -19px rgba(var(--p0-rgb), 1),
+    inset 34px 22px 26px -26px rgba(var(--amber-rgb), 0.35);
 }
 
 html[data-theme="light"] .hiw-orb-b {
   background: radial-gradient(circle at 60% 22%,
-      rgba(210, 202, 230, 0.82) 0%,
-      rgba(184, 188, 216, 0.86) 22%,
-      rgba(var(--teal-rgb), 0.9) 50%,
-      rgba(var(--teal-rgb), 0.94) 80%);
+      rgba(var(--p0-rgb), 0.95) 0%,
+      rgba(var(--violet-rgb), 0.24) 34%,
+      rgba(var(--violet-rgb), 0.38) 74%,
+      rgba(var(--violet-rgb), 0.48) 100%);
   box-shadow:
-    inset -12px 16px 0 -10px rgba(255, 246, 228, 1),
-    inset -18px 24px 22px -18px rgba(255, 214, 176, 0.85),
-    0 0 30px -8px rgba(220, 186, 232, 0.45);
+    inset -12px 16px 0 -10px rgba(var(--p0-rgb), 1),
+    inset -18px 24px 22px -18px rgba(var(--amber-rgb), 0.3);
 }
 
 html[data-theme="light"] .hiw-c-line {
@@ -713,7 +708,7 @@ html[data-theme="light"] .hiw-flare {
 
 /* The sky's fade overlay takes the pale ground by day. */
 html[data-theme="light"] .hiw-sky::after {
-  background: linear-gradient(180deg, #eff2f9 0px, rgba(239, 242, 249, 0.9) 100px, transparent 270px, transparent calc(100% - 60px), #f1f3f9 100%);
+  background: linear-gradient(180deg, var(--p1) 0px, rgba(var(--p1-rgb), 0.9) 100px, transparent 270px, transparent calc(100% - 60px), var(--p1) 100%);
 }
 
 /* Process Dashboard & physics lab */

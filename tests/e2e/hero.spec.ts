@@ -205,13 +205,13 @@ test.describe("hero: reduced motion", () => {
 });
 
 test.describe("hero: light theme", () => {
-  test("the headline is dark ink on the pale page, not white on white", async ({ page }) => {
+  test("the headline is indigo ink on the paper, not white on white", async ({ page }) => {
     await arrive(page);
     await page.evaluate(() => document.documentElement.setAttribute("data-theme", "light"));
     await page.waitForTimeout(300);
     const color = await page.evaluate(() => getComputedStyle(document.querySelector("h1.hx-title")!).color);
-    expect(color).toBe("rgb(23, 24, 44)");
+    expect(color).toBe("rgb(27, 29, 51)");
     const btn = await page.evaluate(() => getComputedStyle(document.querySelector(".hx-btn-primary")!).backgroundColor);
-    expect(btn).toBe("rgb(23, 24, 44)");
+    expect(btn).toBe("rgb(27, 29, 51)");
   });
 });
