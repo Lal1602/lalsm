@@ -152,6 +152,8 @@ html[data-lite="1"] {
   transform: translateY(-2px);
 }
 .lite-project-thumb {
+  /* A span: without display:block the aspect-ratio never applied and the picture had no height. */
+  display: block;
   position: relative;
   aspect-ratio: 16 / 10;
 }
@@ -172,4 +174,17 @@ html[data-lite="1"] {
   font-size: 0.8rem;
   line-height: 1.4;
   color: var(--text-muted);
+}
+
+/* The plate number on a grid card, so the fallback keeps the archive's numbering. */
+.lite-project-no {
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  font-family: var(--font-code);
+  font-size: 0.62rem;
+  font-style: normal;
+  letter-spacing: 0.14em;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
 }

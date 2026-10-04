@@ -1,39 +1,9 @@
 /* --- Swiper / Sliders --- */
-.swiper {
-  width: 100%;
-  padding-top: 50px;
-  padding-bottom: 50px;
-  /* Space for shadow/glow */
-  overflow: visible;
-  /* Allows glow to not be cut off */
-}
-
-.swiper-wrapper {
-  perspective: 1000px;
-}
 
 /* General swiper slide */
-.swiper-slide {
-  height: auto;
-  display: flex;
-  justify-content: center;
-}
 
 /* Project slider: fixed width so slidesPerView:'auto' works correctly.
            280px base with a fluid clamp so it scales nicely on large screens. */
-.project-slider .swiper-slide {
-  width: clamp(260px, 28vw, 340px);
-  height: 440px;
-  flex-shrink: 0;
-}
-
-.swiper-pagination-bullet {
-  background: var(--text-muted);
-}
-
-.swiper-pagination-bullet-active {
-  background: var(--accent-cyan);
-}
 
 /* ══ ZERO-GRAVITY FLUID GALLERY ═════════════════════════════════════════
            Architecture:
@@ -51,75 +21,10 @@
         ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── Edge fade mask on the slider track ─────────────────────────── */
-.project-slider {
-  -webkit-mask-image: linear-gradient(to right,
-      transparent 0%,
-      black 8%,
-      black 92%,
-      transparent 100%);
-  mask-image: linear-gradient(to right,
-      transparent 0%,
-      black 8%,
-      black 92%,
-      transparent 100%);
-  /* freeMode needs overflow visible so cards peek past the container */
-  overflow: visible;
-  padding: 40px 0 50px;
-}
 
 /* ── Float wrapper — ONLY the continuous idle levitation lives here ─ */
-.project-float-wrapper {
-  height: 100%;
-  /* will-change tells the compositor to promote this layer before
-             the animation starts — eliminates the first-frame stutter */
-  will-change: transform;
-  animation: floatAnim 6s ease-in-out infinite alternate;
-}
 
 /* Stagger the 11 cards so they bob independently, not in unison */
-.swiper-slide:nth-child(1) .project-float-wrapper {
-  animation-delay: 0s;
-}
-
-.swiper-slide:nth-child(2) .project-float-wrapper {
-  animation-delay: -1.1s;
-}
-
-.swiper-slide:nth-child(3) .project-float-wrapper {
-  animation-delay: -2.2s;
-}
-
-.swiper-slide:nth-child(4) .project-float-wrapper {
-  animation-delay: -3.3s;
-}
-
-.swiper-slide:nth-child(5) .project-float-wrapper {
-  animation-delay: -4.4s;
-}
-
-.swiper-slide:nth-child(6) .project-float-wrapper {
-  animation-delay: -5.5s;
-}
-
-.swiper-slide:nth-child(7) .project-float-wrapper {
-  animation-delay: -0.8s;
-}
-
-.swiper-slide:nth-child(8) .project-float-wrapper {
-  animation-delay: -2.0s;
-}
-
-.swiper-slide:nth-child(9) .project-float-wrapper {
-  animation-delay: -3.6s;
-}
-
-.swiper-slide:nth-child(10) .project-float-wrapper {
-  animation-delay: -1.7s;
-}
-
-.swiper-slide:nth-child(11) .project-float-wrapper {
-  animation-delay: -4.9s;
-}
 
 /* ── The keyframe: pure transform only — GPU compositor path ─────── */
 @keyframes floatAnim {
@@ -215,48 +120,10 @@
 }
 
 /* ── Image wrapper ───────────────────────────────────────────────── */
-.card-img-wrapper {
-  height: 200px;
-  overflow: hidden;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.card-img-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-  display: block;
-}
-
-.project-card:hover .card-img-wrapper img {
-  transform: scale(1.12);
-}
 
 /* Cyan accent overlay on hover */
-.card-img-wrapper::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 243, 255, 0.35), transparent 60%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-
-.project-card:hover .card-img-wrapper::after {
-  opacity: 1;
-}
 
 /* ── Text content panel ──────────────────────────────────────────── */
-.card-content {
-  padding: 22px;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
 
 .project-title {
   font-size: 1.3rem;
@@ -270,28 +137,10 @@
   color: var(--accent-cyan);
 }
 
-.project-desc {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  line-height: 1.55;
-  margin-bottom: 18px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 /* ── Pause float on hover — so the card holds perfectly still ────── */
-.project-float-wrapper:has(.project-card:hover) {
-  animation-play-state: paused;
-}
 
 /* ── Mobile: disable float (saves battery, improves readability) ─── */
 @media (max-width: 768px) {
-  .project-float-wrapper {
-    animation: none;
-  }
 
   .project-card {
     filter: brightness(1) grayscale(0%);
@@ -306,8 +155,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.92);
   z-index: 10000;
   display: none;
   /* Javascript akan mengubah ini jadi Flex */
@@ -433,36 +281,6 @@
 }
 
 /* Tombol Close yang "Melayang/Sticky" */
-.close-modal {
-  position: sticky;
-  /* Nempel terus di layar */
-  top: 15px;
-  /* Jarak dari atas viewport modal */
-  float: right;
-  margin-right: 15px;
-  margin-top: -60px;
-  /* Tarik ke atas biar nindih gambar */
-
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--glass-border);
-  color: white;
-  font-size: 2rem;
-  cursor: pointer;
-  z-index: 100;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-}
-
-.close-modal:hover {
-  background: var(--accent-purple);
-  transform: rotate(90deg);
-}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ACHIEVEMENT / CERTIFICATE MODAL — Redesigned
@@ -472,9 +290,7 @@
 .ach-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(4, 4, 8, 0.78);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(4, 4, 8, 0.92);
   z-index: 10000;
   display: none;
   /* JS sets to flex on open */
@@ -516,7 +332,7 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: rgba(10, 10, 16, 0.72);
+  background: rgba(10, 10, 16, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.75);
   font-size: 1.25rem;
@@ -524,7 +340,6 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  backdrop-filter: blur(8px);
   transition: background 0.22s ease, color 0.22s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -722,9 +537,6 @@
 
 
 /* --- Achievements --- */
-.achievements-section {
-  background: linear-gradient(to bottom, transparent, rgba(255, 215, 0, 0.05), transparent);
-}
 
 .achievement-card {
   border-left: 3px solid var(--accent-gold);

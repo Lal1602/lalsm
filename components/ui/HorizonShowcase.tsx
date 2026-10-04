@@ -8,6 +8,8 @@ import CosmicNebulaSeam from "./CosmicNebulaSeam";
 import AccretionHorizonSeam from "./AccretionHorizonSeam";
 import horizonScrollState from "@/lib/horizonScrollState";
 import { useLite } from "@/lib/lite";
+import { useMediaQuery } from "./hiw/hooks";
+import { useSeamSnap } from "./useSeamSnap";
 
 // Lazy-loaded — both use browser APIs, must be client-only
 const CvTimelineSlide = dynamic(() => import("./CvTimelineSlide"), { ssr: false });
@@ -35,6 +37,10 @@ export default function HorizonShowcase() {
   const [mounted, setMounted] = useState(false);
   const { lite } = useLite();
   const sectionRef = useRef<HTMLElement | null>(null);
+  // Where the section is not pinned (phones) its bottom edge is the seam into Projects: keep it on a
+  // whole device pixel. Pinned, the same is done through the pin's length (GSAPEffects).
+  const stacked = useMediaQuery("(max-width: 968px)");
+  useSeamSnap(sectionRef, stacked);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -135,12 +141,12 @@ export default function HorizonShowcase() {
 
       {/* ── Seamless Cosmic-to-Cyber Transition Bridge (Procedural Nebula Continuation + Cyber Grid) ── */}
       <div className="horizon-top-transition" aria-hidden="true">
-        {!lite && <CosmicNebulaSeam part="lower" />}
+        <CosmicNebulaSeam part="lower" />
         <div className="horizon-top-cyber-grid" />
       </div>
 
       {/* ── Seamless Accretion Wave & Horizon Seam (Upper Half, renders behind cards) ── */}
-      {mounted && !lite && <AccretionHorizonSeam part="upper" />}
+      {mounted && <AccretionHorizonSeam part="upper" />}
 
       {/* Slides wrapper — GSAP translates this horizontally for scroll */}
       <div className="horizon-wrapper">

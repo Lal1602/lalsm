@@ -1,221 +1,153 @@
-# 🚀 Bilal | Creative Developer Portfolio
+# Bilal Sanayu Majid · Creative Developer Portfolio
 
-<div align="center">
+A single-page portfolio that is also a piece of engineering: every section on the page is a working
+instrument rather than a description, and the whole thing is held to a frame budget.
 
-  <p align="center">
-    <strong>An immersive, highly interactive, and next-generation creative developer portfolio.</strong>
-  </p>
-
-  <p align="center">
-    <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-16.2.6-black?style=for-the-badge&logo=next.js" alt="Next.js" /></a>
-    <a href="https://react.dev"><img src="https://img.shields.io/badge/React-19.2.4-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" /></a>
-    <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
-    <a href="https://threejs.org"><img src="https://img.shields.io/badge/Three.js-WebGL-000000?style=for-the-badge&logo=three.js&logoColor=white" alt="Three.js" /></a>
-    <a href="https://gsap.com"><img src="https://img.shields.io/badge/GSAP-3.15-88CE02?style=for-the-badge&logo=greensock&logoColor=white" alt="GSAP" /></a>
-    <a href="https://ai.google.dev"><img src="https://img.shields.io/badge/Gemini_AI-API_2.3-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini AI" /></a>
-  </p>
-
-</div>
+Built with Next.js 16 (App Router), React 19, TypeScript, Motion, GSAP + Lenis, and a handful of
+hand-written WebGL renderers. Content, case studies, a blog, a printable CV and a Gemini-backed
+assistant sit behind the same data files.
 
 ---
 
-## 🌟 Overview
+## What is on the page
 
-Welcome to the personal portfolio of **Bilal Sanayu Majid**, an Informatics Engineering student at **Politeknik Elektronika Negeri Surabaya (PENS / EEPIS)** and a passionate **Creative Developer**.
+| Section | What it is |
+| --- | --- |
+| **Hero** | Starfield (Three.js) behind a morphing portrait and glitch type. |
+| **What I Build** | Three bays, one live instrument each: a **frame-time meter** that measures this very tab (and can load it on request), a **request trace** that replays a simulated request through a stack with a fault you can inject, and a **probe game** on a fixed-step loop. Only the open bay's demo is mounted. |
+| **How I Work** | The **Flight Deck**: four stages on a route map. Scroll flies the ship, drag the map to scrub, hold a bay's button to engage it. Built on Motion with springs and an odometer; on a phone the bays become a swipe rail. |
+| **Creative Playground** | A pinned horizontal run (GSAP ScrollTrigger on Lenis): an observation deck over a tube-cursor WebGL background, then the career pathway. |
+| **Projects** | The **Observatory Plates**: one draw call renders the plate carousel from a texture atlas. Every project also has a static case-study page. |
+| **Achievements / Contact** | Kinetic marquee; contact form (Web3Forms) and socials. |
+| **Ask Bilal** | Streaming chat drawer. Gemini when `GEMINI_API_KEY` is set, a local keyword simulation otherwise. |
 
-This project bridges bleeding-edge 3D WebGL graphics, GSAP scroll-driven animations, high-precision UI engineering, and real-time AI capabilities into a cohesive, cyberpunk/sci-fi aesthetic portfolio.
-
----
-
-## ✨ Key Features & Experience Highlights
-
-### 1. 🌌 Hero & 3D Celestial Environment
-- **Interactive Three.js Starfield Canvas**: Dynamic background rendering 6,000 luminous particles and 50 floating wireframe icosahedrons with smooth mouse reactivity.
-- **Organic Morphing Shape (`image-blob`)**: Custom CSS clip-path/border-radius morphing avatar frame with cyan neon glow and interactive hover states.
-- **Glitch Typography (`glitch-text`)**: Cyan and magenta chromatic aberration text animations.
-- **Live Stats Floating Badge**: Glassmorphic floating card highlighting 35+ shipped projects with smooth floating animations.
-
-### 2. 🧩 "What I Build" (About Section)
-- **Spatial Bento Architecture**: Modular grid showcasing creative development philosophies, UI/UX craftsmanship, and full-stack technical competencies.
-- **Interactive Retro Terminal**: Interactive console simulation showcasing developer command-line capabilities and logs.
-- **Canvas Holographic Visualizer**: Dynamic visual flair reinforcing creative engineering depth.
-
-### 3. ⚡ "How I Work" (Process Steps)
-- **Multi-Stage Development Lifecycle**: 4-phase interactive process tracking from concept ideation through deployment.
-- **Tone Ramp Progression**: Real-time stage tone color transition with visual packets and drift effects.
-
-### 4. 🛰️ "The Horizon" (Horizontal Scroll Cinema)
-- **Pinned Horizontal Experience**: Custom GSAP ScrollTrigger timeline integrated with smooth Lenis scroll.
-- **Cosmic Pixel Stars Backdrop**: Bespoke HTML5 canvas rendering thousands of twinkling pixel stars.
-- **Career Pathway & CV Timeline (`CvTimelineSlide`)**: Interactive career trajectory timeline with institution details, tags, and downloadable CV modal.
-- **Dynamic Project Estimator (`ProjectEstimatorSlide`)**: Interactive budget, scope, and timeline calculator for prospective clients.
-- **Interactive Tech Graph (`TechGraphSlide`)**: Interactive visualization of frontend, 3D, and backend tech stacks.
-
-### 5. 💼 Projects & Detail Dossier
-- **Fluid Swiper Showcase**: Responsive multi-card slider highlighting enterprise applications, Web3 prototypes, and interactive experiences.
-- **Project Detail Modal (`ProjectModal`)**: In-depth project dossier modals with tech tags, project goals, preview galleries, and live links.
-
-### 6. 🏆 Achievements & Marquee
-- **Infinite Kinetic Marquees**: High-speed, seamless infinite text & card runners highlighting certifications, competition wins, and milestones.
-
-### 7. 🤖 "Ask Bilal AI" (Gemini AI Assistant)
-- **Integrated Generative Chatbot**: Built using `@google/genai` (Google Gemini API).
-- **Personalized Context**: Knowledgeable about Bilal's skills, history, education at PENS Surabaya, and project achievements.
-- **Sci-Fi HUD Interface**: Sleek drawer overlay with streaming responses, suggested questions, and sound feedback.
-
-### 8. 🎨 Theme Engine & Accessibility
-- **Dual Theme Support**: Seamless switching between **Cyber Dark** (deep space, cyan & neon violet) and **Slate/Lilac Light** mode via Zustand store (`useThemeStore`).
-- **Custom Tube / Magnetic Cursor**: Smooth trailing cursor with magnetic button attraction and scale morphing.
-- **Reduced Motion Support**: Automatic detection and graceful fallback for users with OS-level `prefers-reduced-motion` enabled.
+Light and dark themes, a **Lite mode** (below), and full keyboard and reduced-motion support.
 
 ---
 
-## 🛠️ Technology Stack
+## How it stays smooth
+
+- **Quality governor** (`lib/quality.ts`, `lib/qualityGovernor.ts`): one rAF sampler watches frame
+  times and publishes a tier 0–3 as `<html data-q>`. Effects read it (nebula resolution, tube
+  resolution, particle counts, idle frame rate) and get cheaper, never absent. Lite reads as tier 3.
+- **Warm-up behind the preloader** (`lib/warmup.ts`, `lib/warmupTasks.ts`): WebGL contexts, shader
+  compilation, the plate atlas, the Motion feature bundle, fonts, and the tubes' first frame are all
+  done while the preloader is up, so arriving at a section is an animation, not a stall.
+- **Nebula seams**: the glow that joins two sections is two canvases (one in each section) drawn by a
+  single renderer (`lib/space/SpaceRenderer.ts`) from one shared world-space field, so the halves match.
+  Section boundaries are snapped to an 80 px grid (`lib/seamGrid.ts`, `useSeamSnap`) so they land on a
+  whole device pixel at fractional zoom, which is what keeps the join invisible.
+- **No scroll-jacking beyond the one pin**: the Playground is the only pinned section, and ScrollTrigger
+  snapping is deliberately off because it fights Lenis.
+- **Lite mode** (`lib/liteBoot.ts`): decided before first paint from reduced motion, Save-Data, a weak
+  device, or the visitor's choice. Sets `<html data-lite>`; drops the WebGL starfield, tube cursor,
+  seam animation and backdrop blur, uses native scrolling, and swaps the plates for a plain grid.
+
+---
+
+## Stack
 
 | Layer | Technologies |
-|---|---|
-| **Core Framework** | [Next.js 16](https://nextjs.org/) (App Router), [React 19](https://react.dev/), [TypeScript 5](https://www.typescriptlang.org/) |
-| **3D & WebGL** | [Three.js](https://threejs.org/), [@react-three/fiber](https://r3f.docs.pmnd.rs/), [@react-three/drei](https://github.com/pmndrs/drei), [@react-three/postprocessing](https://github.com/pmndrs/react-postprocessing) |
-| **Motion & Scrolling** | [GSAP 3](https://gsap.com/) (ScrollTrigger), [@gsap/react](https://gsap.com/resources/React/), [Lenis](https://lenis.studiofreight.com/) |
-| **Styling & UI** | Vanilla CSS Design System, [Tailwind CSS v4](https://tailwindcss.com/), [Swiper 12](https://swiperjs.com/) |
-| **AI Integration** | [@google/genai](https://ai.google.dev/) (Google Gemini 2.0 / Flash API) |
-| **State Management** | [Zustand 5](https://zustand-demo.pmnd.rs/) |
+| --- | --- |
+| Framework | Next.js 16 (App Router), React 19, TypeScript 5 |
+| Motion | Motion (`motion/react`, LazyMotion), GSAP + ScrollTrigger, Lenis |
+| WebGL | Three.js (starfield, tube cursor build), custom raw-WebGL renderers for the nebula and plates |
+| Styling | One flat cascade in `app/styles/*.css` (order matters), Tailwind v4 for resets |
+| AI | `@google/genai`, NDJSON streaming, per-IP rate limit (optional Upstash Redis) |
+| Content | MDX blog (`@next/mdx`), typed `data/*.ts`, `pdf-lib` for the generated CV |
+| State | Zustand |
+| Tests | Vitest (unit), Playwright (e2e and perf) |
 
 ---
 
-## 📂 Project Structure
+## Project structure
 
-```bash
-lalsm/
-├── app/
-│   ├── layout.tsx              # Root layout with fonts, metadata, and theme attributes
-│   ├── page.tsx                # Main entry point assembling all sections
-│   ├── portfolio.css           # Global design tokens, animations, and theme rules
-│   └── globals.css             # Tailwind base imports
-├── components/
-│   ├── scene/                  # Three.js 3D canvas scenes and WebGL models
-│   └── ui/                     # Modular interface components
-│       ├── AboutSection.tsx    # "What I Build" bento showcase
-│       ├── AchievementsSection.tsx # Infinite marquee of achievements
-│       ├── AiChatOverlay.tsx   # Google Gemini AI assistant drawer
-│       ├── BackgroundPixelStars.tsx # Canvas-driven starfield
-│       ├── ClientShell.tsx     # Dynamic client-only component wrapper
-│       ├── ContactSection.tsx  # Interactive contact form and socials
-│       ├── CvTimelineSlide.tsx # Horizontal career pathway & CV timeline
-│       ├── CustomCursor.tsx    # Magnetic custom cursor
-│       ├── GSAPEffects.tsx     # Global GSAP ScrollTrigger coordinator
-│       ├── HeroSection.tsx     # Hero jumbotron with morphing blob & glitch typography
-│       ├── HorizonShowcase.tsx # Horizontal scroll cinematic container
-│       ├── LenisSetup.tsx      # Smooth momentum scroll initializer
-│       ├── Navbar.tsx          # Navigation header with theme switch & mobile drawer
-│       ├── ProcessSteps.tsx    # "How I Work" 4-stage lifecycle timeline
-│       ├── ProjectEstimatorSlide.tsx # Interactive client project cost calculator
-│       ├── ProjectsSection.tsx # Swiper project showcase
-│       ├── ProjectModal.tsx    # Detailed project popup modal
-│       ├── TechGraphSlide.tsx  # Interactive technology stack radar
-│       └── ThreeBackground.tsx # Three.js canvas starfield & floating polyhedra
-├── stores/
-│   └── index.ts                # Zustand store (theme, AI chat state, modals)
-├── lib/                        # Helper utilities & scroll event buses
-├── public/                     # Static media, icons, and profile assets
-└── types/                      # TypeScript declarations
+```
+app/
+  page.tsx, layout.tsx          Home page and root layout (lite/theme boot script lives here)
+  styles/                       The stylesheet, split by section. Numeric prefixes set the cascade order.
+  api/ai/chat/                  Streaming assistant endpoint
+  projects/, blog/, cv/         Case studies, MDX blog, printable CV (+ cv.pdf)
+components/
+  ui/                           Sections and effects (AboutSection, ProcessSteps, HorizonShowcase, ...)
+  ui/hiw/                       How I Work: FlightDeck, Station, Ship, StageBay, HiwSky
+  ui/wb/                        What I Build demos: FrameMeter, RequestTrace, ProbeRun
+  motion/                       MotionRoot (shared LazyMotion), feature bundle
+  site/                         Shell for the non-home pages
+lib/
+  space/, plates/               The two WebGL renderers (shaders, layout, atlas)
+  flight/, build/               Pure logic behind How I Work and What I Build (unit-tested)
+  quality*.ts, warmup*.ts       Quality governor and the warm-up pipeline
+  seamGrid.ts                   Section-boundary grid
+  chat/, cv/, blog/             Assistant, CV and blog plumbing
+data/                           projects.ts, achievements.ts, profile.ts: the single source of truth
+content/blog/                   MDX posts (each exports a `meta` object; the file name is the slug)
+stores/                         Zustand stores
+tests/unit, e2e, perf           Vitest, Playwright, frame-budget runs
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting started
 
-### Prerequisites
-- **Node.js**: `v18.18.0` or higher
-- **Package Manager**: `npm`, `yarn`, or `pnpm`
+Node 20.9+ and npm.
 
-### Installation
+```bash
+npm install
+cp .env.example .env     # everything is optional; see the file
+npm run dev              # http://localhost:3000
+```
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Lal1602/lalsm.git
-   cd lalsm
-   ```
+Without `GEMINI_API_KEY` the assistant answers from a built-in keyword simulation.
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Configure Environment Variables:**
-   Copy `.env.example` to `.env` and fill in what you need. Everything is optional; with no
-   `GEMINI_API_KEY` the assistant answers from a built-in keyword simulation.
-   ```bash
-   cp .env.example .env
-   ```
-   *(You can obtain a free API key at [Google AI Studio](https://aistudio.google.com/))*
-
-4. **Launch the Development Server:**
-   ```bash
-   npm run dev
-   ```
-
-5. **Open in Browser:**
-   Navigate to [http://localhost:3000](http://localhost:3000) to explore the portfolio.
-
----
-
-## 📦 Build for Production
+### Production build
 
 ```bash
 npm run build
 npm run start
 ```
 
-Set `NEXT_PUBLIC_SITE_URL` to your real domain before building: it feeds the canonical URLs, sitemap,
+Set `NEXT_PUBLIC_SITE_URL` to the real domain before building: it feeds canonical URLs, the sitemap,
 robots.txt, Open Graph tags and JSON-LD.
 
 ---
 
-## ✅ Quality Checks
+## Checks
 
 | Command | What it does |
 | --- | --- |
-| `npm run lint` | ESLint (Next + TypeScript + React Compiler rules) |
+| `npm run lint` | ESLint (Next, TypeScript, React Compiler rules) |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Vitest unit tests: chat validation, rate limiter, stream parser, action parser, CV, lite boot |
-| `npm run test:e2e` | Playwright smoke tests against a production build (`npm run build` first; `PW_CHANNEL=chrome` reuses an installed Chrome) |
+| `npm test` | Vitest: chat validation, rate limiter, stream and action parsers, CV, Lite boot, quality governor, warm-up, seam grid, and the pure logic of the flight deck and the three demos |
+| `npm run test:e2e` | Playwright against a production build (`npm run build` first; `PW_CHANNEL=chrome` reuses an installed Chrome). Covers the sections, seams at fractional pixel ratios, Lite, reduced motion, phones and keyboard |
+| `npm run perf` | Scrolls the whole page on a CPU-throttled Chrome and prints frame times per section; `PERF_ASSERT=1` fails over budget. Headless Chrome may use a software GL stack, so compare runs on the same machine rather than reading absolute GPU numbers |
 | `npm run check` | lint + typecheck + unit tests |
 
-CI (`.github/workflows/ci.yml`) runs all of the above on every push and pull request.
+Run the e2e suite with `--workers=1` if you see timeouts: several tests are real-time and a loaded
+machine makes parallel runs flaky.
 
 ---
 
-## 🧭 How the Newer Pieces Fit
+## Working in the code
 
-- **Content lives in `data/`**: `projects.ts`, `achievements.ts` and `profile.ts` feed the 3D gallery, the case-study pages,
-  the CV, the sitemap and the AI assistant's knowledge. Add a project once and it appears everywhere.
-- **Case studies**: `/projects` and `/projects/[slug]` (statically generated). The home page modal links to them.
-- **Blog**: MDX files in `content/blog/` export a `meta` object (title, description, date, tags); the file name is the slug.
-- **CV**: `/cv` is a printable page and `/cv.pdf` a PDF generated from the same data. Drop a designed PDF at
-  `public/cv/Bilal-Sanayu-Majid-CV.pdf` and `/cv.pdf` serves it instead, no code change.
-- **AI assistant**: `app/api/ai/chat/route.ts` streams NDJSON, validates input (`lib/chat/validate.ts`), rate-limits per IP
-  (`lib/chat/rateLimit.ts`, optional Upstash Redis), fails over between models with timeouts, and falls back to a local simulation.
-- **Lite mode**: `lib/liteBoot.ts` decides before first paint (reduced motion, Save-Data, weak device, or the visitor's choice via
-  the toggle bottom-left) and sets `<html data-lite>`. Lite drops the WebGL starfield, tube cursor, seam canvases, backdrop blur and
-  smooth-scroll, and swaps the 3D film strip for a plain card grid.
-- **Styles**: `app/styles/*.css` is the old single stylesheet split by section. Order matters (one flat cascade), so keep the numeric
-  prefixes and namespace new class names.
-- **Analytics**: off by default. Set `NEXT_PUBLIC_ANALYTICS_PROVIDER` (plausible, umami or vercel); see `.env.example`.
+- **Content** lives in `data/`. Add a project once and it appears in the plates, the case-study pages,
+  the CV, the sitemap and the assistant's knowledge.
+- **Styles are one flat cascade.** Generic class names silently lose on source order, so namespace new
+  sections (`hiw-`, `fd-`, `wb-`, `plate-`, `seam-`, `lite-`).
+- **Per-frame values** (anything driven by scroll, pointer or a loop) are written to leaf elements through
+  motion values or refs, never CSS transitions and never React state.
+- **Hydration**: anything that reads a browser preference must use `useSyncExternalStore` with a server
+  snapshot (see `useMediaQuery` in `components/ui/hiw/hooks.ts`). Motion's `useReducedMotion` does not
+  and causes a mismatch for visitors who have reduced motion on.
+- **Analytics** are off by default; set `NEXT_PUBLIC_ANALYTICS_PROVIDER` (plausible, umami or vercel).
 
 ---
 
-## 👤 Author
+## Author
 
-**Bilal Sanayu Majid**
-- **Institution**: Informatics Engineering, PENS (Politeknik Elektronika Negeri Surabaya)
-- **Role**: Creative Developer / Full-Stack Engineer
-- **Website**: [bilal-portfolio.vercel.app](http://localhost:3000)
-- **GitHub**: [@Lal1602](https://github.com/Lal1602)
-- **LinkedIn**: [Ahmad Bilal](https://linkedin.com)
+**Bilal Sanayu Majid** · Informatics Engineering, PENS (Politeknik Elektronika Negeri Surabaya)
+[GitHub @Lal1602](https://github.com/Lal1602)
 
----
+## License
 
-## 📄 License
-
-This project is licensed under the MIT License — feel free to explore, learn, and draw inspiration from the code!
+MIT. Explore, learn, and take what is useful.

@@ -1,14 +1,13 @@
 {
   "name": "lalsm",
   "version": "0.1.0",
-  "description": "Bilal's Creative Developer Portfolio showcasing immersive 3D experiences, advanced GSAP animations, and AI-powered interactions.",
+  "description": "Bilal's Creative Developer Portfolio: working instruments instead of descriptions, hand-written WebGL, a frame budget, and an AI assistant.",
   "keywords": [
     "portfolio",
     "creative-developer",
     "nextjs",
     "threejs",
     "gsap",
-    "react-three-fiber",
     "ai",
     "gemini-api",
     "webgl"
@@ -23,7 +22,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "npm run lint && npm run typecheck && npm test"
+    "check": "npm run lint && npm run typecheck && npm test",
+    "perf": "playwright test -c playwright.perf.config.ts"
   },
   "dependencies": {
     "@google/genai": "^2.3.0",
@@ -31,17 +31,14 @@
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^16.2.6",
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.6.1",
-    "@react-three/postprocessing": "^3.0.4",
     "gsap": "^3.15.0",
     "lenis": "^1.3.23",
+    "motion": "^14.0.0",
     "next": "16.3.8",
     "pdf-lib": "^1.17.1",
     "react": "19.2.4",
     "react-device-detect": "^2.2.3",
     "react-dom": "19.2.4",
-    "swiper": "^12.1.4",
     "three": "^0.184.0",
     "zustand": "^5.0.13"
   },

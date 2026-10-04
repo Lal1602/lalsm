@@ -1,0 +1,1371 @@
+/* ══ HOW I WORK — the flight deck ═══════════════════════════════════════════
+   A trajectory with four stations, a ship that flies it, and a docking bay under
+   each station. The sky (40-process.css) and the nebula seam sit behind it.
+
+   NAMESPACE. Every class here is `fd-` (or `hiw-` for the sky). The stylesheet is
+   one flat 9,000-line file and generic names silently lose on source order.
+
+   MOTION. Everything that moves is driven by Framer Motion values and lands as a
+   transform or opacity on an element of its own (components/ui/hiw). The only
+   other motion in this file is a handful of short, one-shot transitions on state
+   (hover, active, engaged) that are scoped so they never touch a property Framer
+   is writing. `.fd` carries data-motion, which opts the whole deck out of the
+   global 0.4s transition rule at the foot of C0-nav-and-theme.css.
+
+   LAYOUT CONTRACT. The bays are four equal columns with NO gap (the visible gutter
+   is padding inside each column), so the centre of bay i is exactly (2i+1)/8 of
+   the row. The stations on the map sit at those same fractions, which is what lets
+   a hairline drop straight from each station onto its bay.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ascent {
+  /* A heat ramp: cool at the planning end, hot at launch. */
+  --stage-tone-0: #4fb8e0;
+  --stage-tone-0-rgb: 79, 184, 224;
+  --stage-tone-1: #8b7cf6;
+  --stage-tone-1-rgb: 139, 124, 246;
+  --stage-tone-2: #f0a868;
+  --stage-tone-2-rgb: 240, 168, 104;
+  --stage-tone-3: #e2603f;
+  --stage-tone-3-rgb: 226, 96, 63;
+
+  position: relative;
+}
+
+/* ── Sky layers (HiwSky) ───────────────────────────────────────────────────
+   Each layer is a bit larger than the sky so sliding it never shows an edge. */
+
+.hiw-layer {
+  position: absolute;
+  inset: -140px -40px;
+  pointer-events: none;
+  /* These move on every scroll frame. Without their own compositor layers each change of
+     transform re-rasterised the star field (measured: p50 20.7ms with them moving, 13.8ms
+     frozen); promoted, a move is a matrix change on the GPU. */
+  will-change: transform;
+}
+
+.hiw-orb {
+  will-change: transform;
+}
+
+.hiw-layer .hiw-stars {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── The deck ─────────────────────────────────────────────────────────────── */
+
+.fd {
+  position: relative;
+  isolation: isolate;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── The map ──────────────────────────────────────────────────────────────── */
+
+.fd-map {
+  position: relative;
+  width: 100%;
+  /* The map's own proportions: MAP_W x MAP_H in lib/flight/path.ts. */
+  aspect-ratio: 1000 / 150;
+  margin-bottom: 8px;
+  touch-action: pan-y;
+}
+
+.fd-plot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.fd-grid line {
+  stroke: rgba(170, 200, 240, 0.075);
+  stroke-width: 1;
+}
+
+.fd-route-dots {
+  fill: none;
+  stroke: rgba(176, 206, 242, 0.34);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-dasharray: 1.5 8;
+}
+
+.fd-route {
+  fill: none;
+  stroke: rgba(176, 206, 242, 0.2);
+  stroke-width: 1;
+}
+
+/* The lit part of the route: from the pad to wherever the ship is. */
+.fd-trail {
+  fill: none;
+  stroke: url(#fd-ramp);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.fd-scrub {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.fd-scrub:active {
+  cursor: grabbing;
+}
+
+/* A hairline from each station down onto its bay. */
+.fd-drop {
+  position: absolute;
+  z-index: 1;
+  width: 1px;
+  margin: 22px 0 0 -0.5px;
+  bottom: -28px;
+  background: linear-gradient(180deg, rgba(var(--tone-rgb), 0.55), rgba(var(--tone-rgb), 0));
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.fd-drop[data-active] {
+  opacity: 1;
+}
+
+/* ── Stations ─────────────────────────────────────────────────────────────── */
+
+.fd-st {
+  position: absolute;
+  z-index: 4;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tone);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fd-st:focus-visible {
+  outline: 1px dashed rgba(var(--tone-rgb), 0.9);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.fd-st i,
+.fd-st-label {
+  pointer-events: none;
+}
+
+.fd-st-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 10px 2px rgba(var(--tone-rgb), 0.7);
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4), background-color 0.3s ease;
+}
+
+.fd-st-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 1px solid rgba(var(--tone-rgb), 0.55);
+  border-radius: 50%;
+  transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3), border-color 0.3s ease;
+}
+
+.fd-st-spike {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  opacity: 0.55;
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.fd-st-spike-h {
+  width: 44px;
+  height: 1px;
+  margin: -0.5px 0 0 -22px;
+  background: linear-gradient(90deg, transparent, rgba(var(--tone-rgb), 0.95) 50%, transparent);
+}
+
+.fd-st-spike-v {
+  width: 1px;
+  height: 44px;
+  margin: -22px 0 0 -0.5px;
+  background: linear-gradient(180deg, transparent, rgba(var(--tone-rgb), 0.95) 50%, transparent);
+}
+
+.fd-st-bloom {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70px;
+  height: 70px;
+  margin: -35px 0 0 -35px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--tone-rgb), 0.38), transparent 68%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.fd-st[data-active] .fd-st-ring {
+  transform: scale(1.45);
+  border-color: rgba(var(--tone-rgb), 1);
+}
+
+.fd-st[data-active] .fd-st-core {
+  transform: scale(1.35);
+}
+
+.fd-st[data-active] .fd-st-spike {
+  opacity: 1;
+  transform: scale(1.18);
+}
+
+.fd-st[data-active] .fd-st-bloom {
+  opacity: 1;
+}
+
+.fd-st[data-engaged] .fd-st-core {
+  background: var(--tone);
+}
+
+.fd-st-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 1px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.3s ease;
+}
+
+.fd-st-label b {
+  color: var(--tone);
+  font-weight: 500;
+}
+
+.fd-st-label i {
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  opacity: 0.55;
+}
+
+.fd-st[data-active] .fd-st-label {
+  color: #ffffff;
+}
+
+/* Engaged: a ring that opens out once and fades. Replays because the element is re-keyed. */
+.fd-st-ping {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border: 1.5px solid var(--tone);
+  border-radius: 50%;
+  opacity: 0;
+  animation: fdPing 0.9s cubic-bezier(0.15, 0.85, 0.25, 1) both;
+}
+
+@keyframes fdPing {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(3.6);
+  }
+}
+
+/* ── The ship ─────────────────────────────────────────────────────────────── */
+
+.fd-ship {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  width: 30px;
+  height: 18px;
+  margin: -9px 0 0 -15px;
+  pointer-events: none;
+}
+
+.fd-craft {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.fd-craft-body {
+  fill: #e9f2ff;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+}
+
+.fd-craft-spine {
+  stroke: rgba(11, 13, 48, 0.5);
+  stroke-width: 0.8;
+}
+
+.fd-craft-lamp {
+  fill: var(--stage-tone-3);
+}
+
+.fd-flare {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  width: 54px;
+  height: 7px;
+  margin: -3.5px -7px 0 0;
+  border-radius: 99px;
+  background: linear-gradient(270deg, rgba(255, 228, 176, 0.95), rgba(255, 142, 72, 0.55) 46%, rgba(255, 100, 60, 0));
+  transform-origin: right center;
+  /* Rest value; Framer takes over the scale and opacity while the ship moves. */
+  transform: scaleX(0.4);
+  opacity: 0.5;
+}
+
+.fd[data-calm] .fd-flare {
+  transform: scaleX(0.55);
+}
+
+/* ── Mission readout ──────────────────────────────────────────────────────── */
+
+.fd-hud {
+  position: absolute;
+  left: 0;
+  top: -4px;
+  z-index: 3;
+  pointer-events: none;
+  font-family: var(--font-code);
+}
+
+.fd-hud-k {
+  margin: 0 0 6px;
+  font-size: 0.6rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.fd-hud-v {
+  display: flex;
+  align-items: baseline;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  color: #f4f8ff;
+}
+
+.fd-hud-v > i {
+  margin-left: 0.12em;
+  font-size: 0.42em;
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+.fd-hud-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.fd-hud-s {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0 0 4px;
+  font-size: 0.56rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.fd-hud-s b {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.fd-roll {
+  display: inline-flex;
+}
+
+.fd-roll-place {
+  display: block;
+  width: 0.62em;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+  text-align: center;
+}
+
+.fd-roll-col {
+  display: block;
+}
+
+.fd-roll-col i {
+  display: block;
+  height: 1em;
+  line-height: 1;
+}
+
+.fd-auto {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 36px;
+  padding: 0 14px 0 12px;
+  border: 1px solid rgba(190, 215, 245, 0.28);
+  border-radius: 2px;
+  background: rgba(6, 9, 20, 0.85);
+  color: rgba(226, 236, 252, 0.85);
+  font-family: var(--font-code);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+
+.fd-auto i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6df0b6;
+  box-shadow: 0 0 8px rgba(109, 240, 182, 0.8);
+}
+
+.fd[data-mode="manual"] .fd-auto i {
+  background: var(--stage-tone-2);
+  box-shadow: 0 0 8px rgba(var(--stage-tone-2-rgb), 0.8);
+}
+
+.fd-auto:hover:not(:disabled),
+.fd-auto:focus-visible {
+  border-color: var(--stage-tone-2);
+  color: #ffffff;
+}
+
+.fd-auto:disabled {
+  cursor: default;
+}
+
+.fd-total {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 3;
+  margin: 0;
+  transform: translateX(-62%);
+  white-space: nowrap;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+  pointer-events: none;
+}
+
+.fd-total i {
+  margin: 0 0.5em;
+  opacity: 0.5;
+}
+
+/* ── The bays ─────────────────────────────────────────────────────────────── */
+
+.fd-bays {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: clamp(22px, 3.4vh, 34px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fd-bay {
+  position: relative;
+  padding: 0 6.5px;
+}
+
+.fd-bay-in {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: clamp(18px, 2.6vh, 24px) 20px clamp(14px, 2.2vh, 20px);
+  overflow: hidden;
+  border: 1px solid rgba(var(--tone-rgb), 0.2);
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(var(--tone-rgb), 0.085) 0%, rgba(7, 11, 23, 0.97) 36%, rgba(5, 8, 18, 0.99) 100%);
+  transition: border-color 0.4s ease, opacity 0.45s ease;
+}
+
+/* Once the deck has arrived, the bays the ship is not at recede. */
+.fd[data-ready] .fd-bay:not([data-active]) .fd-bay-in {
+  opacity: 0.6;
+}
+
+.fd-bay[data-active] .fd-bay-in {
+  border-color: rgba(var(--tone-rgb), 0.62);
+}
+
+/* Blueprint corner brackets, which open up on the active bay. */
+.fd-corner {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border: 0 solid rgba(var(--tone-rgb), 0.85);
+  pointer-events: none;
+  transition: width 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2), height 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.fd-corner-tl {
+  left: 5px;
+  top: 5px;
+  border-left-width: 1px;
+  border-top-width: 1px;
+}
+
+.fd-corner-tr {
+  right: 5px;
+  top: 5px;
+  border-right-width: 1px;
+  border-top-width: 1px;
+}
+
+.fd-corner-bl {
+  left: 5px;
+  bottom: 5px;
+  border-left-width: 1px;
+  border-bottom-width: 1px;
+}
+
+.fd-corner-br {
+  right: 5px;
+  bottom: 5px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+
+.fd-bay[data-active] .fd-corner {
+  width: 20px;
+  height: 20px;
+}
+
+/* A scale along the top edge, like the rule on a drawing. */
+.fd-ruler {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: 10px;
+  height: 6px;
+  background: repeating-linear-gradient(90deg, rgba(var(--tone-rgb), 0.5) 0 1px, transparent 1px 8px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.fd-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(var(--tone-rgb), 0.9), transparent);
+  box-shadow: 0 0 18px 3px rgba(var(--tone-rgb), 0.28);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fd-sheen {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260px;
+  height: 260px;
+  margin: -130px 0 0 -130px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 62%);
+  pointer-events: none;
+}
+
+.fd-bay-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: clamp(4px, 1vh, 10px) 0 clamp(8px, 1.4vh, 12px);
+}
+
+.fd-num {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, min(4.4vw, 6.6vh), 3.8rem);
+  font-weight: 700;
+  line-height: 0.82;
+  letter-spacing: -0.035em;
+}
+
+.fd-num-base {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(var(--tone-rgb), 0.78);
+}
+
+/* Solid on top of the outline, wiped open left to right when the bay is the active one. */
+.fd-num-fill {
+  position: absolute;
+  inset: 0;
+  color: var(--tone);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.fd-bay[data-active] .fd-num-fill {
+  clip-path: inset(0 0 0 0);
+}
+
+.fd-bay-code {
+  padding-top: 4px;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.fd-bay-code i {
+  opacity: 0.6;
+}
+
+.fd-name {
+  margin: 0 0 clamp(6px, 1.1vh, 10px);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.fd-char {
+  display: inline-block;
+}
+
+.fd-desc {
+  flex: 1 1 auto;
+  margin: 0 0 clamp(10px, 1.8vh, 18px);
+  font-size: 0.86rem;
+  line-height: 1.58;
+  color: rgba(226, 232, 245, 0.74);
+}
+
+/* Duration and share, set like a data sheet. */
+.fd-data {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px 18px;
+  margin: 0 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(var(--tone-rgb), 0.18);
+  font-family: var(--font-code);
+}
+
+.fd-data dt {
+  margin-bottom: 4px;
+  font-size: 0.56rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.fd-data dd {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.fd-data dd b {
+  font-weight: 500;
+}
+
+.fd-data dd i {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+/* The bar is this stage's real share of the whole job; the tick is how far along you are when it ends. */
+.fd-share {
+  position: relative;
+  height: 2px;
+  margin-bottom: clamp(10px, 1.8vh, 18px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.fd-share-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--tone);
+  box-shadow: 0 0 10px rgba(var(--tone-rgb), 0.6);
+  transform-origin: left center;
+}
+
+.fd-share-mark {
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.fd-out {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 clamp(10px, 1.6vh, 16px);
+  font-family: var(--font-code);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.fd-out small {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.fd-out > span {
+  flex: 1;
+}
+
+.fd-elapsed {
+  font-weight: 500;
+  text-align: right;
+  color: var(--tone);
+}
+
+.fd-elapsed small {
+  text-align: right;
+}
+
+.fd-check {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(var(--tone-rgb), 0.6);
+  border-radius: 2px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.fd-check::after {
+  content: "";
+  position: absolute;
+  left: 3.5px;
+  top: 0.5px;
+  width: 4px;
+  height: 8px;
+  border: solid #07101c;
+  border-width: 0 1.6px 1.6px 0;
+  transform: rotate(40deg) scale(0);
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.5) 0.1s;
+}
+
+.fd-bay[data-engaged] .fd-check {
+  background: var(--tone);
+  box-shadow: 0 0 12px rgba(var(--tone-rgb), 0.6);
+}
+
+.fd-bay[data-engaged] .fd-check::after {
+  transform: rotate(40deg) scale(1);
+}
+
+/* ── Hold to engage ───────────────────────────────────────────────────────── */
+
+.fd-engage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: clamp(42px, 5.4vh, 48px);
+  width: 100%;
+  padding: 0 12px 0 10px;
+  border: 1px solid rgba(var(--tone-rgb), 0.38);
+  border-radius: 2px;
+  background: rgba(var(--tone-rgb), 0.05);
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.fd-engage:hover,
+.fd-engage:focus-visible {
+  border-color: rgba(var(--tone-rgb), 0.9);
+  background: rgba(var(--tone-rgb), 0.1);
+}
+
+.fd-engage[data-engaged] {
+  border-color: rgba(var(--tone-rgb), 0.7);
+  background: rgba(var(--tone-rgb), 0.14);
+  cursor: default;
+}
+
+.fd-engage-ring {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+}
+
+.fd-engage-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 2;
+}
+
+.fd-engage-fill {
+  fill: none;
+  stroke: var(--tone);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 16px 16px;
+}
+
+.fd-engage-tick {
+  fill: none;
+  stroke: var(--tone);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transition: opacity 0.2s ease 0.1s;
+}
+
+.fd-engage[data-engaged] .fd-engage-tick {
+  opacity: 1;
+}
+
+.fd-engage-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.fd-engage-text b {
+  font-family: var(--font-code);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.fd-engage-text i {
+  font-family: var(--font-code);
+  font-size: 0.54rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.fd-burst {
+  position: absolute;
+  left: 26px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.fd-burst-ring {
+  position: absolute;
+  left: -14px;
+  top: -14px;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--tone);
+  border-radius: 50%;
+}
+
+.fd-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  background: var(--tone);
+  box-shadow: 0 0 8px 1px rgba(var(--tone-rgb), 0.8);
+}
+
+.fd-spark.is-warm {
+  background: #fff1d6;
+}
+
+/* ── Where you are, for the rail ──────────────────────────────────────────── */
+
+.fd-count {
+  display: none;
+}
+
+.fd-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Short laptop screens ───────────────────────────────────────────────────
+   The whole deck (header, map, four bays) should be on one screen. Under 860px of
+   height the data sheet tightens, and under 760px the share bar and the ruler go:
+   the printed duration and share stay, only the drawing of them folds away. */
+
+@media (min-width: 861px) and (max-height: 860px) {
+  .fd-desc {
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .fd-data {
+    gap: 6px 18px;
+    padding-top: 8px;
+    margin-bottom: 8px;
+  }
+
+  .fd-ruler {
+    display: none;
+  }
+
+  .fd-bay-in {
+    padding-top: 14px;
+    padding-bottom: 12px;
+  }
+}
+
+@media (min-width: 861px) and (max-height: 760px) {
+  .fd-share {
+    display: none;
+  }
+
+  .fd-data {
+    margin-bottom: 12px;
+  }
+
+  .ascent-eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .fd-bays {
+    margin-top: 16px;
+  }
+
+  .fd-bay-meta {
+    margin: 0 0 6px;
+  }
+
+  .fd-engage {
+    min-height: 38px;
+  }
+
+  .fd-num {
+    font-size: 2.2rem;
+  }
+
+  .fd-bay-code {
+    padding-top: 0;
+  }
+
+  .fd-out {
+    margin-bottom: 8px;
+  }
+}
+
+/* ── Narrow layouts ─────────────────────────────────────────────────────────
+   Below 860px the bays become a swipe rail, and the rail is the throttle: your
+   thumb flies the ship. Four stages still cost one screen. The breakpoint is
+   mirrored in FlightDeck.tsx (useMediaQuery). */
+
+@media (max-width: 1040px) {
+  .hiw-constellation {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .fd-bay-in {
+    padding: 22px 16px 16px;
+  }
+
+  .fd-desc {
+    font-size: 0.8rem;
+  }
+
+  .fd-st-label {
+    font-size: 0.54rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+@media (max-width: 860px) {
+  .hiw-section {
+    padding: 56px 0 68px;
+  }
+
+  /* Both planets are sized in vw, so on a narrow viewport the lower one would grow
+     relative to the copy; anchor it to the bottom edge instead. */
+  .hiw-orb-b {
+    left: -54vw;
+    top: 120vw;
+    width: 118.5vw;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 42%, rgba(0, 0, 0, 0.85) 55%, rgba(0, 0, 0, 0.48) 68%, rgba(0, 0, 0, 0.15) 80%, transparent 92%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 42%, rgba(0, 0, 0, 0.85) 55%, rgba(0, 0, 0, 0.48) 68%, rgba(0, 0, 0, 0.15) 80%, transparent 92%);
+  }
+
+  .hiw-orb-a {
+    left: 74vw;
+    top: -26vw;
+    width: 58vw;
+  }
+
+  /* A mini map in the same box as the big one, so the ship and stations keep their places.
+     Its readout and the autopilot button sit on a row above it rather than over the route. */
+  .fd-map {
+    margin: 44px 0 16px;
+  }
+
+  .fd-hud {
+    top: -44px;
+  }
+
+  .fd-auto {
+    top: -44px;
+    bottom: auto;
+  }
+
+  .fd-grid line {
+    stroke-width: 2.4;
+  }
+
+  .fd-route-dots {
+    stroke-width: 3.2;
+    stroke-dasharray: 3 14;
+  }
+
+  .fd-route {
+    stroke-width: 2.4;
+  }
+
+  .fd-trail {
+    stroke-width: 6;
+  }
+
+  .fd-ship {
+    transform-origin: center;
+  }
+
+  .fd-st-label,
+  .fd-total,
+  .fd-hud-s {
+    display: none;
+  }
+
+  .fd-hud-k {
+    margin-bottom: 2px;
+    font-size: 0.52rem;
+  }
+
+  .fd-hud-v {
+    font-size: 1.6rem;
+  }
+
+  .fd-auto {
+    min-height: 32px;
+    padding: 0 10px 0 9px;
+    font-size: 0.54rem;
+  }
+
+  /* Drawn small to sit in the row above the map, but a thumb needs more than 32px: widen the hit area, not the button. */
+  .fd-auto::after {
+    content: "";
+    position: absolute;
+    inset: -8px -6px;
+  }
+
+  .fd-drop {
+    display: none;
+  }
+
+  /* The rail. Flat tonal bays carry no drop shadow, so there is nothing for the
+     scrolling row to clip into a slab, and no padding or negative margin to
+     compensate. */
+  .fd-bays {
+    position: relative;
+    display: flex;
+    margin: 0 -20px;
+    padding: 0 20px 4px;
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .fd-bays::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fd-bay {
+    flex: 0 0 82%;
+    padding: 0;
+    scroll-snap-align: start;
+  }
+
+  .fd-bay-in {
+    min-height: 0;
+  }
+
+  /* Hover recession makes no sense where nothing hovers; the rail shows one bay at a time anyway. */
+  .fd[data-ready] .fd-bay:not([data-active]) .fd-bay-in {
+    opacity: 0.78;
+  }
+
+  .fd-count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 0 0;
+    font-family: var(--font-code);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.42);
+  }
+
+  .fd-count > span:first-child {
+    color: #ffffff;
+  }
+
+  .fd-dots {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .fd-dots i {
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .fd-dots i[data-on] {
+    background: var(--tone);
+    transform: scale(1.5);
+  }
+
+  .fd-count-total {
+    opacity: 0.55;
+  }
+
+  .fd-count-pct {
+    margin-left: auto;
+    color: var(--stage-tone-2);
+  }
+}
+
+@media (max-width: 560px) {
+  .fd-bay {
+    flex-basis: 88%;
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .fd-st-ping {
+    animation: none;
+  }
+
+  .fd-st-core,
+  .fd-st-ring,
+  .fd-st-spike,
+  .fd-st-bloom,
+  .fd-corner,
+  .fd-num-fill,
+  .fd-check,
+  .fd-check::after,
+  .fd-bay-in,
+  .fd-drop,
+  .fd-dots i {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* ── Daylight ───────────────────────────────────────────────────────────────
+   The deck is dark glass-free tonal surfaces at night; by day the same layout
+   becomes paper-pale panels with dark type, and the lit parts take the tone. */
+
+html[data-theme="light"] .fd-grid line {
+  stroke: rgba(40, 60, 110, 0.1);
+}
+
+html[data-theme="light"] .fd-route-dots {
+  stroke: rgba(40, 60, 110, 0.4);
+}
+
+html[data-theme="light"] .fd-route {
+  stroke: rgba(40, 60, 110, 0.26);
+}
+
+html[data-theme="light"] .fd-st-core {
+  background: var(--tone);
+}
+
+html[data-theme="light"] .fd-st-label {
+  color: rgba(20, 28, 52, 0.6);
+}
+
+html[data-theme="light"] .fd-st[data-active] .fd-st-label {
+  color: #0f1630;
+}
+
+html[data-theme="light"] .fd-craft-body {
+  fill: #1b2547;
+  stroke: #1b2547;
+}
+
+html[data-theme="light"] .fd-craft-spine {
+  stroke: rgba(255, 255, 255, 0.6);
+}
+
+html[data-theme="light"] .fd-hud-k,
+html[data-theme="light"] .fd-hud-s,
+html[data-theme="light"] .fd-total,
+html[data-theme="light"] .fd-bay-code {
+  color: rgba(20, 28, 52, 0.55);
+}
+
+html[data-theme="light"] .fd-hud-v {
+  color: #0f1630;
+}
+
+html[data-theme="light"] .fd-hud-s b {
+  color: rgba(20, 28, 52, 0.78);
+}
+
+html[data-theme="light"] .fd-auto {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(20, 28, 52, 0.25);
+  color: #1b2547;
+}
+
+html[data-theme="light"] .fd-bay-in {
+  border-color: rgba(var(--tone-rgb), 0.35);
+  background: linear-gradient(180deg, rgba(var(--tone-rgb), 0.14) 0%, rgba(255, 255, 255, 0.9) 38%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+html[data-theme="light"] .fd-name,
+html[data-theme="light"] .fd-data dd {
+  color: #14182c;
+}
+
+html[data-theme="light"] .fd-desc {
+  color: rgba(28, 34, 54, 0.78);
+}
+
+html[data-theme="light"] .fd-data dt,
+html[data-theme="light"] .fd-out small,
+html[data-theme="light"] .fd-engage-text i {
+  color: rgba(20, 28, 52, 0.5);
+}
+
+html[data-theme="light"] .fd-out {
+  color: rgba(20, 28, 52, 0.8);
+}
+
+html[data-theme="light"] .fd-share {
+  background: rgba(20, 28, 52, 0.12);
+}
+
+html[data-theme="light"] .fd-share-mark {
+  background: rgba(20, 28, 52, 0.55);
+}
+
+html[data-theme="light"] .fd-engage {
+  color: #14182c;
+}
+
+html[data-theme="light"] .fd-engage-track {
+  stroke: rgba(20, 28, 52, 0.14);
+}
+
+html[data-theme="light"] .fd-count,
+html[data-theme="light"] .fd-count > span:first-child {
+  color: rgba(20, 28, 52, 0.6);
+}
+
+html[data-theme="light"] .fd-dots i {
+  background: rgba(20, 28, 52, 0.18);
+}
+
+html[data-theme="light"] .fd-sheen {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.5), transparent 62%);
+}

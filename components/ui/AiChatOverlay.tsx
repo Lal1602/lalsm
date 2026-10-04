@@ -385,9 +385,7 @@ export default function AiChatOverlay() {
           height: 100dvh;
           z-index: 9998;
           border-left: 1px solid rgba(255, 255, 255, 0.08);
-          background: rgba(10, 10, 10, 0.85);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
+          background: rgba(10, 10, 12, 0.96);
           padding: 20px;
           display: flex;
           flex-direction: column;
@@ -463,7 +461,8 @@ export default function AiChatOverlay() {
           height: 192px;
           background: rgba(139, 92, 246, 0.15);
           border-radius: 50%;
-          filter: blur(64px);
+          mask-image: radial-gradient(circle, #000 0%, transparent 70%);
+          -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 70%);
           pointer-events: none;
           z-index: 0;
         }
@@ -475,7 +474,8 @@ export default function AiChatOverlay() {
           height: 192px;
           background: rgba(37, 99, 235, 0.15);
           border-radius: 50%;
-          filter: blur(64px);
+          mask-image: radial-gradient(circle, #000 0%, transparent 70%);
+          -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 70%);
           pointer-events: none;
           z-index: 0;
         }
@@ -740,7 +740,6 @@ export default function AiChatOverlay() {
           height: 56px;
           border-radius: 50%;
           background: linear-gradient(135deg, rgba(13, 13, 23, 0.85), rgba(30, 27, 75, 0.95));
-          backdrop-filter: blur(8px);
           border: 1px solid rgba(255, 255, 255, 0.08);
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(99, 102, 241, 0.15);
           display: flex;
@@ -1042,8 +1041,7 @@ export default function AiChatOverlay() {
           color: #8a6ab0 !important;
         }
         html[data-theme="light"] .ai-chat-backdrop {
-          background: rgba(255, 255, 255, 0.4) !important;
-          backdrop-filter: blur(4px) !important;
+          background: rgba(255, 255, 255, 0.6) !important;
         }
       ` }} />
     </>

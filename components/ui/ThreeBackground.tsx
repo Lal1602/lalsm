@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import horizonScrollState from "@/lib/horizonScrollState";
+import { getQualityPreset, onQualityChange } from "@/lib/quality";
 
 export default function ThreeBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -22,7 +23,9 @@ export default function ThreeBackground() {
         0.1,
         1000
       );
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      // No MSAA: this layer is 6000 additive points and 6%-opacity wireframes, which
+      // gain nothing from it, and multisampling a full-viewport target is not free.
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
       renderer.setSize(window.innerWidth, window.innerHeight);
       containerRef.current.appendChild(renderer.domElement);
 
@@ -37,6 +40,12 @@ export default function ThreeBackground() {
         "position",
         new THREE.BufferAttribute(posArray, 3)
       );
+      // Quality tiers thin the field by drawing fewer of the same points.
+      const applyQuality = () => {
+        particlesGeometry.setDrawRange(0, Math.round(particlesCount * getQualityPreset().particles));
+      };
+      applyQuality();
+      const offQuality = onQualityChange(applyQuality);
       const particlesMaterial = new THREE.PointsMaterial({
         size: 0.04,
         color: 0x00f3ff,
@@ -100,6 +109,33 @@ export default function ThreeBackground() {
       document.addEventListener("mousemove", onMouseMove);
 
       const clock = new THREE.Clock();
+
+      // ── Covered ranges ──────────────────────────────────────────────────
+      // From How I Work through Projects every section paints its own opaque
+      // sky, so this layer is invisible there. The loop keeps ticking (it is a
+      // single early return) but nothing is drawn while the viewport sits fully
+      // inside that range. The last 300px of Projects fade into the page, so
+      // they still count as visible.
+      let coverStart = Infinity;
+      let coverEnd = -Infinity;
+      const measureCover = () => {
+        const first = document.getElementById("workflow");
+        const last = document.getElementById("projects");
+        if (!first || !last) return;
+        coverStart = first.getBoundingClientRect().top + window.scrollY;
+        coverEnd = last.getBoundingClientRect().bottom + window.scrollY - 300;
+      };
+      let measureTimer = 0;
+      const scheduleMeasure = () => {
+        window.clearTimeout(measureTimer);
+        measureTimer = window.setTimeout(measureCover, 200);
+      };
+      measureCover();
+      window.addEventListener("resize", scheduleMeasure);
+      window.addEventListener("load", scheduleMeasure);
+      window.addEventListener("lalsm:preloader-done", scheduleMeasure);
+      const coverObserver = new ResizeObserver(scheduleMeasure);
+      coverObserver.observe(document.body);
 
       let currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
       function updateThemeVisuals(themeStr: string) {
@@ -185,6 +221,7 @@ export default function ThreeBackground() {
           }
         }
         if (insideHorizonPin) return;
+        if (scrollY > coverStart + 40 && scrollY + window.innerHeight < coverEnd) return;
         camera.position.z = 4 - effectiveScrollY * 0.0025;
         particlesMesh.rotation.y = elapsedTime * 0.05;
         particlesMesh.rotation.z = effectiveScrollY * 0.0002;
@@ -214,6 +251,12 @@ export default function ThreeBackground() {
 
       return () => {
         cancelAnimationFrame(animId);
+        offQuality();
+        coverObserver.disconnect();
+        window.clearTimeout(measureTimer);
+        window.removeEventListener("resize", scheduleMeasure);
+        window.removeEventListener("load", scheduleMeasure);
+        window.removeEventListener("lalsm:preloader-done", scheduleMeasure);
         themeObserver.disconnect();
         window.removeEventListener("scroll", onScroll);
         document.removeEventListener("mousemove", onMouseMove);

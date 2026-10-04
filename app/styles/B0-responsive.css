@@ -14,6 +14,8 @@
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
+    /* Its bottom edge is the seam into Projects: see useSeamSnap. */
+    padding-bottom: var(--seam-snap, 0px) !important;
     /* Pixel stars background still fills via position:absolute;inset:0 */
   }
 
@@ -118,7 +120,8 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    filter: blur(40px);
+    mask-image: radial-gradient(circle, #000 0%, transparent 70%);
+    -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 70%);
     pointer-events: none;
     opacity: 0.6;
   }
@@ -221,17 +224,7 @@
 
   /* Removed swipe hint text, using interactive arrows instead */
 
-  /* 3D Projects mobile overrides */
-  .project-3d-canvas-wrap {
-    height: 320px;
-    margin-top: 10px;
-    touch-action: pan-y !important;
-  }
-
   /* Projects overrides */
-  .project-slider .swiper-slide {
-    width: 280px !important;
-  }
 
   .project-card {
     height: 340px;
@@ -250,10 +243,6 @@
     width: 220px;
     min-width: 220px;
     padding: 16px 18px;
-  }
-
-  .interactive-info-grid {
-    grid-template-columns: 1fr;
   }
 
   .project-detail-modal {
@@ -278,10 +267,8 @@
     width: 34px;
     height: 34px;
     font-size: 1.15rem;
-    background: rgba(5, 5, 8, 0.82) !important;
+    background: rgba(5, 5, 8, 0.92) !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   }
 
@@ -300,19 +287,6 @@
 }
 
 /* --- WebGL Three.js Canvas Container --- */
-.three-webgl-canvas-wrap {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: auto;
-  overflow: hidden;
-  /* Flatten 3D context so parent slide rotateY + perspective never distorts the sphere size */
-  transform-style: flat;
-  /* Allow direct mouse drag interaction */
-}
 
 /* Ensure typography in Slide 1 sits cleanly in front of WebGL */
 .slide--kinetic .horizon-slide-content {
@@ -330,24 +304,6 @@
 }
 
 /* Cyber HUD Interactive Status Capsule */
-.hud-interactive-status {
-  position: absolute;
-  bottom: 25px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(10, 10, 14, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  padding: 8px 18px;
-  border-radius: 30px;
-  z-index: 10;
-  pointer-events: none;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
-}
 
 .hud-pulse-dot {
   width: 6px;
@@ -370,26 +326,6 @@
   background-color: var(--accent-purple);
   box-shadow: 0 0 10px var(--accent-purple);
   animation: idle-pulse 2s infinite ease-in-out;
-}
-
-.hud-status-text {
-  font-family: var(--font-code);
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: color 0.4s ease;
-}
-
-.hud-interactive-status:has(.hud-pulse-dot.active) {
-  border-color: rgba(0, 243, 255, 0.15);
-  box-shadow: 0 10px 30px rgba(0, 243, 255, 0.04);
-}
-
-.hud-interactive-status:has(.hud-pulse-dot.active) .hud-status-text {
-  color: rgba(255, 255, 255, 0.8);
 }
 
 @keyframes active-pulse {
@@ -458,23 +394,11 @@
     font-size: clamp(1.6rem, 9vw, 3.5rem) !important;
   }
 
-  .glitch-card {
-    padding: 20px 16px;
-  }
-
   /* ── PROJECTS MOBILE ── */
-  .project-slider .swiper-slide {
-    width: calc(100vw - 48px) !important;
-    max-width: 300px !important;
-  }
 
   .project-card {
     height: 300px;
     border-radius: 14px;
-  }
-
-  .project-float-wrapper {
-    animation: none !important;
   }
 
   .btn-quick-view {
@@ -662,38 +586,10 @@
   /* ── ABOUT — Spatial Hologram (responsive handled by its own @media block) ── */
 
   /* ── WORKFLOW KINETIC TYPOGRAPHY ── */
-  .workflow-text-item {
-    font-size: clamp(1.5rem, 7vw, 3rem);
-    padding: 0.18em 16px 0.18em 0;
-    white-space: normal;
-    /* wrap long words */
-    word-break: break-word;
-  }
-
-  .workflow-text-item .num-prefix {
-    display: none;
-    /* hide numbers to save space */
-  }
-
-  .floating-workflow-card {
-    display: none;
-  }
 
   /* ── SKILL BARS ── */
-  .skill-item:hover {
-    transform: none;
-    /* no horizontal shift on mobile */
-  }
 
   /* ── PROJECTS SWIPER ── */
-  .project-slider .swiper-slide {
-    width: clamp(240px, 72vw, 300px);
-    height: 420px;
-  }
-
-  .project-float-wrapper {
-    animation: none;
-  }
 
   .project-card {
     filter: brightness(1) grayscale(0%);
@@ -815,18 +711,13 @@
     /* Prevent slide content from stretching container width */
   }
 
-  /* Slide 1: Kinetic hero — center WebGL sphere, beautiful ambient visibility */
-  .slide--kinetic .three-webgl-canvas-wrap {
-    opacity: 0.75;
-    /* visible and extremely premium */
-    pointer-events: none;
-    /* let touch pass through for vertical scroll safety */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100% !important;
+  /* The last slide ends exactly on the nebula seam; a rule there would redraw the
+     section edge the seam exists to hide. */
+  .horizon-slide:last-child {
+    border-bottom: none;
   }
+
+  /* Slide 1: Kinetic hero — center WebGL sphere, beautiful ambient visibility */
 
   .slide--kinetic .horizon-slide-content {
     max-width: 100% !important;
@@ -866,33 +757,10 @@
   }
 
   /* Old timeline wrapper — no longer used but kept in case of partial renders */
-  .timeline-horizontal-wrapper {
-    flex-direction: column !important;
-    gap: 32px !important;
-  }
 
   /* ── HUD Status Bar ── */
-  .hud-interactive-status {
-    bottom: 16px;
-    padding: 6px 14px;
-    max-width: calc(100% - 32px);
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  .hud-status-text {
-    font-size: 0.55rem;
-    letter-spacing: 0.08em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 220px;
-  }
 
   /* ── AI Chat Overlay ── */
-  .ai-chat-container {
-    bottom: calc(16px + var(--safe-bottom)) !important;
-    right: 16px !important;
-  }
 
   /* ── Scroll indicator ── */
   .scroll-indicator {
@@ -919,9 +787,6 @@
 @media (max-width: 480px) {
 
   /* ── PROJECTS SMALL MOBILE ── */
-  .project-slider .swiper-slide {
-    width: calc(100vw - 32px) !important;
-  }
 
   .project-card {
     height: 260px;
@@ -938,10 +803,6 @@
     padding: 12px;
   }
 
-  .marquee-card-icon ion-icon {
-    font-size: 1.2rem;
-  }
-
   /* ── FOOTER SMALL MOBILE ── */
   .footer-nav ul {
     gap: 8px 12px;
@@ -952,7 +813,6 @@
   }
 
   .footer-bottom p,
-  .copyright,
   .time-display {
     font-size: 0.65rem;
   }
@@ -999,16 +859,8 @@
   /* About stack — spatial section handles responsiveness via its own @media block */
 
   /* Workflow */
-  .workflow-text-item {
-    font-size: clamp(1.3rem, 8.5vw, 2.2rem);
-  }
 
   /* Projects */
-  .project-slider .swiper-slide {
-    width: calc(100vw - 48px);
-    max-width: 300px;
-    height: 400px;
-  }
 
   /* Horizon slides */
   .horizon-slide {
@@ -1018,10 +870,6 @@
 
   .kinetic-hero-title {
     font-size: clamp(2rem, 12vw, 3.5rem);
-  }
-
-  .outro-title {
-    font-size: clamp(2rem, 11vw, 3.2rem);
   }
 
   .slide-badge {
@@ -1065,19 +913,13 @@
   }
 
   /* HUD status */
-  .hud-status-text {
-    max-width: 160px;
-    font-size: 0.5rem;
-  }
 }
 
 /* ── Performance: Reduce animations on low-end devices ── */
 @media (prefers-reduced-motion: reduce) {
 
-  .project-float-wrapper,
   .stats-badge,
-  .image-blob,
-  .outro-arrow-wrap {
+  .image-blob {
     animation: none !important;
   }
 
@@ -1086,43 +928,4 @@
   }
 }
 
-/* --- Sleek Looping Animation Bar for Project Section --- */
-.project-loop-bar-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 10px auto 0;
-  padding: 0 10px;
-  position: relative;
-  z-index: 10;
-}
-
-.project-loop-bar-track {
-  width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 2px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.02);
-}
-
-.project-loop-bar-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
-  box-shadow: 0 0 10px var(--accent-cyan);
-  border-radius: 2px;
-  will-change: width;
-}
-
-.project-loop-bar-hud {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-family: var(--font-code);
-  font-size: 0.6rem;
-  color: var(--text-muted);
-  letter-spacing: 0.1em;
-  opacity: 0.7;
-}
 

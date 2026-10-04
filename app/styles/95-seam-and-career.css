@@ -15,15 +15,24 @@
 }
 
 .accretion-horizon-seam-upper {
-  bottom: -1px;
-  height: 261px;
+  bottom: 0;
+  height: 320px;
   z-index: 17;
 }
 
 .accretion-horizon-seam-lower {
   top: 0;
-  height: 260px;
+  height: 320px;
   z-index: 6;
+}
+
+.accretion-horizon-seam-container[data-ready="false"] {
+  background:
+    radial-gradient(45% 55% at 10% 50%, rgba(240, 140, 20, 0.42), transparent 70%),
+    radial-gradient(40% 55% at 50% 50%, rgba(52, 215, 165, 0.34), transparent 70%),
+    radial-gradient(45% 55% at 90% 50%, rgba(35, 170, 242, 0.42), transparent 70%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 50%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 50%, transparent);
 }
 
 .accretion-horizon-seam-canvas {
@@ -550,200 +559,8 @@
 
 
 /* SLIDE 2: PHYSICS LAB */
-.physics-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.lab-grid-layout {
-  display: grid;
-  grid-template-columns: 45% 55%;
-  align-items: center;
-  gap: 60px;
-  width: 100%;
-}
-
-.lab-terminal {
-  background: rgba(10, 10, 14, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 30px;
-  backdrop-filter: blur(12px);
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-}
-
-.lab-terminal::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
-}
-
-.terminal-title {
-  font-family: var(--font-code);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-}
-
-.terminal-readouts {
-  margin: 25px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
-  padding-bottom: 20px;
-}
-
-.readout-row {
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-code);
-  font-size: 0.8rem;
-}
-
-.readout-label {
-  color: var(--text-muted);
-}
-
-.readout-value {
-  color: #ffffff;
-  font-weight: 700;
-}
-
-.readout-value.active {
-  color: var(--accent-cyan);
-  text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
-}
-
-.terminal-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.btn-terminal {
-  flex: 1 1 calc(50% - 12px);
-  padding: 12px 18px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: #ffffff;
-  font-family: var(--font-code);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.btn-terminal:hover {
-  background: rgba(0, 243, 255, 0.06);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-  box-shadow: 0 0 15px rgba(0, 243, 255, 0.15);
-}
-
-.btn-terminal.active {
-  background: rgba(188, 19, 254, 0.1);
-  border-color: var(--accent-purple);
-  color: var(--accent-purple);
-}
-
-.btn-terminal.active:hover {
-  box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
-}
 
 /* SLIDE 3: GLITCH CARDS */
-.glitch-cards-wrapper {
-  display: flex;
-  gap: 40px;
-  margin-top: 40px;
-  width: 100%;
-}
-
-.glitch-card {
-  flex: 1;
-  background: rgba(10, 10, 14, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
-  overflow: hidden;
-  padding: 24px;
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
-}
-
-.glitch-card-image-wrap {
-  width: 100%;
-  height: 220px;
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-  margin-bottom: 24px;
-}
-
-.glitch-card-image-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-  filter: grayscale(40%) contrast(1.1);
-}
-
-.glitch-overlay-noise {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.6)),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='glitch'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23glitch)'/%3E%3C/svg%3E");
-  opacity: 0.15;
-  mix-blend-mode: color-dodge;
-  pointer-events: none;
-  z-index: 2;
-  transition: opacity 0.3s ease;
-}
-
-.glitch-card:hover {
-  box-shadow: 0 30px 60px rgba(0, 243, 255, 0.08);
-}
-
-.glitch-card:hover .glitch-card-image-wrap img {
-  transform: scale(1.06);
-  filter: grayscale(0%) contrast(1.05);
-}
-
-.glitch-card:hover .glitch-overlay-noise {
-  opacity: 0.35;
-  animation: static-flicker 0.15s infinite;
-}
-
-@keyframes static-flicker {
-  0% {
-    transform: translate(0, 0);
-  }
-
-  50% {
-    transform: translate(-2px, 1px);
-  }
-
-  100% {
-    transform: translate(1px, -2px);
-  }
-}
-
-.glitch-card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
 
 .card-num {
   font-family: var(--font-code);
@@ -751,59 +568,4 @@
   color: var(--accent-purple);
 }
 
-.card-heading {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.card-text {
-  font-family: var(--font-body);
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
 /* SLIDE 4: OUTRO MATRIX */
-.outro-title {
-  font-family: var(--font-display);
-  font-size: clamp(3rem, 6vw, 5.5rem);
-  font-weight: 900;
-  line-height: 1;
-  text-transform: uppercase;
-  color: #ffffff;
-  margin-bottom: 25px;
-}
-
-.outro-arrow-wrap {
-  margin-top: 40px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 1px dashed rgba(255, 255, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: bounce-vertical 2s infinite ease-in-out;
-}
-
-.outro-arrow {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  color: var(--accent-cyan);
-  text-shadow: 0 0 10px var(--accent-cyan);
-}
-
-@keyframes bounce-vertical {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(8px);
-  }
-}
-

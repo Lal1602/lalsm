@@ -12,8 +12,9 @@
   /* Solid dark base — matches the horizon-container bottom boundary #030308
      so there is 100% zero gap or contrast difference at the section boundary */
   background: linear-gradient(180deg, #030308 0%, #03050c 120px, transparent 400px);
-  /* Slight overlap into the horizon-container above to eliminate any sub-pixel gap */
-  margin-top: -2px;
+  /* No overlap with the section above: the nebula seam handles the join, and its
+     two halves assume the seam line sits exactly on this edge (renderer: originY). */
+  margin-top: 0;
 }
 
 .cosmic-projects-container {
@@ -68,90 +69,21 @@
     radial-gradient(circle at 15% 22%, rgba(255, 175, 75, 0.32) 0%, rgba(225, 130, 40, 0.16) 32%, rgba(180, 80, 20, 0.05) 55%, transparent 75%),
     radial-gradient(circle at 85% 20%, rgba(79, 184, 224, 0.22) 0%, rgba(30, 90, 200, 0.09) 38%, transparent 70%),
     radial-gradient(circle at 50% 65%, rgba(139, 124, 246, 0.06) 0%, transparent 55%);
+  /* The amber glow belongs to the section proper. At the top edge the nebula seam
+     is the only thing that should be painting: if this sat under the seam's thin
+     patches it would put a bright step right on the line that the section above
+     (dark) does not have. It fades in as the seam dissolves. */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 60px, #000 440px);
+  mask-image: linear-gradient(180deg, transparent 0, transparent 60px, #000 440px);
 }
 
-.cosmos-starfield {
+/* One star tile, painted once by ProjectsBackdrop. Nothing here moves. */
+.cosmos-stars {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.cosmos-embers {
-  position: absolute;
-  inset: 0;
-}
-
-.cosmos-ember {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(220, 235, 255, 0.7);
-  animation: cosmos-ember-float ease-in-out infinite;
-}
-
-.cosmos-ember.is-warm {
-  background: rgba(255, 210, 150, 0.85);
-  box-shadow: 0 0 6px rgba(240, 168, 104, 0.6);
-}
-
-@keyframes cosmos-ember-float {
-
-  0%,
-  100% {
-    transform: translate(0, 0);
-    opacity: 0.2;
-  }
-
-  50% {
-    transform: translate(var(--drift, 20px), var(--rise, -40px));
-    opacity: 0.85;
-  }
-}
-
-/* Relativistic Shooting Light Streaks with Motion Trails */
-.cosmos-streaks {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.cosmos-streak {
-  position: absolute;
-  height: 1.5px;
-  border-radius: 999px;
-  animation: cosmos-streak-fly linear infinite;
-  opacity: 0;
-}
-
-.cosmos-streak.is-warm {
-  background: linear-gradient(90deg, transparent 0%, rgba(240, 168, 104, 0.85) 60%, #fff3e0 100%);
-  box-shadow: 0 0 8px rgba(240, 168, 104, 0.7), 0 0 16px rgba(240, 168, 104, 0.3);
-}
-
-.cosmos-streak.is-cool {
-  background: linear-gradient(90deg, transparent 0%, rgba(79, 184, 224, 0.85) 60%, #e0f7ff 100%);
-  box-shadow: 0 0 8px rgba(79, 184, 224, 0.7), 0 0 16px rgba(79, 184, 224, 0.3);
-}
-
-@keyframes cosmos-streak-fly {
-  0% {
-    transform: translateX(-100px) scaleX(0.4);
-    opacity: 0;
-  }
-
-  12% {
-    opacity: 0.85;
-  }
-
-  85% {
-    opacity: 0.85;
-  }
-
-  100% {
-    transform: translateX(110vw) scaleX(1.4);
-    opacity: 0;
-  }
+  background-size: 768px 768px;
+  background-repeat: repeat;
+  opacity: 0.9;
 }
 
 .cosmos-vignette {
@@ -192,18 +124,6 @@
 
 
 
-.cosmos-archive-tag {
-  position: absolute;
-  top: 175px;
-  right: 70px;
-  font-family: var(--font-code);
-  font-size: 0.72rem;
-  letter-spacing: 0.22em;
-  color: rgba(180, 210, 240, 0.45);
-  pointer-events: none;
-  z-index: 12;
-}
-
 /* ── Section Header (Luxury Serif Title + Tech Metadata) ── */
 .project-cosmic-header {
   margin-bottom: 20px;
@@ -239,7 +159,8 @@
   font-family: var(--font-code);
   font-size: 0.62rem;
   letter-spacing: 0.16em;
-  color: rgba(200, 225, 255, 0.45);
+  color: rgba(214, 232, 255, 0.7);
+  text-shadow: 0 1px 10px rgba(2, 4, 12, 0.95);
   text-transform: lowercase;
 }
 
@@ -262,7 +183,8 @@
   font-family: var(--font-code);
   font-size: 0.66rem;
   letter-spacing: 0.18em;
-  color: var(--accent-cyan);
+  color: #b9e7ff;
+  text-shadow: 0 1px 10px rgba(2, 4, 12, 0.95);
 }
 
 .index-hairline {
@@ -272,244 +194,405 @@
   background: linear-gradient(90deg, rgba(79, 184, 224, 0.5) 0%, rgba(79, 184, 224, 0.02) 100%);
 }
 
-/* ── 3D Canvas Stage Container ── */
-.project-3d-canvas-wrap {
-  width: 100%;
-  height: 440px;
+/* ═══════════════════════════════════════════════════════════════════════════
+   OBSERVATORY PLATES — the Projects gallery
+   The plates themselves are one WebGL draw call (lib/plates). Everything a visitor
+   reads or presses is ordinary DOM around them: the number, title, tags, buttons
+   and the tick rail. Class names are all plate- prefixed (one flat stylesheet).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.plate-gallery {
   position: relative;
+  margin-top: 18px;
+}
+
+.plate-stage {
+  position: relative;
+  /* Full-bleed: the plates slide off the edges of the screen instead of being cut
+     at the content column. */
+  width: 100vw;
+  left: 50%;
+  margin-left: -50vw;
+  height: var(--plate-stage-h, 420px);
   outline: none;
-  cursor: grab;
+  touch-action: pan-y;
 }
 
-.project-3d-canvas-wrap:active {
-  cursor: grabbing;
+.plate-stage:focus-visible {
+  outline: 1px dashed rgba(180, 225, 255, 0.55);
+  outline-offset: 6px;
+  border-radius: 6px;
 }
 
+.plate-host {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
 
-
-/* ── Bottom Progress Bar & Track ── */
-.project-loop-bar-container {
-  margin-top: 8px;
+.plate-canvas {
+  display: block;
   width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.project-loop-bar-hud {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 28px;
-  font-family: var(--font-code);
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  color: rgba(180, 210, 240, 0.7);
-}
-
-.project-loop-bar-track {
-  flex: 1;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.08);
-  position: relative;
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.project-loop-bar-fill {
+/* The rail the plates hang from. */
+.plate-rail {
   position: absolute;
   left: 0;
+  right: 0;
   top: 0;
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
-  box-shadow: 0 0 10px var(--accent-cyan);
-  border-radius: 2px;
+  width: 100%;
+  height: 56px;
+  color: rgba(190, 215, 245, 0.3);
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* ── Bottom Celestial Gyroscope / Orbital Instrument Widget ── */
-.cosmos-gyroscope-widget {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 40px;
-  margin-top: 16px;
+/* The plate's number, as a very large outline numeral in the empty corner of the
+   header. (Behind the plate itself it would be completely hidden.) */
+.plate-numeral {
+  position: absolute;
+  right: 5vw;
+  top: -190px;
+  z-index: 0;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(8rem, 15vw, 15rem);
+  line-height: 0.8;
+  letter-spacing: 0.02em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(214, 232, 255, 0.34);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
 }
 
-.gyro-readout {
+.plate-numeral span {
+  display: block;
+  animation: plateRise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes plateRise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Arrival: the stage is dark until the plates develop, then the words come up ── */
+.plate-gallery[data-revealed="false"] .plate-numeral,
+.plate-gallery[data-revealed="false"] .plate-rail {
+  opacity: 0;
+}
+
+.plate-gallery[data-revealed="true"] .plate-numeral,
+.plate-gallery[data-revealed="true"] .plate-rail {
+  opacity: 1;
+  transition: opacity 1.4s ease 0.2s;
+}
+
+.plate-gallery[data-revealed="false"] .plate-info,
+.plate-gallery[data-revealed="false"] .plate-controls {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.plate-gallery[data-revealed="true"] .plate-info,
+.plate-gallery[data-revealed="true"] .plate-controls {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.9s ease 0.9s, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s;
+}
+
+/* ── Text under the stage ── */
+.plate-info {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 24px 48px;
+  align-items: end;
+  margin-top: 6px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(170, 200, 235, 0.14);
+}
+
+.plate-eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: #a9dcf0;
+  text-shadow: 0 1px 10px rgba(2, 4, 12, 0.9);
+  animation: plateRise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.plate-eyebrow i {
+  font-style: normal;
+  margin: 0 0.3em;
+  opacity: 0.5;
+}
+
+.plate-title {
+  margin: 0 0 10px;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 3.4vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: #fff;
+  animation: plateRise 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) 0.05s both;
+}
+
+.plate-desc {
+  margin: 0;
+  max-width: 56ch;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(222, 234, 250, 0.82);
+  animation: plateRise 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) 0.12s both;
+}
+
+.plate-info-side {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  animation: plateRise 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) 0.18s both;
+}
+
+.plate-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   font-family: var(--font-code);
-  font-size: 0.65rem;
-  letter-spacing: 0.14em;
-  line-height: 1.35;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: rgba(206, 226, 250, 0.8);
 }
 
-.gyro-readout.left {
-  text-align: right;
+.plate-tech li + li::before {
+  content: "·";
+  margin-right: 14px;
+  opacity: 0.5;
 }
 
-.gyro-readout.right {
-  text-align: left;
-}
-
-.gyro-val {
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(79, 184, 224, 0.45);
-}
-
-.gyro-sub {
-  color: rgba(180, 210, 240, 0.45);
-}
-
-.gyro-orb-wrap {
-  width: 48px;
-  height: 48px;
+.plate-actions {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.gyro-orb {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #3e4d60 0%, #161e2a 55%, #05080f 100%);
-  box-shadow: inset -2px -2px 6px rgba(0, 0, 0, 0.85), 0 0 15px rgba(0, 0, 0, 0.6);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.gyro-ring {
-  position: absolute;
-  width: 48px;
-  height: 15px;
-  border-radius: 50%;
-  border: 1.5px solid #00f3ff;
-  box-shadow: 0 0 12px #00f3ff, inset 0 0 8px #00f3ff;
-  transform: rotate(-15deg);
-  animation: gyro-ring-tilt 4.5s ease-in-out infinite alternate;
-}
-
-.gyro-core-glow {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff;
-}
-
-@keyframes gyro-ring-tilt {
-  0% {
-    transform: rotate(-22deg) scaleY(0.85);
-  }
-
-  100% {
-    transform: rotate(22deg) scaleY(1.15);
-  }
-}
-
-/* ── Navbar 3D Globe & Projects Active Indicator Dot ── */
-.navbar-globe-icon {
+.plate-open,
+.plate-case {
   display: inline-flex;
   align-items: center;
-  margin-left: 8px;
-  vertical-align: middle;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 2px;
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-.globe-svg {
-  width: 18px;
-  height: 18px;
-  animation: globe-slow-spin 22s linear infinite;
-  filter: drop-shadow(0 0 6px rgba(79, 184, 224, 0.45));
+.plate-open {
+  border: 1px solid #f2e6cf;
+  background: #f2e6cf;
+  color: #0b0d14;
+  font-weight: 600;
 }
 
-@keyframes globe-slow-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
+.plate-open:hover,
+.plate-open:focus-visible {
+  background: #ffffff;
+  border-color: #ffffff;
 }
 
-.nav-item-projects {
-  position: relative;
+.plate-case {
+  border: 1px solid rgba(190, 215, 245, 0.4);
+  background: transparent;
+  color: #dbe9ff;
+}
+
+.plate-case:hover,
+.plate-case:focus-visible {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+/* ── Prev / next and the tick rail ── */
+.plate-controls {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: 14px;
+  margin-top: 22px;
 }
 
-.nav-projects-dot {
-  position: absolute;
-  bottom: -8px;
-  width: 4.5px;
-  height: 4.5px;
+.plate-step {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(190, 215, 245, 0.28);
   border-radius: 50%;
+  background: transparent;
+  color: #dbe9ff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.plate-step:hover,
+.plate-step:focus-visible {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.plate-ticks {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plate-ticks li {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.plate-ticks button {
+  position: relative;
+  width: 100%;
+  max-width: 30px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.plate-ticks button::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  width: 1px;
+  height: 10px;
+  background: rgba(190, 215, 245, 0.38);
+  transform: translateX(-50%);
+  transition: height 0.25s ease, background 0.25s ease, width 0.25s ease;
+}
+
+.plate-ticks button:hover::before,
+.plate-ticks button:focus-visible::before {
+  height: 18px;
+  background: #ffffff;
+}
+
+.plate-ticks button[aria-current="true"]::before {
+  width: 2px;
+  height: 26px;
   background: var(--accent-gold);
-  box-shadow: 0 0 8px var(--accent-gold), 0 0 15px var(--accent-gold);
-  animation: dot-glow 2.2s infinite ease-in-out;
 }
 
-@keyframes dot-glow {
+.plate-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
-  0%,
-  100% {
-    opacity: 0.7;
-    transform: scale(1);
-  }
+/* Header hint: one line per input type. */
+.meta-instruction--narrow {
+  display: none;
+}
 
-  50% {
-    opacity: 1;
-    transform: scale(1.35);
+@media (max-width: 860px) {
+  .plate-info {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
+
+@media (max-width: 700px) {
+  .meta-instruction--wide {
+    display: none;
+  }
+
+  .meta-instruction--narrow {
+    display: inline;
+  }
+
+  .plate-numeral {
+    display: none;
+  }
+
+  .plate-ticks {
+    display: none;
+  }
+
+  .plate-controls {
+    justify-content: space-between;
+  }
+
+  .plate-actions > * {
+    flex: 1;
+    justify-content: center;
+    padding: 0 12px;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .plate-numeral span,
+  .plate-eyebrow,
+  .plate-title,
+  .plate-desc,
+  .plate-info-side {
+    animation: none;
+  }
+
+  .plate-gallery[data-revealed="true"] .plate-numeral,
+  .plate-gallery[data-revealed="true"] .plate-rail,
+  .plate-gallery[data-revealed="true"] .plate-info,
+  .plate-gallery[data-revealed="true"] .plate-controls {
+    transition: none;
+  }
+}
+
+
+/* ── Navbar 3D Globe & Projects Active Indicator Dot ── */
 
 /* ── Responsive Refinements ── */
 @media (max-width: 1024px) {
 
-  .reticle-left,
-  .reticle-right {
-    display: none !important;
-  }
-
-  .reticle-center {
-    left: 50%;
-  }
-
-  .project-3d-canvas-wrap {
-    height: 440px;
-  }
-
   .cosmos-top-frame {
     display: none;
   }
-
-  .cosmos-archive-tag {
-    display: none;
-  }
 }
 
-@media (max-width: 640px) {
-  .project-loop-bar-hud {
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .project-loop-bar-track {
-    width: 100%;
-  }
-
-  .cosmos-gyroscope-widget {
-    gap: 20px;
-  }
-
-  .reticle-center {
-    display: none !important;
-  }
-}
 
 
 /* Cyberpunk details overlay modal */
@@ -526,9 +609,7 @@
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(5, 5, 8, 0.82);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  background: rgba(5, 5, 8, 0.92);
 }
 
 .modal-content-card {

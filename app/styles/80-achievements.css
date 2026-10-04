@@ -24,16 +24,6 @@
   flex-wrap: wrap;
 }
 
-.ach-list-eyebrow {
-  font-family: var(--font-code);
-  font-size: 0.75rem;
-  color: var(--accent-gold);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  opacity: 0.8;
-  flex-shrink: 0;
-}
-
 .ach-marquee-section .section-title {
   margin-bottom: 0;
 }
@@ -348,33 +338,6 @@
 
   .track-right {
     animation-duration: 24s;
-  }
-}
-
-@keyframes ai-glow-pulse {
-  0% {
-    box-shadow: 0 0 0 0px rgba(0, 243, 255, 0), 0 0 0 0px rgba(188, 19, 254, 0);
-    filter: brightness(1);
-  }
-
-  55% {
-    box-shadow: 0 0 40px 10px rgba(0, 243, 255, 0.45), 0 0 60px 15px rgba(188, 19, 254, 0.35);
-    filter: brightness(1.15);
-  }
-
-  30% {
-    box-shadow: 0 0 20px 4px rgba(0, 243, 255, 0.25), 0 0 30px 6px rgba(188, 19, 254, 0.2);
-    filter: brightness(1.05);
-  }
-
-  45% {
-    box-shadow: 0 0 35px 8px rgba(0, 243, 255, 0.4), 0 0 50px 12px rgba(188, 19, 254, 0.3);
-    filter: brightness(1.12);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0px rgba(0, 243, 255, 0), 0 0 0 0px rgba(188, 19, 254, 0);
-    filter: brightness(1);
   }
 }
 

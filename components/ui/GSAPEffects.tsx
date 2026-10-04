@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import horizonScrollState from "@/lib/horizonScrollState";
+import { gridPad } from "@/lib/seamGrid";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -238,7 +239,14 @@ export default function GSAPEffects() {
           pin: true,
           scrub: 0.8,
           start: "top top",
-          end: () => `+=${totalScrollWidth()}`,
+          // A little longer than the travel when needed, so the pin's spacer ends on the seam grid:
+          // its bottom edge is the seam into Projects (lib/seamGrid).
+          end: () => {
+            const travel = totalScrollWidth();
+            // The exact height, not offsetHeight: at a browser zoom of 110% or 125% 100vh is not a whole number of px.
+            const held = horizonWrapper.closest<HTMLElement>(".horizon-container")?.getBoundingClientRect().height ?? window.innerHeight;
+            return `+=${travel + gridPad(held + travel)}`;
+          },
           invalidateOnRefresh: true,
           fastScrollEnd: true,
           preventOverlaps: true,
@@ -247,20 +255,6 @@ export default function GSAPEffects() {
             // HorizonShowcase all subscribe to it.
             horizonScrollState.emit(self.progress);
           },
-          snap: {
-            snapTo: (value) => {
-              const step = 1 / (totalSlides - 1);
-              const currentX = Math.abs((gsap.getProperty(horizonWrapper, "x") as number) || 0);
-              const totalW = totalScrollWidth();
-              const visualProgress = totalW > 0 ? currentX / totalW : value;
-              const targetIndex = Math.round(visualProgress / step);
-              return targetIndex * step;
-            },
-            duration: { min: 0.2, max: 0.5 },
-            ease: "power2.out",
-            inertia: false,
-            directional: false,
-          },
           onRefresh: (self) => {
             horizonScrollState.start = self.start;
             horizonScrollState.end = self.end;
@@ -268,6 +262,11 @@ export default function GSAPEffects() {
           },
         },
       });
+
+      // No snapping, on purpose. The page is driven by Lenis, and ScrollTrigger's snap moved it with
+      // GSAP at the same time: the two fought, and a small nudge near either end of the pin lurched the
+      // page. With only two slides any snap is a jump of a whole slide anyway, so the transit just
+      // follows the scroll.
     }
 
 

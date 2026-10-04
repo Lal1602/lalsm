@@ -255,7 +255,7 @@ export default function CvTimelineSlide() {
           position: "absolute", top: "10%", left: "18%",
           width: "420px", height: "420px",
           background: "rgba(0, 243, 255, 0.045)",
-          borderRadius: "50%", filter: "blur(120px)",
+          borderRadius: "50%", maskImage: "radial-gradient(circle, #000 0%, transparent 70%)", WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 70%)",
           pointerEvents: "none", zIndex: 1,
         }}
       />
@@ -264,7 +264,7 @@ export default function CvTimelineSlide() {
           position: "absolute", bottom: "5%", right: "15%",
           width: "300px", height: "300px",
           background: "rgba(188, 19, 254, 0.03)",
-          borderRadius: "50%", filter: "blur(100px)",
+          borderRadius: "50%", maskImage: "radial-gradient(circle, #000 0%, transparent 70%)", WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 70%)",
           pointerEvents: "none", zIndex: 1,
         }}
       />
@@ -352,7 +352,7 @@ export default function CvTimelineSlide() {
             download="Bilal-Sanayu-Majid-CV.pdf"
             onClick={() => track("cv_download", { source: "career-mobile" })}
             className="btn"
-            style={{ fontSize: "0.72rem", padding: "8px 12px", textAlign: "center", display: "block" }}
+            style={{ fontSize: "0.72rem", padding: "14px 12px", textAlign: "center", display: "block" }}
           >
             Get Resume PDF
           </a>

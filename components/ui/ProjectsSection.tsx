@@ -1,12 +1,11 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Canvas } from "@react-three/fiber";
 import Image from "next/image";
-import FilmScene from "./FilmScene";
-import CosmicBackdrop from "./CosmicBackdrop";
-import AccretionHorizonSeam from "./AccretionHorizonSeam";
 import Link from "next/link";
+import PlateGallery from "./PlateGallery";
+import ProjectsBackdrop from "./ProjectsBackdrop";
+import AccretionHorizonSeam from "./AccretionHorizonSeam";
 import { projects, type Project } from "@/data/projects";
 import { OPEN_PROJECT_EVENT } from "@/lib/chat/runActions";
 import { track } from "@/lib/analytics";
@@ -16,41 +15,16 @@ import "./lite.css";
 export default function ProjectsSection() {
   const [mounted, setMounted] = useState(false);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [isDesktop, setIsDesktop] = useState(false);
   const { lite } = useLite();
-  const [canvasInView, setCanvasInView] = useState(false);
-  const canvasWrapRef = useRef<HTMLDivElement>(null);
-
-  // Dynamic telemetry states for the bottom gyroscope widget
-  const [orbitalDeg, setOrbitalDeg] = useState(90);
-  const [coordIndex, setCoordIndex] = useState(21);
-
-  // References to share dynamic, high-performance scroll values across R3F and DOM
-  const scrollRef = useRef({
-    current: 0,
-    target: 0,
-    isDragging: false,
-    lastX: 0,
-    velocity: 0,
-    dragDistance: 0,
-  });
-
-  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // WebGL and the portal modal need a real DOM, so they only render after mount.
+    // The portal modal and the seam canvas need a real DOM, so they render after mount.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    setIsDesktop(window.innerWidth >= 1024);
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // The film strip is drawn in WebGL, so the AI assistant cannot click a DOM card.
-  // It dispatches this event instead and we open the matching project ourselves.
+  // The plates are drawn in WebGL, so the AI assistant cannot click one. It
+  // dispatches this event instead and we open the matching project ourselves.
   useEffect(() => {
     const onOpen = (event: Event) => {
       const title = String((event as CustomEvent<{ title?: string }>).detail?.title ?? "").toLowerCase();
@@ -64,110 +38,37 @@ export default function ProjectsSection() {
     return () => window.removeEventListener(OPEN_PROJECT_EVENT, onOpen);
   }, []);
 
-  // Frame observer to pause WebGL rendering when outside viewport
-  useEffect(() => {
-    const wrap = canvasWrapRef.current;
-    if (!wrap) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setCanvasInView(entry.isIntersecting),
-      { rootMargin: "200px" }
-    );
-    io.observe(wrap);
-    return () => io.disconnect();
-  }, [mounted, lite]);
-
-  // Periodic telemetry updater based on scroll angle
-  useEffect(() => {
-    if (!mounted) return;
-    let rId: number;
-    let lastDeg = -1;
-
-    const tick = () => {
-      const cur = scrollRef.current.current;
-      const MathPI2 = Math.PI * 2;
-      const norm = (((cur % MathPI2) + MathPI2) % MathPI2) / MathPI2;
-      const deg = Math.round(norm * 360);
-      if (deg !== lastDeg) {
-        lastDeg = deg;
-        setOrbitalDeg(deg);
-        setCoordIndex((Math.round(norm * (projects.length - 1)) % projects.length) + 1);
-      }
-      rId = requestAnimationFrame(tick);
-    };
-
-    rId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rId);
-  }, [mounted]);
-
-  // Pointer drag event handlers
-  const handlePointerDown = (e: React.PointerEvent) => {
-    scrollRef.current.isDragging = true;
-    scrollRef.current.lastX = e.clientX;
-    scrollRef.current.dragDistance = 0;
-    scrollRef.current.velocity = 0;
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!scrollRef.current.isDragging) return;
-    const deltaX = e.clientX - scrollRef.current.lastX;
-    scrollRef.current.lastX = e.clientX;
-
-    scrollRef.current.dragDistance += Math.abs(deltaX);
-
-    const sensitivity = 0.003;
-    scrollRef.current.target -= deltaX * sensitivity;
-    scrollRef.current.velocity = -deltaX * sensitivity;
-  };
-
-  const handlePointerUp = () => {
-    if (scrollRef.current.isDragging) {
-      scrollRef.current.isDragging = false;
-    }
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    if (!isDesktop) return;
-    const sensitivity = 0.001;
-    scrollRef.current.target += e.deltaY * sensitivity;
-  };
-
   return (
-    <section
-      className="section cosmic-projects-section"
-      id="projects"
-      aria-label="Projects Section"
-    >
+    <section className="section cosmic-projects-section" id="projects" aria-label="Projects Section">
       {/* ── Seamless Accretion Wave & Horizon Telemetry Seam (Lower Half) ── */}
-      {mounted && !lite && <AccretionHorizonSeam part="lower" />}
+      {mounted && <AccretionHorizonSeam part="lower" />}
 
-      {/* 1. Deep Space Atmospheric Canvas & Nebula Backdrop */}
-      {mounted && !lite && <CosmicBackdrop />}
+      <ProjectsBackdrop />
 
-      {/* 2. Top Viewport HUD Frame */}
+      {/* Top Viewport HUD Frame */}
       <div className="cosmos-top-frame" aria-hidden="true">
         <div className="cosmos-corner-bracket is-tl"></div>
         <div className="cosmos-frame-line"></div>
       </div>
 
-      {/* Upper-Right Mid Space Monospace Label */}
-      <div className="cosmos-archive-tag" aria-hidden="true">
-        ARCHIVE_X-01
-      </div>
-
       <div className="container cosmic-projects-container" style={{ position: "relative", zIndex: 10 }}>
-        {/* 3. High-Fashion Editorial Serif Section Title & Metadata */}
         <div className="project-cosmic-header">
           <div className="project-title-row">
             <h2 className="project-serif-title">PROJECTS</h2>
             <div className="project-header-meta">
-              <span className="meta-subtext">microscopic subtext</span>
-              <span className="meta-instruction">
-                {lite
-                  ? "// TAP A PROJECT TO OPEN ITS ARCHIVE RECORD"
-                  : isDesktop
-                    ? "// GRAB & DRAG OR SCROLL TO SPIN VINTAGE FILM STRIP"
-                    : "// SWIPE LEFT/RIGHT • TAP TO EXPAND ARCHIVE RECORD"}
-              </span>
+              <span className="meta-subtext">observatory plate archive</span>
+              {lite ? (
+                <span className="meta-instruction">{"// TAP A PROJECT TO OPEN ITS ARCHIVE RECORD"}</span>
+              ) : (
+                <>
+                  <span className="meta-instruction meta-instruction--wide">
+                    {"// DRAG THE RAIL, USE ← → OR CLICK A PLATE"}
+                  </span>
+                  <span className="meta-instruction meta-instruction--narrow">
+                    {"// SWIPE THE RAIL • TAP THE PLATE TO OPEN IT"}
+                  </span>
+                </>
+              )}
             </div>
           </div>
           <div className="project-index-line">
@@ -176,102 +77,10 @@ export default function ProjectsSection() {
           </div>
         </div>
 
-        {lite ? (
-          // Lite gallery: plain DOM cards, no WebGL canvas, no drag physics.
-          <ul className="lite-projects">
-            {projects.map((project) => (
-              <li key={project.slug}>
-                <button
-                  type="button"
-                  className="lite-project-card"
-                  onClick={() => setActiveProject(project)}
-                  aria-label={`Open ${project.title}`}
-                >
-                  <span className="lite-project-thumb">
-                    <Image
-                      src={project.image}
-                      alt=""
-                      fill
-                      sizes="(max-width: 600px) 50vw, 240px"
-                    />
-                  </span>
-                  <span className="lite-project-body">
-                    <strong>{project.title}</strong>
-                    <span>{project.desc}</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <>
-          {/* 4. 3D WebGL Canvas Container with Cyber-Glass Monitors */}
-          <div
-            ref={canvasWrapRef}
-            className="project-3d-canvas-wrap"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerLeave={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            onWheel={handleWheel}
-            style={{ touchAction: isDesktop ? "none" : "pan-y" }}
-          >
-            {mounted && (
-              <Canvas
-                camera={{ position: [0, 0, 4.0], fov: 50 }}
-                dpr={[1, 1.5]}
-                frameloop={canvasInView ? "always" : "never"}
-                gl={{ alpha: true, antialias: true, stencil: false }}
-                style={{ background: "transparent", touchAction: isDesktop ? "none" : "pan-y" }}
-              >
-                <FilmScene
-                  projects={projects}
-                  onSelectProject={(proj) => setActiveProject(proj)}
-                  scrollRef={scrollRef}
-                  progressRef={progressRef}
-                />
-              </Canvas>
-            )}
-          </div>
-
-          {/* 6. Sleek Cosmic Progress Bar & Drag Indicator */}
-          <div className="project-loop-bar-container">
-            <div className="project-loop-bar-hud">
-              <span className="hud-code">• // {projects.length} PROJECTS //</span>
-              <div className="project-loop-bar-track">
-                <div ref={progressRef} className="project-loop-bar-fill"></div>
-              </div>
-              <span className="hud-code">DRAG TO EXPLORE THE GALAXY</span>
-            </div>
-          </div>
-
-          {/* 7. Bottom Celestial Gyroscope / Orbital Instrument Widget */}
-          <div className="cosmos-gyroscope-widget" aria-hidden="true">
-            <div className="gyro-readout left">
-              <span className="gyro-val">{orbitalDeg}° ORBITAL</span>
-              <span className="gyro-sub">STR106</span>
-            </div>
-
-            <div className="gyro-orb-wrap">
-              <div className="gyro-orb">
-                <div className="gyro-ring"></div>
-                <div className="gyro-core-glow"></div>
-              </div>
-            </div>
-
-            <div className="gyro-readout right">
-              <span className="gyro-val">
-                {String(coordIndex).padStart(2, "0")} COORDINATE
-              </span>
-              <span className="gyro-sub">0E</span>
-            </div>
-          </div>
-          </>
-        )}
+        <PlateGallery onOpen={setActiveProject} />
       </div>
 
-      {/* Cyberpunk details overlay modal */}
+      {/* Details overlay modal */}
       {activeProject && mounted && createPortal(
         <div className="project-detail-modal" onClick={() => setActiveProject(null)}>
           <div className="modal-backdrop"></div>

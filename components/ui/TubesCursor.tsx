@@ -1,5 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
+import { markTubesWarmed } from "@/lib/tubesWarm";
+import { getQualityPreset, onQualityChange } from "@/lib/quality";
 
 // ── Type stubs for the self-hosted threejs-components module ─────────────────────────
 interface TubesInstance {
@@ -11,6 +13,8 @@ interface TubesInstance {
     minPixelRatio?: number;
     maxPixelRatio?: number;
     resize?: () => void;
+    render?: () => void;
+    renderer?: { init?: () => Promise<unknown> };
   };
   dispose?: () => void;
 }
@@ -33,6 +37,17 @@ function randomColors(count: number): string[] {
   return Array.from({ length: count }, () =>
     "#" + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0")
   );
+}
+
+async function warm(app: TubesInstance) {
+  try {
+    await app.three?.renderer?.init?.();
+    app.three?.render?.();
+  } catch (err) {
+    console.warn("[TubesCursor] warm-up frame failed:", err);
+  } finally {
+    markTubesWarmed();
+  }
 }
 
 /**
@@ -70,6 +85,7 @@ export default function TubesCursor() {
     // to resolve a module.
     const MODULE_URL: string = "/vendor/tubes1.min.js";
 
+    let offQuality: (() => void) | null = null;
     const initTimer = setTimeout(() => {
       syncSize(); // re-sync just before init in case layout shifted
       (import(/* webpackIgnore: true */ MODULE_URL) as Promise<{ default: TubesFactory }>)
@@ -84,23 +100,35 @@ export default function TubesCursor() {
           // The library pins its buffer to 2x whatever the screen is, so on a 1x
           // display it drew 4.2 megapixels (plus a bloom pass) into a 1.05
           // megapixel canvas — resolution the screen cannot show. Both bounds
-          // default to 2, so the max alone stays clamped up at 2.
-          if (app.three) {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            app.three.minPixelRatio = dpr;
-            app.three.maxPixelRatio = dpr;
+          // default to 2, so the max alone stays clamped up at 2. The governor then takes
+          // it lower on a device that is struggling: the tubes are a soft glow, so
+          // they lose almost nothing and the fill cost drops with the square of it.
+          const fit = () => {
+            if (!app.three) return;
+            const ratio = Math.min(window.devicePixelRatio || 1, 2) * getQualityPreset().tubeScale;
+            if (app.three.maxPixelRatio === ratio) return;
+            app.three.minPixelRatio = ratio;
+            app.three.maxPixelRatio = ratio;
             app.three.resize?.();
-          }
+          };
+          fit();
+          offQuality = onQualityChange(fit);
           appRef.current = app;
+          // The library only renders while on screen, so its first frame (pipelines, render targets,
+          // bloom) would land on the frame the visitor scrolls in. Draw it now, behind the preloader.
+          void warm(app);
         })
         .catch((err: unknown) => {
           console.error("[TubesCursor] Failed to load:", err);
+          markTubesWarmed();
         });
     }, 150);
 
     return () => {
       ro.disconnect();
       clearTimeout(initTimer);
+      offQuality?.();
+      markTubesWarmed();
       if (appRef.current && typeof appRef.current.dispose === "function") {
         appRef.current.dispose();
       }

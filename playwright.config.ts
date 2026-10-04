@@ -14,6 +14,9 @@ export default defineConfig({
   testDir: "tests/e2e",
   timeout: 45_000,
   fullyParallel: true,
+  // Most pages here run WebGL canvases and real-time interactions (a hold, a game loop, a
+  // frame meter). Many of them at once starve each other and turn timing assertions flaky.
+  workers: process.env.CI ? 2 : 3,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {

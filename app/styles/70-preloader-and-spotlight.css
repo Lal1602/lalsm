@@ -1,12 +1,5 @@
 /* --- Footer Removed (Replaced below) --- */
 
-.social-icons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
 .social-icon {
   font-size: 1.5rem;
   color: var(--text-muted);
@@ -229,11 +222,6 @@
 
   /* nav-links & menu-toggle mobile overrides moved to the
              comprehensive responsive block at the bottom of this file. */
-
-  .swiper {
-    overflow: hidden;
-    /* Prevent overflow on small screens */
-  }
 
   /* Fix button centering */
   .btn-group {

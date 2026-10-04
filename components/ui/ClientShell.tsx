@@ -1,13 +1,14 @@
 "use client";
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
 import { useLite } from "@/lib/lite";
+import { startQualityGovernor } from "@/lib/quality";
 
 const Preloader = dynamic(() => import("./Preloader"), { ssr: false });
 const ThreeBackground = dynamic(() => import("./ThreeBackground"), { ssr: false });
 const CustomCursor = dynamic(() => import("./CustomCursor"), { ssr: false });
 const Navbar = dynamic(() => import("./Navbar"), { ssr: false });
 const GSAPEffects = dynamic(() => import("./GSAPEffects"), { ssr: false });
-const SwiperInit = dynamic(() => import("./SwiperInit"), { ssr: false });
 const GlobalInteractions = dynamic(() => import("./GlobalInteractions"), { ssr: false });
 const LenisSetup = dynamic(() => import("./LenisSetup"), { ssr: false });
 const AiChatOverlay = dynamic(() => import("./AiChatOverlay"), { ssr: false });
@@ -18,6 +19,11 @@ export default function ClientShell() {
   // whole page, and smooth-scroll (native scrolling is the cheapest there is).
   const { lite } = useLite();
 
+  // Watches frame times for the whole session and publishes a quality tier.
+  useEffect(() => {
+    startQualityGovernor();
+  }, []);
+
   return (
     <>
       {!lite && <LenisSetup />}
@@ -26,7 +32,6 @@ export default function ClientShell() {
       <CustomCursor />
       <Navbar />
       <GSAPEffects />
-      <SwiperInit />
       <GlobalInteractions />
       <AiChatOverlay />
       <LiteToggle />
