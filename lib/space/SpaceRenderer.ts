@@ -51,6 +51,8 @@ interface Slot extends SlotOptions {
   dirty: boolean;
   /** The slot's constellation artwork as a GL texture, rebuilt on resize. */
   constTex: ConstTexture | null;
+  /** Set around one draw made behind the preloader, before the slot has ever been on screen. */
+  warm?: boolean;
 }
 
 const KIND = {
@@ -317,6 +319,40 @@ class SpaceRendererImpl {
     };
   }
 
+  /**
+   * Behind the preloader: waits for the seams to mount (they do so after hydration), then draws each one that
+   * has never been drawn, once, one per frame. What a first draw costs (the render targets, the constellation
+   * texture, the canvas surfaces) is then paid here, and the seam is already `data-ready` when the visitor
+   * scrolls to it, instead of showing its CSS fallback for a moment and then swapping. Resolves with how many
+   * it drew.
+   */
+  async warmSlots(expected: number, waitMs: number): Promise<number> {
+    const pause = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+    const frame = () =>
+      new Promise<void>((r) => {
+        const t = setTimeout(r, 64);
+        requestAnimationFrame(() => {
+          clearTimeout(t);
+          r();
+        });
+      });
+    const deadline = performance.now() + waitMs;
+    while (this.gl && this.slots.size < expected && performance.now() < deadline) await pause(50);
+    if (!this.gl) return 0;
+
+    let drawn = 0;
+    for (const slot of Array.from(this.slots)) {
+      if (slot.ready || !this.slots.has(slot)) continue;
+      slot.warm = true;
+      const preset = getQualityPreset();
+      this.draw(performance.now(), preset.nebulaScale, preset.nebulaOctaves, preset.particles, preset.dpr);
+      slot.warm = false;
+      drawn += 1;
+      await frame();
+    }
+    return drawn;
+  }
+
   private ensureListeners() {
     if (this.cleanups.length > 0) return;
     const onMove = (e: PointerEvent) => {
@@ -466,7 +502,7 @@ class SpaceRendererImpl {
     const c = this.uC;
 
     for (const slot of this.slots) {
-      if (!slot.visible) continue;
+      if (!slot.visible && !slot.warm) continue;
       if (!this.animate && !slot.dirty) continue;
 
       const cfg = KIND[slot.kind];

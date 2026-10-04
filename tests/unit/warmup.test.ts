@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getWarmupSnapshot,
+  getWarmupStatuses,
   registerWarmup,
   resetWarmupForTests,
   startWarmup,
@@ -65,6 +66,74 @@ describe("warm-up pipeline", () => {
     await done;
     expect(await v).toBe(42);
     expect(await x).toBeUndefined();
+  });
+
+  it("counts progress by weight, so a heavy task moves the readout further than a light one", async () => {
+    registerWarmup({ name: "light", weight: 1, run: async () => 1 });
+    registerWarmup({ name: "heavy", weight: 3, run: () => new Promise((r) => setTimeout(() => r(2), 100)) });
+
+    const done = startWarmup();
+    await vi.advanceTimersByTimeAsync(0);
+    // The light one is done, the heavy one is not: a quarter of the work, not half.
+    expect(getWarmupSnapshot().progress).toBeCloseTo(0.25, 5);
+    expect(getWarmupSnapshot().last).toEqual({ name: "light", status: "ok" });
+    await vi.advanceTimersByTimeAsync(100);
+    await done;
+    expect(getWarmupSnapshot().progress).toBe(1);
+  });
+
+  it("runs the gpu lane one task at a time, in order, with the others in parallel", async () => {
+    const log: string[] = [];
+    const slow = (name: string, ms: number) => () =>
+      new Promise<string>((resolve) => {
+        log.push(`${name}:start`);
+        setTimeout(() => {
+          log.push(`${name}:end`);
+          resolve(name);
+        }, ms);
+      });
+    registerWarmup({ name: "g1", lane: "gpu", run: slow("g1", 50) });
+    registerWarmup({ name: "g2", lane: "gpu", run: slow("g2", 50) });
+    registerWarmup({ name: "net", run: slow("net", 80) });
+
+    const done = startWarmup();
+    await vi.advanceTimersByTimeAsync(0);
+    // g1 and the parallel task have started; g2 waits its turn.
+    expect(log).toEqual(expect.arrayContaining(["g1:start", "net:start"]));
+    expect(log).not.toContain("g2:start");
+    await vi.advanceTimersByTimeAsync(400);
+    await done;
+    expect(log.indexOf("g1:end")).toBeLessThan(log.indexOf("g2:start"));
+    expect(getWarmupSnapshot()).toMatchObject({ total: 3, settled: 3, finished: true });
+  });
+
+  it("starts the timeout of a lane task when it starts, not while it waits in the queue", async () => {
+    registerWarmup({ name: "first", lane: "gpu", run: () => new Promise((r) => setTimeout(() => r(1), 300)), timeoutMs: 1000 });
+    registerWarmup({ name: "second", lane: "gpu", run: () => new Promise((r) => setTimeout(() => r(2), 300)), timeoutMs: 400 });
+
+    const done = startWarmup();
+    await vi.advanceTimersByTimeAsync(1000);
+    await done;
+    // 600ms after the run began, past its own 400ms budget if that had been counted from the start.
+    expect(warmValue("second")).toBe(2);
+  });
+
+  it("reports how every task ended", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    registerWarmup({ name: "fine", run: async () => 1 });
+    registerWarmup({ name: "late", run: () => new Promise(() => {}), timeoutMs: 20 });
+    registerWarmup({
+      name: "broken",
+      run: async () => {
+        throw new Error("no");
+      },
+    });
+    const done = startWarmup();
+    expect(getWarmupStatuses().late).toBe("pending");
+    await vi.advanceTimersByTimeAsync(20);
+    await done;
+    expect(getWarmupStatuses()).toEqual({ fine: "ok", late: "timeout", broken: "error" });
+    warn.mockRestore();
   });
 
   it("starts a task that registers after the run began", async () => {

@@ -60,6 +60,8 @@ export class PlateRenderer {
   private atlasH = 0;
   private rows = 1;
   private loaded: boolean[] = [];
+  /** Settles when every plate after the critical ones has been fetched, decoded and uploaded (or failed). */
+  restLoaded: Promise<void> = Promise.resolve();
 
   private count: number;
   private size: PlateSize;
@@ -116,8 +118,9 @@ export class PlateRenderer {
     r.initGl();
     await r.loadCritical();
     r.warmFrame();
-    // The rest arrive while the visitor is still reading the page above.
-    void r.loadRest();
+    // The rest arrive while the visitor is still reading the page above (or, on a fast connection, while the
+    // splash is still up: `restLoaded` lets the warm-up wait a little for them).
+    r.restLoaded = r.loadRest().catch(() => undefined);
     return r;
   }
 

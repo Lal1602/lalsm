@@ -49,9 +49,18 @@ them (`D0-paper-night.css` holds the light skin of the sections that were drawn 
 - **Quality governor** (`lib/quality.ts`, `lib/qualityGovernor.ts`): one rAF sampler watches frame
   times and publishes a tier 0–3 as `<html data-q>`. Effects read it (nebula resolution, tube
   resolution, particle counts, idle frame rate) and get cheaper, never absent. Lite reads as tier 3.
-- **Warm-up behind the preloader** (`lib/warmup.ts`, `lib/warmupTasks.ts`): WebGL contexts, shader
-  compilation, the plate atlas, the Motion feature bundle, fonts, and the tubes' first frame are all
-  done while the preloader is up, so arriving at a section is an animation, not a stall.
+- **Warm-up behind the splash** (`lib/warmup.ts`, `lib/warmupTasks.ts`): eight systems are prepared
+  while the splash is up: the hero's portrait dots, fonts, the code of every lazily mounted part, the
+  certificates, the shared WebGL context and shaders, a first draw of each of the four nebula seams,
+  the tubes' first frame, and the plate atlas with its plates. Arriving at a section is an animation, not
+  a stall. The heavy ones run one at a time with a frame between (the `gpu` lane), so the screen in front
+  keeps painting; progress is weighted by cost.
+- **The splash is in the first paint** (`components/ui/PreloaderShell.tsx`, `lib/splash.ts`): it is
+  server-rendered markup, so it covers the page from the first pixel, before any script, and for every
+  visitor (Lite and reduced motion included, with a shorter, calmer version). The controller
+  (`Preloader.tsx`) only writes real numbers into it: the dial's 120 ticks, one arc per system, the
+  odometer, the readout. It opens along the horizon in two halves (transforms only), and the hero's
+  entrance starts as it opens. With scripts off it is not shown at all.
 - **Nebula seams**: the glow that joins two sections is two canvases (one in each section) drawn by a
   single renderer (`lib/space/SpaceRenderer.ts`) from one shared world-space field, so the halves match.
   Section boundaries are snapped to an 80 px grid (`lib/seamGrid.ts`, `useSeamSnap`) so they land on a

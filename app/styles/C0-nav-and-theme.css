@@ -493,12 +493,6 @@ html[data-theme="light"] body {
 
 /* Specific Light Mode Overrides */
 
-/* Preloader */
-html[data-theme="light"] .preloader {
-  background-color: var(--p0) !important;
-  color: var(--violet) !important;
-}
-
 /* Navbar styles */
 html[data-theme="light"] .navbar {
   background: rgba(var(--p0-rgb), 0.82) !important;

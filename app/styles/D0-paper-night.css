@@ -461,10 +461,6 @@ html[data-theme="light"] .time-display {
 
 /* ── 70-preloader-and-spotlight.css ── */
 
-html[data-theme="light"] .preloader {
-  background-color: var(--p1);
-}
-
 html[data-theme="light"] .spotlight {
   background: radial-gradient(600px circle at var(--x) var(--y),
       rgba(var(--teal-rgb), 0.06),

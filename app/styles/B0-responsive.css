@@ -684,16 +684,6 @@
 
   /* ── Scroll indicator ── */
 
-  /* ── Preloader ── */
-  .counter {
-    font-size: 5rem;
-  }
-
-  .loading-text {
-    font-size: 0.78rem;
-    letter-spacing: 2px;
-    margin-top: 16px;
-  }
 }
 
 /* ════════════════════════════════
@@ -806,15 +796,6 @@
     height: 110px;
   }
 
-  /* Preloader */
-  .counter {
-    font-size: 4rem;
-  }
-
-  .loading-text {
-    font-size: 0.7rem;
-    letter-spacing: 1.5px;
-  }
 
   /* HUD status */
 }

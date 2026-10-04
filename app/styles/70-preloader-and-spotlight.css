@@ -11,52 +11,358 @@
   transform: translateY(-3px);
 }
 
-/* --- PRELOADER STYLES (RESPONSIVE UPDATED) --- */
+/* --- SPLASH ("First Light") ---
+   The markup is rendered by the server (components/ui/PreloaderShell.tsx), so all of this is in the first paint,
+   before any script. The controller (components/ui/Preloader.tsx) only writes numbers: the lit ticks, the locked
+   arcs, the odometer, the readout. The intro is CSS and needs nothing. Namespace: pl-.
+   In the light theme the screen is paper and ink (the tokens of C0-nav-and-theme.css), not a black card. */
 .preloader {
+  --pl-bg: #000;
+  --pl-ink: #e8edf5;
+  --pl-mute: #8892b0;
+  --pl-lit: var(--accent-cyan);
+  --pl-dim: rgba(255, 255, 255, 0.17);
+  --pl-dial: min(84vw, 64svh, 560px);
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100vh;
-  /* Fallback untuk browser lama */
   height: 100dvh;
-  /* Dynamic Viewport Height (Supaya pas di browser HP modern) */
-  background-color: #000;
+  background-color: var(--pl-bg);
+  color: var(--pl-ink);
   z-index: var(--z-preloader);
-  /* Paling atas, tapi tetap di bawah cursor */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--accent-cyan);
   font-family: var(--font-display);
   overflow: hidden;
-  /* Mencegah scroll di dalam preloader */
+  /* If nothing ever lifts it (a script that failed to load), it gives way by itself. */
+  animation: pl-failsafe 0.01s linear 16s forwards;
 }
 
-.loader-content {
-  text-align: center;
+html[data-theme="light"] .preloader {
+  --pl-bg: var(--p1);
+  --pl-ink: var(--ink);
+  --pl-mute: var(--ink-2);
+  --pl-lit: var(--teal);
+  --pl-dim: rgba(var(--ink-rgb), 0.2);
+}
+
+/* The page is locked and covered from the first paint until the curtain has opened. */
+html[data-splash] body {
+  overflow: hidden;
+  animation: pl-unlock 0.01s linear 16s forwards;
+}
+
+/* The two floating controls sit above the splash in the stack; they have nothing to do until it opens. */
+html[data-splash] .lite-root,
+html[data-splash] .ai-chat-toggle-btn {
+  visibility: hidden;
+}
+
+@keyframes pl-failsafe {
+  to {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+@keyframes pl-unlock {
+  to {
+    overflow: auto;
+  }
+}
+
+.pl-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* A hexagonal lattice of dots, the same grid as the hero portrait. It comes up from the centre as the work
+   is done: --pl-r (a percentage of the way to the corner) is the only thing that moves, a few times a second. */
+.pl-field {
+  --pl-r: -22%;
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--pl-dim) 0 1px, transparent 1.7px),
+    radial-gradient(circle, var(--pl-dim) 0 1px, transparent 1.7px);
+  background-size: 34px 58.9px;
+  background-position: 0 0, 17px 29.45px;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 var(--pl-r), transparent calc(var(--pl-r) + 22%));
+  mask-image: radial-gradient(circle at 50% 50%, #000 var(--pl-r), transparent calc(var(--pl-r) + 22%));
+}
+
+/* The horizon: the line the curtain will open along. Under the stage, over nothing else. */
+.pl-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  margin-top: -0.5px;
+  background: linear-gradient(90deg, transparent, var(--pl-lit) 20%, var(--pl-lit) 80%, transparent);
+  opacity: 0.34;
+  animation: pl-draw 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes pl-draw {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.34;
+  }
+}
+
+.pl-dial {
+  position: relative;
+  width: var(--pl-dial);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  animation: pl-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes pl-rise {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pl-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.pl-dial svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  padding: 0 20px;
-  /* Safe area biar gak mepet pinggir layar HP */
+  height: 100%;
+  overflow: visible;
 }
 
-.counter {
-  font-size: 8rem;
-  /* Desktop Default */
-  font-weight: 900;
+/* 120 ticks, a long one every fifth like the hero ruler: each lights as the work advances. */
+.pl-tick {
+  stroke: var(--pl-dim);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  transition: stroke 0.3s ease-out;
+}
+
+.pl-tick--long {
+  stroke-width: 2.2;
+}
+
+.pl-tick.is-on {
+  stroke: var(--pl-lit);
+}
+
+/* One arc per system. Dim until its work is done, lit when it is; one that ran out of time says so. */
+.pl-arc {
+  fill: none;
+  stroke: var(--pl-dim);
+  stroke-width: 3;
+  transition: stroke 0.35s ease-out;
+}
+
+.pl-arc.is-locked {
+  stroke: var(--pl-lit);
+  animation: pl-lock 0.7s ease-out;
+}
+
+.pl-arc.is-late {
+  stroke: var(--pl-mute);
+  stroke-dasharray: 2 5;
+}
+
+@keyframes pl-lock {
+  35% {
+    stroke-width: 8;
+  }
+}
+
+/* The sweep: turns on the compositor, so the screen is alive even while the main thread is busy compiling. */
+.pl-sweep {
+  position: absolute;
+  width: 76%;
+  height: 76%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 235deg,
+    color-mix(in srgb, var(--pl-lit) 22%, transparent) 358.5deg,
+    var(--pl-lit) 360deg
+  );
+  opacity: 0.85;
+  transition: opacity 0.25s ease-out;
+  animation: pl-turn 7s linear infinite;
+}
+
+@keyframes pl-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The odometer. Three reels of digits (0..9 and a 0 again, so 9 rolls into 0 without a jump). */
+.pl-count {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  font-size: calc(var(--pl-dial) * 0.19);
+  font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  /* Supaya angka tidak goyang lebarnya saat berubah */
+  animation: pl-fade 0.8s 0.15s both;
 }
 
-.loading-text {
+.pl-digit {
+  display: block;
+  width: 0.66em;
+  height: 1em;
+  overflow: hidden;
+  text-align: center;
+  transition: opacity 0.3s ease-out;
+}
+
+.pl-digit.is-ghost {
+  opacity: 0.2;
+}
+
+.pl-reel {
+  display: block;
+  will-change: transform;
+}
+
+.pl-reel i {
+  display: block;
+  height: 1em;
+  line-height: 1em;
+  font-style: normal;
+}
+
+.pl-pct {
+  align-self: flex-start;
+  margin: 0.1em 0 0 0.12em;
+  font-size: 0.36em;
+  color: var(--pl-lit);
+}
+
+.pl-read {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + var(--pl-dial) / 2 + clamp(14px, 2.6vmin, 30px));
+  padding: 0 16px;
+  text-align: center;
   font-family: var(--font-code);
-  letter-spacing: 5px;
-  /* Desktop Default */
-  margin-top: 20px;
-  color: var(--text-muted);
-  font-size: 1rem;
+  font-size: clamp(0.62rem, 0.5rem + 0.9vmin, 0.84rem);
+  letter-spacing: 0.3em;
   text-transform: uppercase;
+  color: var(--pl-mute);
+  animation: pl-fade 0.8s 0.3s both;
+}
+
+.pl-corner {
+  position: absolute;
+  padding: clamp(14px, 2.6vmin, 32px);
+  font-family: var(--font-code);
+  font-size: clamp(0.56rem, 0.46rem + 0.5vmin, 0.68rem);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--pl-mute);
+  white-space: nowrap;
+  animation: pl-fade 0.9s 0.45s both;
+}
+
+.pl-corner[data-pl="elapsed"] {
+  text-transform: none;
+}
+
+.pl-corner--tl {
+  top: 0;
+  left: 0;
+}
+
+.pl-corner--tr {
+  top: 0;
+  right: 0;
+}
+
+.pl-corner--bl {
+  bottom: 0;
+  left: 0;
+}
+
+.pl-corner--br {
+  bottom: 0;
+  right: 0;
+}
+
+/* Leaving. The controller makes two halves of the stage; the page is seen through the gap between them. */
+.preloader.is-leaving .pl-sweep {
+  opacity: 0;
+}
+
+.preloader.is-split {
+  background-color: transparent;
+}
+
+.preloader.is-split > .pl-stage {
+  visibility: hidden;
+}
+
+.pl-half {
+  position: absolute;
+  inset: 0;
+  background-color: var(--pl-bg);
+  will-change: transform;
+}
+
+.pl-half--top {
+  clip-path: inset(0 0 50% 0);
+}
+
+.pl-half--bottom {
+  clip-path: inset(50% 0 0 0);
+}
+
+/* A copy of the stage would start its intro again; this one is already there. */
+.pl-half * {
+  animation: none !important;
+}
+
+.pl-half .pl-sweep {
+  display: none;
+}
+
+/* Calm visitors (Lite, which includes reduced motion): no turning, no intro, just the numbers. */
+html[data-lite="1"] .preloader * {
+  animation: none;
+}
+
+html[data-lite="1"] .pl-sweep {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader * {
+    animation: none;
+  }
+
+  .pl-sweep {
+    display: none;
+  }
 }
 
 /* Hacker Text Effect Styles */
@@ -103,16 +409,6 @@
     /* Reduced size */
   }
 
-  .counter {
-    font-size: 6rem;
-    /* Turun dari 8rem ke 6rem */
-  }
-
-  .loading-text {
-    font-size: 0.9rem;
-    letter-spacing: 3px;
-    /* Spasi dirapatkan dikit */
-  }
 }
 
 @media (max-width: 768px) {
@@ -156,16 +452,5 @@
 
   /* Adjust Hero Text further for very small screens */
 
-  .counter {
-    font-size: 4rem;
-    /* Ukuran pas buat HP, tidak terlalu dominan */
-  }
-
-  .loading-text {
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-    /* Rapat supaya teks panjang muat satu baris */
-    margin-top: 15px;
-  }
 }
 

@@ -24,6 +24,8 @@ import Analytics from "@/components/ui/Analytics";
 import { profile } from "@/data/profile";
 import { LITE_BOOT_SCRIPT } from "@/lib/liteBoot";
 import { HERO_BOOT_SCRIPT } from "@/lib/entrance";
+import { SPLASH_BOOT_SCRIPT } from "@/lib/splash";
+import PreloaderShell from "@/components/ui/PreloaderShell";
 import { siteDescription, siteName, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -147,6 +149,12 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: LITE_BOOT_SCRIPT }} />
         {/* Hero entrance flag (data-hero on <html>), set before first paint. See lib/entrance. */}
         <script dangerouslySetInnerHTML={{ __html: HERO_BOOT_SCRIPT }} />
+        {/* Splash flag (data-splash on <html>: the scroll is locked, the page starts at the top). See lib/splash. */}
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_BOOT_SCRIPT }} />
+        {/* Without scripts nothing would ever lift the splash: it is not shown at all. */}
+        <noscript>
+          <style>{".preloader{display:none!important}html[data-splash] body{overflow:auto!important}"}</style>
+        </noscript>
         <script
           type="module"
           src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
@@ -162,6 +170,8 @@ export default function RootLayout({
         <a className="skip-link" href="#content">
           Skip to main content
         </a>
+        {/* The splash is part of the HTML, so it is in the first paint: nothing of the page shows before it. */}
+        <PreloaderShell />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c") }}
