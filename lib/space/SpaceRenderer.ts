@@ -137,11 +137,11 @@ class SpaceRendererImpl {
 
       this.uN = this.locate(gl, this.nebula, [
         "uRes", "uCss", "uOrigin", "uWidth", "uTime", "uScroll", "uPointer", "uPointerAmt",
-        "uOct", "uPalette", "uBand", "uExtent", "uPx",
+        "uOct", "uPalette", "uBand", "uExtent", "uPx", "uPaper",
       ]);
       this.uC = this.locate(gl, this.crisp, [
         "uNeb", "uRes", "uCss", "uOrigin", "uWidth", "uTime", "uPalette", "uDust", "uMotes",
-        "uConst", "uNebMap", "uComet",
+        "uConst", "uNebMap", "uComet", "uPaper",
       ]);
 
       canvas.addEventListener("webglcontextlost", (e) => {
@@ -342,12 +342,19 @@ class SpaceRendererImpl {
       this.slots.forEach((s) => (s.dirty = true));
       this.kick();
     });
+    // The theme changes the medium (light on black / ink on paper): every still frame is drawn again.
+    const themeWatch = new MutationObserver(() => {
+      this.slots.forEach((s) => (s.dirty = true));
+      this.kick();
+    });
+    themeWatch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     this.cleanups = [
       () => window.removeEventListener("pointermove", onMove),
       () => window.removeEventListener("scroll", onScroll),
       () => document.removeEventListener("pointerleave", onLeave),
       () => document.removeEventListener("visibilitychange", onVisibility),
       offQuality,
+      () => themeWatch.disconnect(),
     ];
   }
 
@@ -454,6 +461,7 @@ class SpaceRendererImpl {
     // than the nebula, but never more than the screen can show.
     // The crisp layer is stars and hairlines; 1.25x is plenty and 1x on weaker tiers.
     const outScale = Math.min(window.devicePixelRatio || 1, dprCap >= 1.5 ? 1.25 : 1);
+    const paper = document.documentElement.getAttribute("data-theme") === "light" ? 1 : 0;
     const n = this.uN;
     const c = this.uC;
 
@@ -494,6 +502,7 @@ class SpaceRendererImpl {
       gl.uniform1f(n.uBand, cfg.band);
       gl.uniform1f(n.uExtent, cfg.extent);
       gl.uniform1f(n.uPx, cssW / w1);
+      gl.uniform1f(n.uPaper, paper);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
 
       // ── Pass 2: crisp layer at full size, straight into the output surface ──
@@ -521,6 +530,7 @@ class SpaceRendererImpl {
       gl.uniform1f(c.uDust, particles);
       gl.uniform1f(c.uMotes, particles >= 0.8 ? 1 : 0);
       gl.uniform4f(c.uComet, cfg.comet[0] * pageWidth, cfg.comet[1], cfg.comet[2], cfg.comet[3]);
+      gl.uniform1f(c.uPaper, paper);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
 
       if (this.bitmap) {

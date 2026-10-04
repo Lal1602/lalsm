@@ -2,14 +2,17 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useThemeStore } from "@/stores";
+import { switchTheme } from "@/lib/themeTransition";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const mobileLinksRef = useRef<HTMLUListElement>(null);
   const { theme, nextTheme } = useThemeStore();
 
-  const toggleTheme = () => {
-    nextTheme();
+  const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const r = event.currentTarget.getBoundingClientRect();
+    // The new theme spreads out from the toggle.
+    switchTheme(nextTheme, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
   };
 
   // Close mobile menu on navigation click

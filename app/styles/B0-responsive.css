@@ -477,86 +477,6 @@
   }
 
   /* ── HERO ── */
-  .hero {
-    padding-top: 90px;
-    padding-bottom: 100px;
-    min-height: 100dvh;
-  }
-
-  .hero-wrapper {
-    flex-direction: column;
-    text-align: center;
-    gap: 32px;
-    padding-top: 0;
-  }
-
-  .hero-content {
-    text-align: center;
-    order: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .hero-image-container {
-    order: 1;
-  }
-
-  .image-blob {
-    width: 220px;
-    height: 220px;
-  }
-
-  .glitch-text {
-    font-size: clamp(1.7rem, 7vw, 2.4rem);
-    line-height: 1.15;
-    word-break: break-word;
-  }
-
-  .hero-subtitle {
-    font-size: 0.95rem;
-    max-width: 36ch;
-    padding: 0;
-    margin: 0 auto 28px;
-  }
-
-  .btn-group {
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    width: 100%;
-  }
-
-  .btn-group .btn {
-    width: 100%;
-    max-width: 260px;
-    margin-left: 0 !important;
-    text-align: center;
-  }
-
-  .stats-badge {
-    bottom: -18px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    padding: 6px 14px;
-    gap: 10px;
-    white-space: nowrap;
-    width: max-content;
-    border-radius: 10px;
-  }
-
-  .stats-badge strong {
-    font-size: 1rem;
-  }
-
-  .stats-badge span {
-    font-size: 0.62rem !important;
-  }
-
-  .stats-badge ion-icon {
-    font-size: 1.6rem !important;
-  }
 
   /* ── GLOBAL SECTIONS ── */
   .section {
@@ -763,10 +683,6 @@
   /* ── AI Chat Overlay ── */
 
   /* ── Scroll indicator ── */
-  .scroll-indicator {
-    bottom: 20px;
-    font-size: 1.6rem;
-  }
 
   /* ── Preloader ── */
   .counter {
@@ -829,18 +745,6 @@
   }
 
   /* Hero */
-  .image-blob {
-    width: 180px;
-    height: 180px;
-  }
-
-  .glitch-text {
-    font-size: clamp(1.5rem, 8.5vw, 2rem);
-  }
-
-  .hero-subtitle {
-    font-size: 0.88rem;
-  }
 
   /* Section typography */
   .section-title {
@@ -917,11 +821,6 @@
 
 /* ── Performance: Reduce animations on low-end devices ── */
 @media (prefers-reduced-motion: reduce) {
-
-  .stats-badge,
-  .image-blob {
-    animation: none !important;
-  }
 
   * {
     transition-duration: 0.01ms !important;

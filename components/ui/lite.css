@@ -29,7 +29,7 @@
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 html[data-theme="light"] .lite-btn {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(var(--p0-rgb), 0.85);
 }
 .lite-btn:hover,
 .lite-btn:focus-visible {
@@ -52,7 +52,7 @@ html[data-theme="light"] .lite-btn {
 }
 html[data-theme="light"] .lite-menu,
 html[data-theme="light"] .lite-suggest {
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(var(--p0-rgb), 0.96);
 }
 .lite-menu button {
   display: block;

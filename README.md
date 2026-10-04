@@ -23,6 +23,25 @@ assistant sit behind the same data files.
 
 Light and dark themes, a **Lite mode** (below), and full keyboard and reduced-motion support.
 
+### The two themes are two media
+
+The dark theme is the night sky: light added to black. The light theme is the same sky as a **printed
+star atlas**: ink on paper, from the hero to the footer (nothing stays black). There is no white in it:
+the lightest surface is a warm paper at luminance 0.81 (the old theme's cards were 0.95), text is indigo
+ink, and every accent used as text is a pigment that clears 4.5:1 on the paper. The tokens (`--p0..p3`,
+`--ink`, `--teal`...) are one block in `C0-nav-and-theme.css`, and every light rule is written against
+them (`D0-paper-night.css` holds the light skin of the sections that were drawn for the dark).
+
+- **Nebula and stars in ink**: the shared seam renderer has a paper mode (`uPaper` in
+  `lib/space/*.frag.ts`): the same field is read as pigment with density as opacity, stars become
+  specks of ink. The Playground's tubes come from a library that clears to opaque black, so on paper
+  its canvas is inverted and multiplied onto the page (neon in, ink out).
+- **The paper follows the sun over Surabaya** (`lib/paperSun.ts`, `PaperSun.tsx`): noon is the
+  stylesheet's paper; toward the horizon it warms, after dark it is dimmed a few percent and warmed
+  further, like a sheet under a lamp. Never lighter than noon; `data-sun` on `<html>` is the elevation.
+- **Switching theme** spreads the new theme from the toggle as a circle (View Transitions API; a plain
+  switch where it is missing or the visitor asked for calm).
+
 ---
 
 ## How it stays smooth

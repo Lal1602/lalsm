@@ -24,6 +24,11 @@
  * Output is premultiplied with alpha = the brightest channel, which composites like
  * additive light over the dark sections around it while remaining a valid
  * premultiplied colour (no read-back clamping surprises).
+ *
+ * On the light theme (uPaper = 1) the same field is read as ink instead of light: the colour of
+ * each place is kept, its value is pulled down to a pigment, and the density becomes the ink's
+ * opacity. Light adds to a dark ground; ink takes away from a pale one; it is the one nebula in
+ * two media, which is why the two themes can share every other parameter.
  */
 
 export const NEBULA_VERT = `
@@ -49,6 +54,7 @@ uniform float uPalette;  // 0 = blue / violet / magenta, 1 = amber / gold / mint
 uniform float uBand;     // half-height of the bright core of the band, css px
 uniform float uExtent;   // distance from the seam at which everything has dissolved
 uniform float uPx;       // css px covered by one render pixel (unused, kept for the host)
+uniform float uPaper;    // 0 = emission on a dark page, 1 = pigment on paper (the light theme)
 
 float hash21(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -188,6 +194,14 @@ void main() {
   float lum = max(max(e.r, e.g), e.b);
   e += n * lum;
   float a = clamp(max(max(e.r, e.g), e.b), 0.0, 1.0);
+  if (uPaper > 0.5) {
+    // Ink: the hue of the gas, deepened (squaring takes neon to pigment), laid on with the gas's density as opacity.
+    vec3 hueC = e / max(a, 0.0001);
+    vec3 pig = hueC * hueC * 0.58;
+    float ink = clamp(a * 0.60, 0.0, 0.66);
+    gl_FragColor = vec4(pig * ink, ink);
+    return;
+  }
   gl_FragColor = vec4(min(e, vec3(a)), a);
 }
 `;

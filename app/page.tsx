@@ -1,4 +1,4 @@
-import HeroSection from "@/components/ui/HeroSection";
+import Hero from "@/components/ui/hero/Hero";
 import AboutSection from "@/components/ui/AboutSection";
 import ProcessSteps from "@/components/ui/ProcessSteps";
 import HorizonShowcase from "@/components/ui/HorizonShowcase";
@@ -7,9 +7,9 @@ import AchievementsSection from "@/components/ui/AchievementsSection";
 import ContactSection from "@/components/ui/ContactSection";
 import Footer from "@/components/ui/Footer";
 import ClientShell from "@/components/ui/ClientShell";
-import { stats } from "@/data/profile";
+import { projects } from "@/data/projects";
 
-const MARQUEE_TEXT = `NEXT.JS • THREE.JS • GSAP • ${stats.projectsShipped} PROJECTS SHIPPED • PENS SURABAYA •`;
+const MARQUEE_TEXT = `NEXT.JS • THREE.JS • GSAP • ${projects.length} PROJECTS IN THE ARCHIVE • PENS SURABAYA •`;
 
 export default function Home() {
   return (
@@ -23,7 +23,7 @@ export default function Home() {
       {/* Navigation placeholder (rendered by ClientShell/Navbar) */}
 
       <main id="content" tabIndex={-1}>
-        <HeroSection />
+        <Hero />
 
         {/* Kinetic Marquee */}
         <div className="kinetic-marquee-container">

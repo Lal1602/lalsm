@@ -286,7 +286,9 @@ export default function CvTimelineSlide() {
             filter: "drop-shadow(0 2px 10px rgba(0, 0, 0, 0.6))",
           }}
         >
-          <span style={{
+          <span
+            className="cv-title-fill"
+            style={{
             background: "linear-gradient(135deg, #ffffff 40%, #c4b5fd 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
@@ -295,6 +297,7 @@ export default function CvTimelineSlide() {
             CAREER
           </span>{" "}
           <span
+            className="cv-title-outline"
             style={{
               color: "transparent",
               WebkitTextStroke: "1.5px rgba(255, 255, 255, 0.92)",
@@ -380,7 +383,9 @@ export default function CvTimelineSlide() {
             filter: "drop-shadow(0 2px 10px rgba(0, 0, 0, 0.6))",
           }}
         >
-          <span style={{
+          <span
+            className="cv-title-fill"
+            style={{
             background: "linear-gradient(135deg, #ffffff 40%, #c4b5fd 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
@@ -389,6 +394,7 @@ export default function CvTimelineSlide() {
             CAREER
           </span>{" "}
           <span
+            className="cv-title-outline"
             style={{
               color: "transparent",
               WebkitTextStroke: "1.5px rgba(255, 255, 255, 0.92)",

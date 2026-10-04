@@ -26,6 +26,7 @@ uniform float uMotes;     // 0 or 1: the larger glowing motes
 uniform sampler2D uConst; // constellations, painted once on a 2D canvas (premultiplied)
 uniform vec2  uNebMap;    // scale and offset into the (taller) nebula texture, see SpaceRenderer
 uniform vec4  uComet;     // start x, start y, direction x, direction y (world css px)
+uniform float uPaper;     // 1 on the light theme: stars are specks of ink, not points of light
 
 float hash21(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -119,6 +120,15 @@ void main() {
   }
 
   cover = clamp(cover, 0.0, 1.0);
+  if (uPaper > 0.5) {
+    // A printed atlas: whatever was a point of light is a mark in ink, dense where the light was bright.
+    vec3 inkC = vec3(0.106, 0.114, 0.20);
+    float k = cover * 0.9;
+    vec3 prgb = neb.rgb * (1.0 - k) + inkC * k;
+    float pa = neb.a * (1.0 - k) + k;
+    gl_FragColor = vec4(min(prgb, vec3(pa)), pa);
+    return;
+  }
   glow = min(glow, vec3(1.0));
   // Premultiplied "over": the crisp layer sits on top of the nebula.
   vec3 rgb = neb.rgb * (1.0 - cover) + glow;

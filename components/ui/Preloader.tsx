@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { getWarmupSnapshot, startWarmup } from "@/lib/warmup";
 import { registerWarmupTasks } from "@/lib/warmupTasks";
+import { setEntrance } from "@/lib/entrance";
 
 /** The counter never finishes faster than this, so it never just flashes. */
 const MIN_MS = 1400;
@@ -37,6 +38,8 @@ export default function Preloader() {
       leaving = true;
       counter.textContent = "100%";
       setTimeout(() => {
+        // The hero's entrance starts with the curtain, not after it: it rises into view as it clears.
+        setEntrance("entering");
         gsap.to(preloader, {
           yPercent: -100,
           duration: 1.5,
@@ -47,11 +50,6 @@ export default function Preloader() {
             window.dispatchEvent(new Event("lalsm:preloader-done"));
           },
         });
-        gsap.fromTo(
-          ".hero h1, .hero p, .hero .btn-group",
-          { y: 100, opacity: 0 },
-          { y: 0, opacity: 1, duration: 1.3, stagger: 0.2, delay: 0.5, ease: "power3.out" },
-        );
       }, 350);
     };
 

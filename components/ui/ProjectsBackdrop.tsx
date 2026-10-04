@@ -17,6 +17,8 @@ function ProjectsBackdrop() {
   useEffect(() => {
     const el = stars.current;
     if (!el) return;
+    const paint = () => {
+    const paper = document.documentElement.getAttribute("data-theme") === "light";
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = TILE;
     const ctx = canvas.getContext("2d");
@@ -29,7 +31,10 @@ function ProjectsBackdrop() {
       const y = rand() * TILE;
       const r = 0.35 + rand() * 0.75;
       const warm = rand() > 0.72;
-      ctx.fillStyle = warm ? `rgba(255,224,176,${0.25 + rand() * 0.4})` : `rgba(206,226,255,${0.2 + rand() * 0.45})`;
+      // On paper the stars are specks of ink, the same scatter.
+      ctx.fillStyle = paper
+        ? warm ? `rgba(128,65,10,${0.22 + rand() * 0.34})` : `rgba(27,29,51,${0.18 + rand() * 0.36})`
+        : warm ? `rgba(255,224,176,${0.25 + rand() * 0.4})` : `rgba(206,226,255,${0.2 + rand() * 0.45})`;
       ctx.beginPath();
       ctx.arc(x, y, r, 0, Math.PI * 2);
       ctx.fill();
@@ -39,9 +44,9 @@ function ProjectsBackdrop() {
       const y = rand() * TILE;
       const r = 1 + rand() * 1.1;
       const warm = rand() > 0.6;
-      const tint = warm ? "255,226,180" : "190,220,255";
+      const tint = paper ? (warm ? "128,65,10" : "12,90,121") : warm ? "255,226,180" : "190,220,255";
       const halo = ctx.createRadialGradient(x, y, 0, x, y, r * 7);
-      halo.addColorStop(0, `rgba(${tint},0.5)`);
+      halo.addColorStop(0, `rgba(${tint},${paper ? 0.22 : 0.5})`);
       halo.addColorStop(1, `rgba(${tint},0)`);
       ctx.fillStyle = halo;
       ctx.beginPath();
@@ -53,6 +58,12 @@ function ProjectsBackdrop() {
       ctx.fill();
     }
     el.style.backgroundImage = `url(${canvas.toDataURL("image/png")})`;
+    };
+    paint();
+    // Repainted when the theme changes (a 768px tile, once).
+    const watch = new MutationObserver(paint);
+    watch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => watch.disconnect();
   }, []);
 
   return (

@@ -90,3 +90,36 @@ test.describe("on a phone", () => {
     }
   });
 });
+
+test.describe("a short laptop window", () => {
+  // 1366x768 minus the browser's own bars leaves about this much.
+  test.use({ viewport: { width: 1366, height: 650 } });
+
+  test("What I Build and How I Work each fit in one view, header to the foot of the deck", async ({ page }) => {
+    await arrive(page);
+    // The fixed nav covers the top ~90px, so what has to fit is everything below it.
+    const room = 650 - 96;
+    for (const [id, head, deck] of [
+      ["about", ".wb-head", ".wb-deck"],
+      ["workflow", ".ascent-head", ".ascent"],
+    ] as const) {
+      await scrollTo(page, id);
+      const span = await page.evaluate(
+        ([h, d]) => document.querySelector(d)!.getBoundingClientRect().bottom - document.querySelector(h)!.getBoundingClientRect().top,
+        [head, deck],
+      );
+      expect(span, `${id} is ${Math.round(span)}px from header to deck`).toBeLessThanOrEqual(room);
+    }
+  });
+
+  test("no instrument is clipped by its stage", async ({ page }) => {
+    await arrive(page);
+    await scrollTo(page, "about");
+    for (let i = 0; i < 3; i++) {
+      await page.locator(".wb-bay-btn").nth(i).click();
+      await page.waitForTimeout(500);
+      const over = await page.locator(".wb-stage-in").evaluate((el) => el.scrollHeight - el.clientHeight);
+      expect(over, `bay ${i} overflows its stage`).toBeLessThanOrEqual(0);
+    }
+  });
+});

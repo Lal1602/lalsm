@@ -19,9 +19,6 @@
   --font-body: 'Rajdhani', sans-serif;
   --font-code: 'Roboto Mono', monospace;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --concave-center: rgba(15, 12, 30, 0.25);
-  --concave-edge: rgba(5, 5, 5, 0.95);
-  --concave-shadow: rgba(0, 0, 0, 0.95);
 
   /* Top-of-stack scale — replaces the old 99,999 / 999,999 / 1,999,999 /
      2,000,000 "just go higher" z-index values with a small, readable set. */

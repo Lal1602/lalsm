@@ -8,6 +8,8 @@ export const profile = {
   shortName: "Bilal",
   role: "Creative Developer & Full Stack Web Developer",
   location: "Surabaya, Indonesia",
+  /** PENS Surabaya. The hero ledger and the Horizon manifest both show these. */
+  coordinates: { lat: -7.2756, lon: 112.7937 },
   email: "bilal.lalsm@gmail.com",
   github: "https://github.com/Lal1602",
   instagram: "https://www.instagram.com/chocolal_s/",

@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 // override earlier ones. Namespace the class names of anything you add.
 import "./styles/00-base.css";
 import "./styles/10-navbar-hero.css";
+import "./styles/11-hero.css";
 import "./styles/20-marquee-footer.css";
 import "./styles/30-about.css";
 import "./styles/31-workbench.css";
@@ -17,10 +18,12 @@ import "./styles/95-seam-and-career.css";
 import "./styles/A0-projects.css";
 import "./styles/B0-responsive.css";
 import "./styles/C0-nav-and-theme.css";
+import "./styles/D0-paper-night.css";
 import "./globals.css";
 import Analytics from "@/components/ui/Analytics";
 import { profile } from "@/data/profile";
 import { LITE_BOOT_SCRIPT } from "@/lib/liteBoot";
+import { HERO_BOOT_SCRIPT } from "@/lib/entrance";
 import { siteDescription, siteName, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -120,7 +123,7 @@ export default function RootLayout({
         */}
         {/* eslint-disable-next-line @next/next/no-page-custom-font -- root layout: the font loads for every route */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Rajdhani:wght@300;500;700&family=Roboto+Mono:wght@300;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Space+Grotesk:wght@400;500;600;700&family=Rajdhani:wght@300;500;700&family=Roboto+Mono:wght@300;500&display=swap"
           rel="stylesheet"
         />
         <link rel="icon" href="/b-logo.jpg" type="image/jpeg" />
@@ -142,6 +145,8 @@ export default function RootLayout({
         />
         {/* Lite mode flag (data-lite on <html>), set before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: LITE_BOOT_SCRIPT }} />
+        {/* Hero entrance flag (data-hero on <html>), set before first paint. See lib/entrance. */}
+        <script dangerouslySetInnerHTML={{ __html: HERO_BOOT_SCRIPT }} />
         <script
           type="module"
           src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"

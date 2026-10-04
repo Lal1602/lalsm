@@ -90,6 +90,7 @@ export default function HorizonShowcase() {
       {mounted && (
         <div
           aria-hidden="true"
+          className="horizon-layer horizon-layer--stars"
           style={{
             position: "absolute",
             inset: 0,
@@ -120,6 +121,7 @@ export default function HorizonShowcase() {
       {mounted && (
         <div
           aria-hidden="true"
+          className="horizon-layer horizon-layer--tubes"
           style={{
             position: "absolute",
             inset: 0,

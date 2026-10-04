@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SEAM_GRID, gridPad } from "@/lib/seamGrid";
+import { SEAM_GRID, gridPad, seamGrid } from "@/lib/seamGrid";
 
 describe("seam grid", () => {
   it("pads to the next multiple of the grid, and not at all when already on it", () => {
@@ -18,6 +18,24 @@ describe("seam grid", () => {
         expect(Math.abs(end * dpr - Math.round(end * dpr))).toBeLessThan(1e-6);
         expect(gridPad(y)).toBeLessThan(SEAM_GRID);
         expect(gridPad(y)).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
+  it("uses the wide grid only where 80px is not a whole number of device pixels", () => {
+    for (const dpr of [1, 1.25, 1.5, 1.75, 2, 2.625, 1.5625, 1.65, 1.875, 0.9375]) expect(seamGrid(dpr)).toBe(SEAM_GRID);
+    // What browsers actually report for 5/3, 4/3 and 2/3.
+    for (const dpr of [1.6667000055, 1.333299994468689, 0.666700005531311]) expect(seamGrid(dpr)).toBe(240);
+    expect(seamGrid(NaN)).toBe(SEAM_GRID);
+    expect(seamGrid(0)).toBe(SEAM_GRID);
+  });
+
+  it("lands the boundary on a whole device pixel at ratios with a denominator of 3 too", () => {
+    for (const dpr of [5 / 3, 4 / 3, 2 / 3, 7 / 3]) {
+      for (const y of [1996.31, 2867.84375, 5724.84375, 123.456]) {
+        const end = y + gridPad(y, seamGrid(dpr));
+        expect(Math.abs(end * dpr - Math.round(end * dpr))).toBeLessThan(1e-6);
+        expect(gridPad(y, seamGrid(dpr))).toBeLessThan(240);
       }
     }
   });

@@ -1233,6 +1233,46 @@
   }
 }
 
+/* A laptop window with the browser's own bars (1366x768 leaves ~620px): the header and the deck of
+   both sections tighten once more so that title, bays and the open instrument still fit in one view. */
+@media (min-width: 861px) and (max-height: 680px) {
+  .wb-index {
+    --wb-h: 430px;
+  }
+
+  .wb-title {
+    font-size: 2.1rem;
+  }
+
+  .wb-eyebrow,
+  .ascent-eyebrow {
+    margin-bottom: 6px;
+  }
+
+  .wb-head,
+  .ascent-head {
+    margin-bottom: 12px;
+  }
+
+  .wb-field {
+    width: clamp(160px, calc((var(--wb-h, 560px) - 190px) * 0.857), 420px);
+  }
+
+  .wb-stage-in {
+    padding: 12px 18px 10px;
+    gap: 8px;
+  }
+
+  .wb-demo {
+    gap: 8px;
+  }
+
+  .wb-bay-btn {
+    padding-top: 10px;
+    padding-bottom: 8px;
+  }
+}
+
 /* ── Phones and tablets: an accordion ──────────────────────────────────── */
 
 @media (max-width: 860px) {
@@ -1389,43 +1429,43 @@
 }
 
 /* ── Light theme ───────────────────────────────────────────────────────────
-   Only what assumes a dark ground is restated; the tones are re-pitched darker
-   so they carry on white. */
+   Only what assumes a dark ground is restated; the tones are the paper theme's pigments (C0). */
 
 html[data-theme="light"] .wb-section {
-  --wb-ok: #138a63;
-  --wb-warn: #a8700f;
-  --wb-bad: #c8284a;
-  --wb-ink: rgba(20, 22, 40, 0.88);
-  --wb-dim: rgba(20, 22, 40, 0.5);
-  --wb-grid: rgba(0, 0, 0, 0.07);
-  --wb-line: rgba(0, 0, 0, 0.5);
-  --wb-hair: rgba(0, 0, 0, 0.12);
-  --wb-plate: #fbfaff;
-  --wb-lane-edge: #1c86b4;
-  --wb-lane-api: #6248d6;
-  --wb-lane-cache: #b0741c;
-  --wb-lane-db: #138a63;
+  --wb-ok: #0b6b49;
+  --wb-warn: var(--amber);
+  --wb-bad: #a81c3a;
+  --wb-ink: rgba(var(--ink-rgb), 0.88);
+  --wb-dim: rgba(var(--ink-rgb), 0.56);
+  --wb-grid: rgba(var(--ink-rgb), 0.07);
+  --wb-line: rgba(var(--ink-rgb), 0.5);
+  --wb-hair: rgba(var(--ink-rgb), 0.14);
+  /* The instrument's plate is a raised sheet of paper, not white. */
+  --wb-plate: var(--p0);
+  --wb-lane-edge: var(--teal);
+  --wb-lane-api: var(--violet);
+  --wb-lane-cache: var(--amber);
+  --wb-lane-db: #0b6b49;
 }
 
 html[data-theme="light"] .wb-item[data-tone="cyan"] {
-  --wb-tone: #1c86b4;
-  --wb-tone-rgb: 28, 134, 180;
+  --wb-tone: var(--teal);
+  --wb-tone-rgb: var(--teal-rgb);
 }
 
 html[data-theme="light"] .wb-item[data-tone="violet"] {
-  --wb-tone: #6248d6;
-  --wb-tone-rgb: 98, 72, 214;
+  --wb-tone: var(--violet);
+  --wb-tone-rgb: var(--violet-rgb);
 }
 
 html[data-theme="light"] .wb-item[data-tone="gold"] {
-  --wb-tone: #b0741c;
-  --wb-tone-rgb: 176, 116, 28;
+  --wb-tone: var(--amber);
+  --wb-tone-rgb: var(--amber-rgb);
 }
 
 html[data-theme="light"] .wb-eyebrow,
 html[data-theme="light"] .ascent-eyebrow {
-  color: rgba(0, 0, 0, 0.42);
+  color: rgba(var(--ink-rgb), 0.42);
 }
 
 html[data-theme="light"] .wb-bay-code,
@@ -1434,11 +1474,11 @@ html[data-theme="light"] .wb-ctl-label,
 html[data-theme="light"] .wb-stat span,
 html[data-theme="light"] .wb-game-stats dt,
 html[data-theme="light"] .wb-stage-head i {
-  color: rgba(0, 0, 0, 0.42);
+  color: rgba(var(--ink-rgb), 0.42);
 }
 
 html[data-theme="light"] .wb-item[data-active] .wb-bay-code {
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(var(--ink-rgb), 0.7);
 }
 
 html[data-theme="light"] .wb-item[data-active] .wb-bay-live,
@@ -1449,49 +1489,48 @@ html[data-theme="light"] .wb-item[data-active] .wb-bay-code b {
 html[data-theme="light"] .wb-bay-name,
 html[data-theme="light"] .wb-bay-btn:hover .wb-bay-name,
 html[data-theme="light"] .wb-item[data-active] .wb-bay-name {
-  color: #1a1a2e;
+  color: var(--ink);
 }
 
 html[data-theme="light"] .wb-bay-name {
-  color: rgba(26, 26, 46, 0.62);
+  color: rgba(var(--ink-rgb), 0.62);
 }
 
 html[data-theme="light"] .wb-bay-name em {
-  color: rgba(0, 0, 0, 0.42);
+  color: rgba(var(--ink-rgb), 0.42);
 }
 
 html[data-theme="light"] .wb-bay-brief {
-  color: rgba(0, 0, 0, 0.5);
+  color: rgba(var(--ink-rgb), 0.5);
 }
 
 html[data-theme="light"] .wb-bay-btn:hover .wb-bay-brief,
 html[data-theme="light"] .wb-item[data-active] .wb-bay-brief {
-  color: rgba(0, 0, 0, 0.74);
+  color: rgba(var(--ink-rgb), 0.74);
 }
 
 html[data-theme="light"] .wb-stack li {
-  color: rgba(0, 0, 0, 0.5);
+  color: rgba(var(--ink-rgb), 0.5);
 }
 
 html[data-theme="light"] .wb-item[data-active] .wb-stack li {
-  color: rgba(0, 0, 0, 0.74);
+  color: rgba(var(--ink-rgb), 0.74);
 }
 
 html[data-theme="light"] .wb-stage {
-  background:
-    linear-gradient(180deg, rgba(var(--wb-tone-rgb), 0.07), rgba(var(--wb-tone-rgb), 0) 46%),
-    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px) 0 0 / 100% 28px,
+  background: linear-gradient(180deg, rgba(var(--wb-tone-rgb), 0.07), rgba(var(--wb-tone-rgb), 0) 46%),
+    linear-gradient(rgba(var(--ink-rgb), 0.03) 1px, transparent 1px) 0 0 / 100% 28px,
     var(--wb-plate);
 }
 
 html[data-theme="light"] .wb-legend,
 html[data-theme="light"] .wb-demo-note,
 html[data-theme="light"] .wb-trace-note {
-  color: rgba(0, 0, 0, 0.55);
+  color: rgba(var(--ink-rgb), 0.55);
 }
 
 html[data-theme="light"] .wb-trace-note[data-tone="bad"] {
-  color: #a82040;
+  color: var(--rust);
 }
 
 html[data-theme="light"] .wb-stat b,
@@ -1501,7 +1540,7 @@ html[data-theme="light"] .wb-trace-req,
 html[data-theme="light"] .wb-node b,
 html[data-theme="light"] .wb-loop-row b,
 html[data-theme="light"] .wb-veil-score {
-  color: #1a1a2e;
+  color: var(--ink);
 }
 
 html[data-theme="light"] .wb-meter-read[data-grade="ok"] .wb-stat--big b {
@@ -1517,7 +1556,7 @@ html[data-theme="light"] .wb-meter-read[data-grade="bad"] .wb-stat--big b {
 }
 
 html[data-theme="light"] .wb-seg-btn {
-  color: rgba(0, 0, 0, 0.55);
+  color: rgba(var(--ink-rgb), 0.55);
 }
 
 html[data-theme="light"] .wb-seg-btn i,
@@ -1526,16 +1565,16 @@ html[data-theme="light"] .wb-span-ms,
 html[data-theme="light"] .wb-loop-row,
 html[data-theme="light"] .wb-trace-result,
 html[data-theme="light"] .wb-log {
-  color: rgba(0, 0, 0, 0.42);
+  color: rgba(var(--ink-rgb), 0.42);
 }
 
 html[data-theme="light"] .wb-span-label,
 html[data-theme="light"] .wb-log li[data-latest] {
-  color: rgba(0, 0, 0, 0.66);
+  color: rgba(var(--ink-rgb), 0.66);
 }
 
 html[data-theme="light"] .wb-seg-btn:hover {
-  color: rgba(0, 0, 0, 0.9);
+  color: rgba(var(--ink-rgb), 0.9);
 }
 
 html[data-theme="light"] .wb-seg-btn[aria-pressed="true"] {
@@ -1551,11 +1590,11 @@ html[data-theme="light"] .wb-meter[data-load="2"] .wb-seg-btn[aria-pressed="true
 }
 
 html[data-theme="light"] .wb-node-dot {
-  border-color: rgba(0, 0, 0, 0.35);
+  border-color: rgba(var(--ink-rgb), 0.35);
 }
 
 html[data-theme="light"] .wb-span[data-idle] .wb-span-bar {
-  background: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 5px);
+  background: repeating-linear-gradient(135deg, rgba(var(--ink-rgb), 0.35) 0 2px, transparent 2px 5px);
 }
 
 /* The playfield stays a dark window in either theme: it is a picture of space,
@@ -1570,7 +1609,7 @@ html[data-theme="light"] .wb-field {
 }
 
 html[data-theme="light"] .wb-field-veil {
-  background: rgba(4, 6, 12, 0.78);
+  background: rgba(var(--ink-rgb), 0.78);
 }
 
 html[data-theme="light"] .wb-field-veil .wb-veil-score {

@@ -75,24 +75,6 @@ export default function GSAPEffects() {
     // Pinned sections change the document height, so re-measure when GSAP does
     ScrollTrigger.addEventListener("refresh", measurePageHeight);
 
-    // Parallax — skipped entirely under reduced motion (purely decorative)
-    if (!prefersReducedMotion) {
-      gsap.to(".parallax-text", {
-        yPercent: 30,
-        ease: "none",
-        scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
-      });
-      gsap.to(".image-blob", {
-        yPercent: 15,
-        ease: "none",
-        scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
-      });
-      gsap.to(".stats-badge", {
-        y: -80, x: -20, rotate: -5, ease: "none",
-        scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
-      });
-    }
-
     // Section title glow — under reduced motion, apply the end state once
     // instead of toggling it on every scroll in/out of view.
     gsap.utils.toArray<HTMLElement>(".section-title").forEach((title) => {
@@ -277,7 +259,7 @@ export default function GSAPEffects() {
     // Hacker text on scroll — kept only on section titles (the one place it
     // reads as a deliberate reveal moment), and skipped under reduced motion.
     if (!prefersReducedMotion) {
-      document.querySelectorAll<HTMLElement>("h2.section-title, h1.glitch-text").forEach((title) => {
+      document.querySelectorAll<HTMLElement>("h2.section-title").forEach((title) => {
         ScrollTrigger.create({
           trigger: title,
           start: "top 80%",

@@ -1035,6 +1035,44 @@
   }
 }
 
+@media (min-width: 861px) and (max-height: 680px) {
+  /* Here, not with .wb-title in 31-workbench.css: 40-process.css sets this size and loads after it. */
+  .ascent-title {
+    font-size: 2.1rem;
+  }
+
+  /* The title's underline hangs below it; the mission clock is the next thing down, so keep them apart. */
+  .ascent-head {
+    margin-bottom: 22px;
+  }
+
+  .fd-bay-in {
+    padding-top: 10px;
+    padding-bottom: 8px;
+  }
+
+  .fd-desc {
+    font-size: 0.78rem;
+    line-height: 1.42;
+  }
+
+  .fd-engage {
+    min-height: 34px;
+  }
+
+  .fd-num {
+    font-size: 1.9rem;
+  }
+
+  .fd-map {
+    margin-bottom: 0;
+  }
+
+  .fd-bays {
+    margin-top: 10px;
+  }
+}
+
 /* ── Narrow layouts ─────────────────────────────────────────────────────────
    Below 860px the bays become a swipe rail, and the rail is the throttle: your
    thumb flies the ship. Four stages still cost one screen. The breakpoint is
@@ -1264,15 +1302,15 @@
    becomes paper-pale panels with dark type, and the lit parts take the tone. */
 
 html[data-theme="light"] .fd-grid line {
-  stroke: rgba(40, 60, 110, 0.1);
+  stroke: rgba(var(--ink-rgb), 0.1);
 }
 
 html[data-theme="light"] .fd-route-dots {
-  stroke: rgba(40, 60, 110, 0.4);
+  stroke: rgba(var(--ink-rgb), 0.4);
 }
 
 html[data-theme="light"] .fd-route {
-  stroke: rgba(40, 60, 110, 0.26);
+  stroke: rgba(var(--ink-rgb), 0.26);
 }
 
 html[data-theme="light"] .fd-st-core {
@@ -1280,92 +1318,92 @@ html[data-theme="light"] .fd-st-core {
 }
 
 html[data-theme="light"] .fd-st-label {
-  color: rgba(20, 28, 52, 0.6);
+  color: rgba(var(--ink-rgb), 0.6);
 }
 
 html[data-theme="light"] .fd-st[data-active] .fd-st-label {
-  color: #0f1630;
+  color: var(--ink);
 }
 
 html[data-theme="light"] .fd-craft-body {
-  fill: #1b2547;
-  stroke: #1b2547;
+  fill: var(--ink);
+  stroke: var(--ink);
 }
 
 html[data-theme="light"] .fd-craft-spine {
-  stroke: rgba(255, 255, 255, 0.6);
+  stroke: rgba(var(--p0-rgb), 0.6);
 }
 
 html[data-theme="light"] .fd-hud-k,
 html[data-theme="light"] .fd-hud-s,
 html[data-theme="light"] .fd-total,
 html[data-theme="light"] .fd-bay-code {
-  color: rgba(20, 28, 52, 0.55);
+  color: rgba(var(--ink-rgb), 0.55);
 }
 
 html[data-theme="light"] .fd-hud-v {
-  color: #0f1630;
+  color: var(--ink);
 }
 
 html[data-theme="light"] .fd-hud-s b {
-  color: rgba(20, 28, 52, 0.78);
+  color: rgba(var(--ink-rgb), 0.78);
 }
 
 html[data-theme="light"] .fd-auto {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(20, 28, 52, 0.25);
-  color: #1b2547;
+  background: rgba(var(--p0-rgb), 0.85);
+  border-color: rgba(var(--ink-rgb), 0.25);
+  color: var(--ink);
 }
 
 html[data-theme="light"] .fd-bay-in {
   border-color: rgba(var(--tone-rgb), 0.35);
-  background: linear-gradient(180deg, rgba(var(--tone-rgb), 0.14) 0%, rgba(255, 255, 255, 0.9) 38%, rgba(255, 255, 255, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(var(--tone-rgb), 0.14) 0%, rgba(var(--p0-rgb), 0.9) 38%, rgba(var(--p0-rgb), 0.95) 100%);
 }
 
 html[data-theme="light"] .fd-name,
 html[data-theme="light"] .fd-data dd {
-  color: #14182c;
+  color: var(--ink);
 }
 
 html[data-theme="light"] .fd-desc {
-  color: rgba(28, 34, 54, 0.78);
+  color: rgba(var(--ink-rgb), 0.78);
 }
 
 html[data-theme="light"] .fd-data dt,
 html[data-theme="light"] .fd-out small,
 html[data-theme="light"] .fd-engage-text i {
-  color: rgba(20, 28, 52, 0.5);
+  color: rgba(var(--ink-rgb), 0.5);
 }
 
 html[data-theme="light"] .fd-out {
-  color: rgba(20, 28, 52, 0.8);
+  color: rgba(var(--ink-rgb), 0.8);
 }
 
 html[data-theme="light"] .fd-share {
-  background: rgba(20, 28, 52, 0.12);
+  background: rgba(var(--ink-rgb), 0.12);
 }
 
 html[data-theme="light"] .fd-share-mark {
-  background: rgba(20, 28, 52, 0.55);
+  background: rgba(var(--ink-rgb), 0.55);
 }
 
 html[data-theme="light"] .fd-engage {
-  color: #14182c;
+  color: var(--ink);
 }
 
 html[data-theme="light"] .fd-engage-track {
-  stroke: rgba(20, 28, 52, 0.14);
+  stroke: rgba(var(--ink-rgb), 0.14);
 }
 
 html[data-theme="light"] .fd-count,
 html[data-theme="light"] .fd-count > span:first-child {
-  color: rgba(20, 28, 52, 0.6);
+  color: rgba(var(--ink-rgb), 0.6);
 }
 
 html[data-theme="light"] .fd-dots i {
-  background: rgba(20, 28, 52, 0.18);
+  background: rgba(var(--ink-rgb), 0.18);
 }
 
 html[data-theme="light"] .fd-sheen {
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.5), transparent 62%);
+  background: radial-gradient(circle, rgba(var(--p0-rgb), 0.5), transparent 62%);
 }

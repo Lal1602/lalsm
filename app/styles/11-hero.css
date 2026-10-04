@@ -1,0 +1,1259 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO: "THE VIEWFINDER"
+   A headline set at the size of the page, a viewfinder frame around it, and a
+   row of facts that are all true. No background of its own: the page's starfield
+   shows through, untouched. Everything here is namespaced hx-.
+
+   Rules this file follows (see 31-workbench.css / 41-flightdeck.css):
+   - decoration is <i>; no filter, no backdrop-filter, no animated box-shadow
+   - per-frame values (pointer, scroll) are transform/opacity written from JS on
+     leaf elements; CSS transitions only for colour/border on a state change
+   - the global 0.4s transition in C0 hits section/h1/p/a/button even inside
+     [data-motion] (only span and div are exempt), so it is switched off here and
+     the few transitions this file wants are declared again below.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hx {
+  --hx-ink: #f4f8ff;
+  --hx-ink-rgb: 244, 248, 255;
+  --hx-dim: rgba(244, 248, 255, 0.64);
+  --hx-label: rgba(255, 255, 255, 0.4);
+  --hx-hair: rgba(255, 255, 255, 0.12);
+  --hx-hair-strong: rgba(255, 255, 255, 0.3);
+  --hx-accent: var(--accent-cyan);
+  --hx-btn-fill: #f4f8ff;
+  --hx-btn-text: #070b17;
+  /* The glass of the lens: dark enough to hide the real letters under it. */
+  --hx-glass: rgba(4, 6, 14, 0.9);
+  --hx-pad: clamp(22px, 8.6vw, 144px);
+  /* Height-bound as much as width-bound: the headline must leave room for the lede and the buttons. */
+  --hx-fs: min(10.4vw, 19svh);
+  /* The lens ring's diameter. */
+  --hx-lens: clamp(124px, 11vw, 190px);
+  /* The portrait's disc. Width-bound, and height-bound so the rings round it fit between the nav and the foot. */
+  --hx-disc: clamp(190px, min(21vw, calc(61svh - 120px)), 380px);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding: clamp(96px, 14svh, 132px) var(--hx-pad) 0;
+  color: var(--hx-ink);
+  /* Clipped on both axes: whatever a ring or the lens's ticks reach past the hero's edge is cut. */
+  overflow: clip;
+}
+
+.hx,
+.hx h1,
+.hx p,
+.hx a,
+.hx button {
+  transition: none;
+}
+
+html[data-theme="light"] .hx {
+  --hx-ink: var(--ink);
+  --hx-ink-rgb: var(--ink-rgb);
+  --hx-dim: rgba(var(--ink-rgb), 0.72);
+  --hx-label: rgba(var(--ink-rgb), 0.5);
+  --hx-hair: rgba(var(--ink-rgb), 0.16);
+  --hx-hair-strong: rgba(var(--ink-rgb), 0.36);
+  --hx-accent: var(--teal);
+  --hx-btn-fill: var(--ink);
+  --hx-btn-text: var(--p0);
+  --hx-glass: rgba(var(--p1-rgb), 0.93);
+}
+
+/* <i> is italic by default: the odometer's digits and every decoration here are <i>. */
+.hx i {
+  font-style: normal;
+}
+
+/* ── The type-specimen sheet ─────────────────────────────────────────────────
+   Hairlines on the headline's real cap heights and baselines, and the margin the column hangs from.
+   Placed and labelled by specimenField.ts. The guide nearest the pointer wakes. */
+
+.hx-spec {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hx-guide {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  display: block;
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--hx-ink-rgb), 0.16) 7%, rgba(var(--hx-ink-rgb), 0.16) 93%, transparent 100%);
+}
+
+/* Cap-height lines are dashed, baselines solid: the usual way a specimen tells them apart. The dashes
+   are a pseudo-element, so that the fade at their ends does not take the label with it. */
+.hx-guide[data-kind="cap"] {
+  background: none;
+}
+
+.hx-guide[data-kind="cap"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, rgba(var(--hx-ink-rgb), 0.17) 0 6px, transparent 6px 12px);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+
+/* The accent, laid over the guide when the pointer is near it. */
+.hx-guide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--hx-accent);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.hx-guide[data-near]::after {
+  opacity: 0.85;
+}
+
+.hx-guide-label {
+  position: absolute;
+  /* Ends 10px short of the margin line (--mx, from specimenField.ts); 100% is the guide's width, the hero's. */
+  right: calc(100% - var(--mx, 144px) + 10px);
+  bottom: 6px;
+  font-family: var(--font-code);
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+  color: var(--hx-label);
+  transition: color 0.35s ease;
+}
+
+.hx-guide[data-near] .hx-guide-label {
+  color: var(--hx-accent);
+}
+
+.hx-margin {
+  position: absolute;
+  top: clamp(92px, 13svh, 118px);
+  width: 1px;
+  background: linear-gradient(180deg, rgba(var(--hx-ink-rgb), 0.18), rgba(var(--hx-ink-rgb), 0.07));
+}
+
+/* ── The rings round the portrait ───────────────────────────────────────────
+   Centre and size come from orbitField.ts (--ox, --oy, --orbit-r). Each ring is its own element, so
+   the slow constant turn is a compositor animation and the extra turn from scrolling is the
+   individual rotate property: the two add. Faint on purpose; the nearest ring to the pointer wakes. */
+
+.hx-orbit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Ends at the hairline above the foot. */
+  bottom: var(--foot-h, 0px);
+  z-index: 0;
+  pointer-events: none;
+  overflow: clip;
+  contain: layout paint;
+  /* One quiet zone: an ellipse round the lede and the buttons, where the rings fade out (on a narrow
+     window the lede reaches toward the rings). */
+  -webkit-mask-image: radial-gradient(ellipse var(--qrx, 0px) var(--qry, 0px) at var(--qx, 0px) var(--qy, 0px), transparent 0%, transparent 66%, #000 100%);
+  mask-image: radial-gradient(ellipse var(--qrx, 0px) var(--qry, 0px) at var(--qx, 0px) var(--qy, 0px), transparent 0%, transparent 66%, #000 100%);
+}
+
+.hx-ring {
+  position: absolute;
+  left: var(--ox, 50%);
+  top: var(--oy, 50%);
+  width: calc(var(--orbit-r, 600px) * 2);
+  height: calc(var(--orbit-r, 600px) * 2);
+  margin: calc(var(--orbit-r, 600px) * -1) 0 0 calc(var(--orbit-r, 600px) * -1);
+  overflow: visible;
+  animation: hx-turn var(--ring-period, 120s) linear infinite var(--ring-dir, normal);
+  will-change: transform;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.hx-ring text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.hx-ring[data-style="outline"] text {
+  fill: none;
+  stroke: rgba(var(--hx-ink-rgb), 0.17);
+  stroke-width: 1.5;
+}
+
+.hx-ring[data-style="mono"] text {
+  font-family: var(--font-code);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  fill: rgba(var(--hx-ink-rgb), 0.32);
+}
+
+.hx-ring[data-lit][data-style="outline"] text {
+  stroke: rgba(var(--hx-ink-rgb), 0.55);
+}
+
+.hx-ring[data-lit][data-style="mono"] text {
+  fill: var(--hx-accent);
+}
+
+.hx-ring text {
+  transition: fill 0.5s ease, stroke 0.5s ease;
+}
+
+.hx-orbit[data-paused] .hx-ring {
+  animation-play-state: paused;
+}
+
+@keyframes hx-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-ring {
+    animation: none;
+  }
+}
+
+/* ── Instrument chrome ───────────────────────────────────────────────────── */
+
+.hx-tick {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 0 solid var(--hx-hair-strong);
+  pointer-events: none;
+}
+
+.hx-tick-tl,
+.hx-tick-tr {
+  top: clamp(92px, 13svh, 118px);
+}
+
+/* Level with the foot's hairline, clear of the fixed Lite toggle and chat button in the corners. */
+.hx-tick-bl,
+.hx-tick-br {
+  bottom: 96px;
+}
+
+.hx-tick-tl,
+.hx-tick-bl {
+  left: clamp(12px, 2.2vw, 36px);
+}
+
+.hx-tick-tr,
+.hx-tick-br {
+  right: clamp(12px, 2.2vw, 36px);
+}
+
+/* The frame breathes, very slightly, once the entrance is over (a running animation would show
+   the ticks early otherwise, since an animation outranks the inline style the entrance holds them with). */
+html:not([data-hero]) .hx-tick {
+  animation: hx-breathe 7s ease-in-out infinite alternate;
+}
+
+@keyframes hx-breathe {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-hero]) .hx-tick {
+    animation: none;
+  }
+}
+
+html[data-lite="1"] .hx-tick {
+  animation: none !important;
+}
+
+.hx-tick-tl {
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+
+.hx-tick-tr {
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+
+.hx-tick-bl {
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+
+.hx-tick-br {
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}
+
+.hx-ruler {
+  position: absolute;
+  z-index: 3;
+  left: calc(var(--hx-pad) * 0.42);
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: min(36svh, 340px);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.hx-ruler i {
+  display: block;
+  width: 6px;
+  height: 1px;
+  background: var(--hx-hair-strong);
+  transform-origin: left center;
+}
+
+.hx-ruler i[data-major] {
+  width: 12px;
+}
+
+/* The marker that walks down the ruler with the scroll. Hidden until the entrance is over. */
+.hx-ruler-mark {
+  position: absolute;
+  top: 0;
+  left: -3px;
+  width: 20px;
+  height: 1px;
+  background: var(--hx-accent);
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+
+html[data-hero] .hx-ruler-mark {
+  opacity: 0;
+}
+
+/* ── The frame: kicker, headline, lede and buttons on a 12-column grid ─── */
+
+.hx-frame {
+  position: relative;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-content: center;
+}
+
+.hx-kicker {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 clamp(12px, 2.4svh, 22px);
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--hx-label);
+}
+
+.hx-kicker .eyebrow-rule {
+  flex: none;
+}
+
+.hx-kicker span:first-of-type {
+  color: var(--hx-dim);
+}
+
+.hx-kicker-dim::before {
+  content: "/";
+  margin-right: 12px;
+  opacity: 0.6;
+}
+
+/* ── The headline ────────────────────────────────────────────────────────── */
+
+.hx-title,
+.hx-title-lit {
+  grid-column: 1 / span 10;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--hx-fs);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--hx-ink);
+  -webkit-text-fill-color: currentColor;
+  text-shadow: none;
+}
+
+.hx-line {
+  display: block;
+}
+
+.hx-line-in {
+  display: inline-block;
+}
+
+.hx-ch {
+  display: inline-block;
+  /* Kerning put back by hand where the font has it (lib/hero/kerning.ts): letters are separate boxes. */
+  margin-left: calc(var(--k, 0) * 1em);
+}
+
+.hx-stop {
+  position: relative;
+  display: inline-block;
+  margin-left: 0.02em;
+  color: var(--hx-accent);
+}
+
+/* The ring the beacon sends out once, when the entrance ends. Invisible until then. */
+.hx-ping {
+  position: absolute;
+  left: 50%;
+  bottom: 0.1em;
+  width: 0.3em;
+  height: 0.3em;
+  margin-left: -0.15em;
+  border: 1px solid var(--hx-accent);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Lede and buttons ────────────────────────────────────────────────────── */
+
+.hx-aside {
+  grid-column: 1 / span 6;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.8svh, 26px);
+  margin-top: clamp(18px, 3.6svh, 40px);
+}
+
+.hx-lede {
+  max-width: 46ch;
+  margin: 0;
+  font-size: clamp(1rem, 0.8vw + 0.55rem, 1.2rem);
+  line-height: 1.62;
+  color: var(--text-muted);
+}
+
+.hx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hx-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 1px solid var(--hx-hair-strong);
+  border-radius: 2px;
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--hx-ink);
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.hx-btn-primary {
+  border-color: var(--hx-btn-fill);
+  background: var(--hx-btn-fill);
+  color: var(--hx-btn-text);
+}
+
+.hx-btn:hover,
+.hx-btn:focus-visible {
+  border-color: var(--hx-accent);
+}
+
+.hx-btn-ghost:hover,
+.hx-btn-ghost:focus-visible {
+  background: rgba(var(--hx-ink-rgb), 0.06);
+}
+
+.hx-btn:focus-visible {
+  outline: 1px solid var(--hx-accent);
+  outline-offset: 4px;
+}
+
+/* The label rolls: two copies in a window one line tall. */
+.hx-btn-window {
+  display: block;
+  height: 1.2em;
+  overflow: hidden;
+  line-height: 1.2;
+}
+
+.hx-btn-roll {
+  display: block;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hx-btn-roll span {
+  display: block;
+  height: 1.2em;
+}
+
+.hx-btn:hover .hx-btn-roll,
+.hx-btn:focus-visible .hx-btn-roll {
+  transform: translateY(-1.2em);
+}
+
+.hx-btn-arrow {
+  flex: none;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hx-btn:hover .hx-btn-arrow,
+.hx-btn:focus-visible .hx-btn-arrow {
+  transform: translateX(4px);
+}
+
+/* ── The portrait: a disc of dots ────────────────────────────────────────────
+   portraitField.ts prints the photograph on the canvas as a halftone; the <img> under it is the
+   portrait for assistive tech, and what shows until the dots are ready (or if they never are). */
+
+/* Out of the grid on a wide screen: a tall item spanning the rows would stretch them and push the headline down.
+   No transform on the figure: the rings are placed from its layout box, which a transform would not move. */
+.hx-portrait {
+  position: absolute;
+  top: calc(50% - var(--hx-disc) / 2);
+  right: 0;
+  z-index: 1;
+  width: var(--hx-disc);
+  aspect-ratio: 1;
+  margin: 0;
+  perspective: 900px;
+}
+
+/* What the pointer loop leans; the figure around it only positions. */
+.hx-portrait-tilt {
+  position: absolute;
+  inset: 0;
+}
+
+.hx-portrait-in {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #090c15;
+}
+
+/* The crop is by position and size (set from lib/hero/halftone.ts on the figure), never a transform: the entrance animates the transform. */
+.hx-photo {
+  position: absolute !important;
+  width: var(--crop-size, 100%) !important;
+  height: var(--crop-size, 100%) !important;
+  left: var(--crop-left, 0) !important;
+  top: var(--crop-top, 0) !important;
+  right: auto !important;
+  bottom: auto !important;
+  max-width: none !important;
+  object-fit: cover;
+}
+
+html[data-theme="light"] .hx-portrait-in {
+  background: var(--p2);
+}
+
+/* Once the dots are ready the photograph steps back: it is drawn again, through the lens, from the canvas. */
+.hx-portrait[data-dots] .hx-portrait-in {
+  opacity: 0 !important;
+}
+
+/* The dots, printed once by portraitField.ts. They come in as a soft-edged wave of light leaving the
+   full stop: a mask over the finished canvas, its centre (--wx, --wy), radius (--wr) and softness (--wb)
+   written by the script, and dropped (data-in) once the wave has passed. */
+.hx-dots {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle at var(--wx, 0px) var(--wy, 0px), #000 0, #000 calc(var(--wr, 0px) - var(--wb, 0px)), transparent var(--wr, 0px));
+  mask-image: radial-gradient(circle at var(--wx, 0px) var(--wy, 0px), #000 0, #000 calc(var(--wr, 0px) - var(--wb, 0px)), transparent var(--wr, 0px));
+}
+
+.hx-dots[data-in] {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* The portrait's lens: the headline's, made the same way. A window holding a copy of the photograph,
+   both moved by whole-pixel translations from the pointer loop; the ring, ticks and readout ride with it. */
+.hx-pl {
+  --pl-d: 150px;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hx-pl-win,
+.hx-pl-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--pl-d);
+  height: var(--pl-d);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hx-pl-win {
+  overflow: hidden;
+  contain: paint;
+}
+
+.hx-pl[data-on] .hx-pl-win,
+.hx-pl[data-on] .hx-pl-ring {
+  opacity: 1;
+}
+
+.hx-pl-copy {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.hx-pl-photo {
+  display: block;
+}
+
+.hx-pl-ring {
+  border: 1px solid var(--hx-accent);
+}
+
+/* The readout is backed, so it reads over the dots. */
+.hx-pl-label {
+  position: absolute;
+  top: calc(100% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 7px;
+  font-family: var(--font-code);
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+  color: var(--hx-accent);
+  background: var(--hx-glass);
+}
+
+/* ── The lens ────────────────────────────────────────────────────────────────
+   Positioned by components/ui/hero/pointer.ts. The window shows a lit copy of the headline through a
+   circle; the copy is moved the opposite way by the same amount, so it stays over the real letters. */
+
+.hx-lens {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.hx-lens-win,
+.hx-lens-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--hx-lens);
+  height: var(--hx-lens);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hx-lens-win {
+  overflow: hidden;
+  contain: paint;
+  background: var(--hx-glass);
+}
+
+.hx-lens[data-on] .hx-lens-win,
+.hx-lens[data-on] .hx-lens-ring {
+  opacity: 1;
+}
+
+.hx-lens-copy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max-content;
+}
+
+/* What the lens shows: the letters as faint outlines, with their skeletons drawn as constellations. */
+.hx-title-lit {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1.2px color-mix(in srgb, var(--hx-accent) 42%, transparent);
+}
+
+.hx-title-lit .hx-stop {
+  color: var(--hx-ink);
+  -webkit-text-fill-color: var(--hx-ink);
+  -webkit-text-stroke: 0;
+}
+
+.hx-title-lit .hx-ch {
+  position: relative;
+}
+
+/* The cap box: its top is 0.107em below the line's top and it is 0.7em tall (Space Grotesk, line-height 0.92). */
+.hx-sk {
+  position: absolute;
+  left: 0.035em;
+  right: 0.035em;
+  top: 0.107em;
+  height: 0.7em;
+  display: block;
+  pointer-events: none;
+  -webkit-text-stroke: 0;
+}
+
+.hx-sk svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--hx-accent);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hx-node {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--hx-accent);
+}
+
+/* A few stars flicker, out of step; the rest hold still. */
+.hx-sk .hx-node:nth-of-type(4n) {
+  animation: hx-twinkle 2.9s ease-in-out infinite;
+}
+
+.hx-sk .hx-node:nth-of-type(7n + 2) {
+  animation: hx-twinkle 3.7s ease-in-out -1.3s infinite;
+}
+
+@keyframes hx-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-sk .hx-node {
+    animation: none !important;
+  }
+}
+
+.hx-lens-ring {
+  border: 1px solid var(--hx-accent);
+}
+
+.hx-lens-tick,
+.hx-lens-cross {
+  position: absolute;
+  display: block;
+  background: var(--hx-accent);
+}
+
+.hx-lens-tick-n,
+.hx-lens-tick-s {
+  left: 50%;
+  width: 1px;
+  height: 9px;
+  margin-left: -0.5px;
+}
+
+.hx-lens-tick-n {
+  top: -14px;
+}
+
+.hx-lens-tick-s {
+  bottom: -14px;
+}
+
+.hx-lens-tick-e,
+.hx-lens-tick-w {
+  top: 50%;
+  width: 9px;
+  height: 1px;
+  margin-top: -0.5px;
+}
+
+.hx-lens-tick-e {
+  right: -14px;
+}
+
+.hx-lens-tick-w {
+  left: -14px;
+}
+
+.hx-lens-cross-h {
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 1px;
+  margin: -0.5px 0 0 -6.5px;
+  opacity: 0.8;
+}
+
+.hx-lens-cross-v {
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 13px;
+  margin: -6.5px 0 0 -0.5px;
+  opacity: 0.8;
+}
+
+.hx-lens-label {
+  position: absolute;
+  top: calc(100% + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-code);
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+  color: var(--hx-accent);
+}
+
+/* Promote layers only while the pointer is in: a standing layer per letter is a cost with no use. */
+.hx[data-hot] .hx-ch,
+.hx[data-hot] .hx-lens-win,
+.hx[data-hot] .hx-lens-ring,
+.hx[data-hot] .hx-lens-copy,
+.hx[data-hot] .hx-pl-win,
+.hx[data-hot] .hx-pl-ring,
+.hx[data-hot] .hx-pl-copy,
+.hx[data-hot] .hx-portrait-tilt {
+  will-change: transform;
+}
+
+/* ── The foot: ledger and cue ────────────────────────────────────────────── */
+
+.hx-foot {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
+  margin-top: clamp(20px, 4.4svh, 52px);
+  padding: 16px 0 clamp(20px, 3.4svh, 32px);
+}
+
+/* The foot's hairline is an element, not a border, so the entrance can draw it across. */
+.hx-hair {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--hx-hair);
+  transform-origin: left center;
+}
+
+.hx-ledger {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px clamp(26px, 4vw, 72px);
+  margin: 0;
+}
+
+.hx-cell {
+  min-width: 0;
+}
+
+.hx-cell dt {
+  margin: 0 0 6px;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--hx-label);
+}
+
+.hx-cell dd {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--hx-ink);
+}
+
+.hx-cell-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.hx-cell-link:focus-visible {
+  outline: 1px solid var(--hx-accent);
+  outline-offset: 4px;
+}
+
+.hx-unit,
+.hx-sep {
+  font-family: var(--font-code);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hx-label);
+}
+
+.hx-sep {
+  letter-spacing: 0;
+}
+
+.hx-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 44px;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--hx-label);
+}
+
+.hx-cue:hover,
+.hx-cue:focus-visible {
+  color: var(--hx-ink);
+}
+
+.hx-cue:focus-visible {
+  outline: 1px solid var(--hx-accent);
+  outline-offset: 4px;
+}
+
+.hx-cue-line {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 34px;
+  background: var(--hx-hair);
+}
+
+.hx-cue-line i {
+  position: absolute;
+  top: 0;
+  left: -1.5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--hx-accent);
+  animation: hx-cue-run 2.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes hx-cue-run {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-cue-line i {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+html[data-lite="1"] .hx-cue-line i {
+  animation: none;
+  opacity: 1;
+}
+
+/* ── Tall windows have room for a bigger headline ─────────────────────────── */
+
+@media (min-width: 861px) and (min-height: 860px) {
+  .hx {
+    --hx-fs: min(11.4vw, 22svh);
+  }
+}
+
+/* ── Entrance ────────────────────────────────────────────────────────────────
+   components/ui/hero/entrance.ts plays it. Until then everything it will animate is hidden here,
+   from the very first paint (a boot script in <head> sets data-hero="wait"; a calm visitor never
+   gets it). "go" is the sequence running: the hidden state is then held by inline style, and the
+   lines stay masked so each letter rises out of its own line. */
+
+html[data-hero="wait"] .hx-tick,
+html[data-hero="wait"] .hx-ruler i,
+html[data-hero="wait"] .hx-kicker > span,
+html[data-hero="wait"] .hx-ch,
+html[data-hero="wait"] .hx-stop,
+html[data-hero="wait"] .hx-lede,
+html[data-hero="wait"] .hx-btn,
+html[data-hero="wait"] .hx-portrait-in,
+html[data-hero="wait"] .hx-cell,
+html[data-hero="wait"] .hx-orbit,
+html[data-hero="wait"] .hx-guide-label,
+html[data-hero="wait"] .hx-cue {
+  opacity: 0;
+}
+
+html[data-hero="wait"] .hx-guide {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+html[data-hero="wait"] .hx-margin {
+  transform: scaleY(0);
+  transform-origin: top center;
+}
+
+html[data-hero="wait"] .hx-kicker .eyebrow-rule,
+html[data-hero="wait"] .hx-hair {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+html[data-hero="wait"] .hx-ch,
+html[data-hero="wait"] .hx-stop {
+  transform: translateY(110%);
+}
+
+html[data-hero="wait"] .hx-portrait-in {
+  clip-path: inset(100% 0 0 0);
+}
+
+html[data-hero="wait"] .hx-line,
+html[data-hero="go"] .hx-line {
+  overflow: hidden;
+}
+
+/* If the script that plays the entrance never runs, show everything after a while rather than never. */
+html[data-hero="wait"] .hx-tick,
+html[data-hero="wait"] .hx-ruler i,
+html[data-hero="wait"] .hx-kicker > span,
+html[data-hero="wait"] .hx-kicker .eyebrow-rule,
+html[data-hero="wait"] .hx-hair,
+html[data-hero="wait"] .hx-ch,
+html[data-hero="wait"] .hx-stop,
+html[data-hero="wait"] .hx-lede,
+html[data-hero="wait"] .hx-btn,
+html[data-hero="wait"] .hx-portrait-in,
+html[data-hero="wait"] .hx-cell,
+html[data-hero="wait"] .hx-orbit,
+html[data-hero="wait"] .hx-guide,
+html[data-hero="wait"] .hx-guide-label,
+html[data-hero="wait"] .hx-margin,
+html[data-hero="wait"] .hx-cue {
+  animation: hx-failsafe 0.01s linear 14s forwards;
+}
+
+@keyframes hx-failsafe {
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+}
+
+/* ── Medium: the lede gets more of the row ───────────────────────────────── */
+
+@media (min-width: 861px) and (max-width: 1100px) {
+  .hx-aside {
+    grid-column: 1 / span 8;
+  }
+}
+
+/* ── Short windows: the headline is already height-bound; tighten the rest ─ */
+
+@media (min-width: 861px) and (max-height: 760px) {
+  .hx-lede {
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  .hx-kicker {
+    margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 861px) and (max-height: 680px) {
+  .hx-btn {
+    min-height: 44px;
+  }
+
+  .hx-aside {
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .hx-foot {
+    margin-top: 16px;
+    padding-top: 12px;
+  }
+
+  .hx-ruler {
+    display: none;
+  }
+}
+
+/* ── Phones and tablets ──────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .hx {
+    --hx-fs: min(14.2vw, 15svh);
+    padding-top: 92px;
+  }
+
+  .hx {
+    --hx-lens: 120px;
+  }
+
+  /* A finger has no cursor position worth reading out, and the label would sit over the lede. */
+  .hx-lens-label,
+  .hx-pl-label {
+    display: none;
+  }
+
+  .hx-ruler {
+    display: none;
+  }
+
+  .hx-frame {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 16px;
+    align-content: center;
+  }
+
+  .hx-kicker {
+    grid-column: 1;
+    grid-row: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: start;
+    gap: 8px;
+    margin: 0 0 clamp(14px, 3svh, 24px);
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+  }
+
+  .hx-kicker-dim::before {
+    display: none;
+  }
+
+  .hx {
+    --hx-disc: 112px;
+  }
+
+  .hx-portrait {
+    position: relative;
+    top: auto;
+    right: auto;
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: clamp(14px, 3svh, 24px);
+    align-self: start;
+  }
+
+  .hx-title {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .hx-aside {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  .hx-lede {
+    max-width: 38ch;
+    font-size: 1rem;
+  }
+
+  .hx-actions {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 280px;
+  }
+
+  .hx-btn {
+    justify-content: space-between;
+    min-height: 48px;
+  }
+
+  /* The Lite toggle and the chat button are fixed in the bottom corners: keep the ledger above them. */
+  .hx-foot {
+    grid-template-columns: minmax(0, 1fr);
+    padding-bottom: 84px;
+  }
+
+  .hx-cell-pos,
+  .hx-cue {
+    display: none;
+  }
+
+  .hx-tick-bl,
+  .hx-tick-br {
+    bottom: 84px;
+  }
+}

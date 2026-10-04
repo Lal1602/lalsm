@@ -87,85 +87,14 @@
 
 /* --- Responsive Modifications (FIX 4: Symmetry & Harmony) --- */
 @media (max-width: 968px) {
-  .hero {
-    /* Fix 3: Increase bottom padding to prevent overlap with scroll indicator */
-    padding-bottom: 120px;
-  }
-
-  .hero-wrapper {
-    /* FIX 2: Change column-reverse to column so Image is TOP, Text is BOTTOM */
-    flex-direction: column;
-    text-align: center;
-    gap: 40px;
-    /* Slightly reduced gap */
-    padding-top: 20px;
-  }
-
-  .hero-content {
-    text-align: center;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .hero-subtitle {
-    margin: 0 auto 30px;
-    padding: 0 15px;
-    /* Prevent text touching edges */
-    font-size: 1rem;
-    /* Slightly smaller reading text */
-  }
-
-  .image-blob {
-    width: 250px;
-    /* Slightly smaller image on tablet/mobile */
-    height: 250px;
-  }
 
   /* FIX 2 & 4: Adjust badge for better visibility and centering */
-  .stats-badge {
-    /* Posisi (biarkan ini) */
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    z-index: 10;
-    width: max-content;
-
-    /* --- BAGIAN YG DIUBAH UTK MENGECILKAN UKURAN --- */
-    bottom: -20px;
-    /* Naikkan sedikit biar nempel gambar (tadinya -20px) */
-    padding: 6px 12px;
-    /* KURANGI PADDING: Biar kotaknya lebih tipis (tadinya 8px 15px) */
-    border-radius: 8px;
-    /* Perkecil lengkungan sudut */
-  }
-
-  .stats-badge strong {
-    font-size: 0.9rem;
-    /* KURANGI FONT ANGKA: (tadinya 1.1rem) */
-  }
 
   /* Tambahan: Kecilkan teks "Projects Done" */
-  .stats-badge span {
-    font-size: 0.65rem !important;
-    /* (tadinya 0.8rem) */
-  }
 
   /* Tambahan: Paksa ikon centang jadi kecil */
-  .stats-badge ion-icon {
-    font-size: 1.8rem !important;
-    /* (tadinya 2.5rem bawaan HTML) */
-  }
 
   /* FIX 1: Adjust large text to prevent overflow */
-  .glitch-text {
-    font-size: 2.2rem;
-    /* Reduced from 2.5rem */
-    line-height: 1.2;
-    word-wrap: break-word;
-  }
 
   /* FIX 1: Hide extremely large parallax text that causes overflow on mobile */
   .parallax-text {
@@ -224,29 +153,8 @@
              comprehensive responsive block at the bottom of this file. */
 
   /* Fix button centering */
-  .btn-group {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-    align-items: center;
-    margin-bottom: 20px;
-    /* Extra margin to ensure distance from scroll arrow */
-  }
-
-  .btn-group .btn {
-    margin-left: 0 !important;
-    /* Remove inline style margin */
-    width: 100%;
-    /* Full width buttons look better on small mobile */
-    max-width: 250px;
-    text-align: center;
-  }
 
   /* Adjust Hero Text further for very small screens */
-  .glitch-text {
-    font-size: 1.8rem;
-  }
 
   .counter {
     font-size: 4rem;

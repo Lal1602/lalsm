@@ -8,7 +8,7 @@ interface Theme {
 
 const AvailableThemes: Theme[] = [{
   type: 'light',
-  color: '#0690d4'
+  color: '#e4ddcc'
 }, {
   type: 'dark',
   color: '#111'

@@ -233,10 +233,22 @@ test.describe("project plates", () => {
     await page.mouse.move(cx - 520, cy, { steps: 6 });
     await page.mouse.up();
     await expect(page.locator(".plate-title")).not.toHaveText("Herbal Mart", { timeout: 5_000 });
-    const after = (await page.locator(".plate-title").textContent()) ?? "";
+
+    // The plates keep gliding after the release. Read the title only once it has stopped changing
+    // (the pace of the glide depends on the machine's frame rate), then click what is in the centre.
+    let after = "";
+    let since = Date.now();
+    for (let i = 0; i < 80 && Date.now() - since < 1500; i++) {
+      await page.waitForTimeout(150);
+      const now = (await page.locator(".plate-title").textContent()) ?? "";
+      if (now !== after) {
+        after = now;
+        since = Date.now();
+      }
+    }
+    await page.waitForTimeout(600);
 
     // A plain click on the centre plate opens that project's record.
-    await page.waitForTimeout(1200); // settle
     await page.mouse.click(cx, cy);
     await expect(page.locator(".project-detail-modal .modal-title")).toHaveText(after);
   });
@@ -323,7 +335,18 @@ test.describe("flight deck (How I Work)", () => {
     await page.mouse.wheel(0, 80);
     await expect(live(page)).toContainText("Stage 02");
 
-    // Autopilot hands it back to the page.
+    // Autopilot hands it back to the page. Let the wheel's glide finish and bring the button into
+    // view first: if the page scrolls under a stationary pointer while it is being clicked, a bay
+    // lands under it and its hover takes the controls straight back.
+    await expect
+      .poll(async () => {
+        const before = await page.evaluate(() => window.scrollY);
+        await page.waitForTimeout(300);
+        return before === (await page.evaluate(() => window.scrollY));
+      })
+      .toBe(true);
+    await page.locator(".fd-auto").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
     await page.locator(".fd-auto").click();
     await expect(page.locator(".fd")).toHaveAttribute("data-mode", "auto");
   });
