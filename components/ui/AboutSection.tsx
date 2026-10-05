@@ -20,9 +20,11 @@ import { useCalm, useMediaQuery } from "./hiw/hooks";
  *
  * One bay is open at a time. On a wide screen the bays are a list on the left and the
  * open one's instrument fills the stage on the right (placed by CSS grid, so there is
- * no layout switch in JS); on a phone it is an accordion and the instrument opens under
- * its bay. Only the open instrument exists, so only one loop can ever be running, and
- * each loads when the section is near rather than with the page.
+ * no layout switch in JS). Only the open instrument exists, so only one loop can ever be
+ * running, and each loads when the section is near rather than with the page.
+ *
+ * On a phone (the same 860px the CSS switches at) there are no instruments: the three
+ * bays are three plain cards, each with its brief and its stack, and nothing to open.
  *
  * Everything the section says is readable at rest: the instruments add proof, not
  * information.
@@ -116,13 +118,7 @@ export default function AboutSection() {
   const [active, setActive] = useState(0);
   const buttons = useRef<Array<HTMLButtonElement | null>>([]);
 
-  const choose = useCallback(
-    (i: number) => {
-      // A wide screen always shows one instrument; on a phone the open bay can be closed again.
-      setActive((cur) => (stacked && cur === i ? -1 : i));
-    },
-    [stacked],
-  );
+  const choose = useCallback((i: number) => setActive(i), []);
 
   const onKeyDown = (e: KeyboardEvent<HTMLUListElement>) => {
     // Only the bay buttons steer the list: the open instrument sits inside it, and its own keys
@@ -153,15 +149,22 @@ export default function AboutSection() {
             <div>
               <p className="wb-eyebrow" data-scroll>
                 <span className="eyebrow-rule" aria-hidden="true" />
-                SYSTEMS BAY · THREE INSTRUMENTS
+                <span className="wb-wide">SYSTEMS BAY · THREE INSTRUMENTS</span>
+                <span className="wb-narrow">SYSTEMS BAY · THREE DISCIPLINES</span>
               </p>
               <h2 className="section-title wb-title" id="wb-heading" data-scroll>
                 What I Build
               </h2>
             </div>
             <p className="wb-lede" data-scroll>
-              Three disciplines, one operator. Each bay has a working instrument rather than a description: open it and
-              press something.
+              <span className="wb-wide">
+                Three disciplines, one operator. Each bay has a working instrument rather than a description: open it
+                and press something.
+              </span>
+              <span className="wb-narrow">
+                Three disciplines, one operator: the part you touch, the part you do not, and everything sent out past the
+                browser.
+              </span>
             </p>
           </header>
 
@@ -174,44 +177,57 @@ export default function AboutSection() {
               style={{ gridTemplateRows: BAYS.map((_, i) => (i === active ? "auto" : "minmax(auto, 1fr)")).join(" ") }}
             >
               {BAYS.map((bay, i) => {
-                const open = active === i;
+                const open = active === i && !stacked;
                 const Demo = DEMOS[i]!;
+                // The face of a bay: the same on a wide screen (a button that opens its instrument) and on a
+                // phone (a card with nothing to open, lit in its own colour).
+                const face = (
+                  <>
+                    {open ? (
+                      <m.i className="wb-lit" layoutId="wb-lit" transition={calm ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 38 }} />
+                    ) : (
+                      <i className="wb-lit wb-lit--static" />
+                    )}
+                    <span className="wb-bay-top">
+                      <Glyph name={bay.glyph} />
+                      <span className="wb-bay-code">
+                        {bay.code}
+                        <i aria-hidden="true" />
+                        <b>{bay.callsign}</b>
+                      </span>
+                      {!stacked && (
+                        <span className="wb-bay-live" aria-hidden="true">
+                          <i />
+                          live
+                        </span>
+                      )}
+                    </span>
+                    <span className="wb-bay-name">
+                      {bay.title[0]} <em>{bay.title[1]}</em>
+                    </span>
+                    <span className="wb-bay-brief">{bay.brief}</span>
+                  </>
+                );
                 return (
-                  <li key={bay.code} className="wb-item" data-tone={bay.tone} data-active={open || undefined}>
+                  <li key={bay.code} className="wb-item" data-tone={bay.tone} data-active={open || stacked || undefined}>
                     <div className="wb-bay">
-                      <button
-                        type="button"
-                        className="wb-bay-btn"
-                        id={`wb-tab-${i}`}
-                        aria-expanded={open}
-                        aria-controls={`wb-panel-${i}`}
-                        ref={(el) => {
-                          buttons.current[i] = el;
-                        }}
-                        onClick={() => choose(i)}
-                      >
-                        {open && !stacked ? (
-                          <m.i className="wb-lit" layoutId="wb-lit" transition={calm ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 38 }} />
-                        ) : (
-                          <i className="wb-lit wb-lit--static" />
-                        )}
-                        <span className="wb-bay-top">
-                          <Glyph name={bay.glyph} />
-                          <span className="wb-bay-code">
-                            {bay.code}
-                            <i aria-hidden="true" />
-                            <b>{bay.callsign}</b>
-                          </span>
-                          <span className="wb-bay-live" aria-hidden="true">
-                            <i />
-                            live
-                          </span>
-                        </span>
-                        <span className="wb-bay-name">
-                          {bay.title[0]} <em>{bay.title[1]}</em>
-                        </span>
-                        <span className="wb-bay-brief">{bay.brief}</span>
-                      </button>
+                      {stacked ? (
+                        <div className="wb-bay-btn">{face}</div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="wb-bay-btn"
+                          id={`wb-tab-${i}`}
+                          aria-expanded={open}
+                          aria-controls={`wb-panel-${i}`}
+                          ref={(el) => {
+                            buttons.current[i] = el;
+                          }}
+                          onClick={() => choose(i)}
+                        >
+                          {face}
+                        </button>
+                      )}
                       <ul className="wb-stack" aria-label={`${bay.callsign} stack`}>
                         {bay.stack.map((name) => (
                           <li key={name}>{name}</li>

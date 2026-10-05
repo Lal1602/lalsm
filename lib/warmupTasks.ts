@@ -78,11 +78,13 @@ export function registerWarmupTasks(): void {
     weight: taskWeight("chunks"),
     timeoutMs: 6500,
     run: async () => {
+      // A phone shows What I Build as three plain cards: it has no instruments to fetch (same 860px as the CSS).
+      const phone = window.matchMedia("(max-width: 860px)").matches;
       await Promise.all([
         import("../components/motion/features"),
-        import("../components/ui/wb/FrameMeter"),
-        import("../components/ui/wb/RequestTrace"),
-        import("../components/ui/wb/ProbeRun"),
+        phone ? undefined : import("../components/ui/wb/FrameMeter"),
+        phone ? undefined : import("../components/ui/wb/RequestTrace"),
+        phone ? undefined : import("../components/ui/wb/ProbeRun"),
         import("../components/ui/CvTimelineSlide"),
         import("../components/ui/AiChatOverlay"),
         // Lite has no tubes, and should not spend the bytes on their component.

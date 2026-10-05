@@ -112,7 +112,7 @@ export default function ProjectModal({ data, onClose }: Props) {
         {/* ── Info pane ────────────────────────────────────────────── */}
         <div className="ach-modal-info">
           {/* Eyebrow */}
-          <p className="ach-modal-eyebrow">{"// Certificate &amp; Achievement"}</p>
+          <p className="ach-modal-eyebrow">{"// Certificate & Achievement"}</p>
 
           {/* Title */}
           <h3 id="achModalTitle" className="ach-modal-title">

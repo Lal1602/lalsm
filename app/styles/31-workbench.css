@@ -5,8 +5,8 @@
    Wide screens: the bays are a list on the left, the open bay's instrument is
    the stage on the right. The stage is placed by grid, not by JS: every <li> is
    `display: contents`, so its bay lands in column 1 on its own row and its stage
-   spans all three rows of column 2. Phones: the list is an accordion and the
-   stage opens under its bay.
+   spans all three rows of column 2. Phones: three plain cards, and no
+   stage.
 
    Nothing here uses filter, backdrop-filter or an animated box-shadow, the page
    is compositing-bound. What moves is transform and opacity, driven from JS on
@@ -1273,9 +1273,24 @@
   }
 }
 
-/* ── Phones and tablets: an accordion ──────────────────────────────────── */
+/* ── Phones and tablets: three cards ──────────────────────────────────────
+   No instruments here (AboutSection renders none below this width, and the stage is hidden in case
+   a render of the wider layout is still on its way out): each bay is a card with its brief and its stack,
+   lit in its own colour. */
+
+.wb-narrow {
+  display: none;
+}
 
 @media (max-width: 860px) {
+  .wb-wide {
+    display: none;
+  }
+
+  .wb-narrow {
+    display: inline;
+  }
+
   .wb-head,
   .ascent-head {
     grid-template-columns: 1fr;
@@ -1284,7 +1299,9 @@
   }
 
   .wb-index {
-    display: block;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
     min-height: 0;
   }
 
@@ -1292,58 +1309,48 @@
     display: block;
   }
 
+  .wb-stage {
+    display: none;
+  }
+
   .wb-bay {
     grid-column: auto;
+    overflow: hidden;
+    border: 1px solid var(--wb-hair);
+    border-radius: 6px;
+    background: linear-gradient(180deg, rgba(var(--wb-tone-rgb), 0.08), rgba(var(--wb-tone-rgb), 0) 60%),
+      rgba(255, 255, 255, 0.02);
   }
 
-  .wb-item:not(:last-child) .wb-bay {
-    border-bottom: 0;
-  }
-
-  .wb-stage {
-    min-height: 0;
-    height: auto;
-    contain: none;
-    margin: 4px 0 18px;
-  }
-
-  .wb-stage-in {
-    overflow: visible;
-  }
-
-  .wb-stage-in {
-    padding: 18px 16px 18px;
-  }
-
-  .wb-demo {
-    min-height: 0;
+  .wb-item:last-child .wb-bay {
+    border-bottom: 1px solid var(--wb-hair);
   }
 
   .wb-bay-btn {
-    padding-top: 22px;
+    padding: 22px 18px 8px 24px;
+    cursor: default;
   }
 
-  /* No hover to lean on: every bay carries its own colour. */
+  .wb-lit {
+    top: 22px;
+    bottom: 14px;
+  }
+
+  .wb-bay-brief {
+    max-width: none;
+  }
+
+  .wb-stack {
+    padding: 4px 18px 20px 24px;
+  }
+
+  /* No hover to lean on, and nothing to open: every card carries its own colour. */
   .wb-glyph {
     color: var(--wb-tone);
   }
 
   .wb-bay-code b {
     color: var(--wb-tone);
-  }
-
-  .wb-game {
-    flex-direction: column;
-    align-items: center;
-    gap: 18px;
-  }
-
-  .wb-field {
-    width: min(100%, 340px);
-  }
-
-  .wb-game-side {
-    width: 100%;
   }
 }
 
@@ -1359,58 +1366,6 @@
 
   .wb-bay-brief {
     font-size: 0.9rem;
-  }
-
-  .wb-meter-read {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .wb-stat--big {
-    grid-column: 1 / -1;
-  }
-
-  .wb-stat--big b {
-    font-size: 2.2rem;
-  }
-
-  .wb-span {
-    grid-template-columns: minmax(0, 1fr) 34px;
-    gap: 4px 10px;
-  }
-
-  .wb-span-label {
-    grid-column: 1 / -1;
-  }
-
-  .wb-span-track {
-    grid-column: 1;
-  }
-
-  .wb-trace-ctl {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .wb-trace-ctl .wb-seg {
-    display: flex;
-  }
-
-  .wb-trace-ctl .wb-seg-btn {
-    flex: 1;
-  }
-
-  .wb-trace-ctl .wb-go {
-    margin-left: 0;
-    align-self: stretch;
-  }
-
-  .wb-node span {
-    display: none;
-  }
-
-  .wb-node b {
-    font-size: 0.56rem;
-    letter-spacing: 0.06em;
   }
 }
 
@@ -1515,6 +1470,12 @@ html[data-theme="light"] .wb-stack li {
 
 html[data-theme="light"] .wb-item[data-active] .wb-stack li {
   color: rgba(var(--ink-rgb), 0.74);
+}
+
+@media (max-width: 860px) {
+  html[data-theme="light"] .wb-bay {
+    background: linear-gradient(180deg, rgba(var(--wb-tone-rgb), 0.09), rgba(var(--wb-tone-rgb), 0) 60%), var(--p0);
+  }
 }
 
 html[data-theme="light"] .wb-stage {

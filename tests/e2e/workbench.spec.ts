@@ -121,21 +121,42 @@ test.describe("what I build (systems bay)", () => {
     await expect(page.locator(".wb-packet")).toHaveCSS("opacity", "0");
   });
 
-  test("on a phone the bays are an accordion, and nothing overflows sideways", async ({ browser }) => {
+  test("on a phone it is three plain cards: no instruments, nothing to open, nothing overflowing", async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     const page = await context.newPage();
-    await arrive(page, 60);
-    await expect(page.locator(".wb-stage")).toHaveCount(1);
-    await expect(bay(page, 0)).toHaveAttribute("aria-expanded", "true");
-    // The open instrument sits under its own bay, not in a separate column.
-    const sameParent = await page.evaluate(() => document.querySelector(".wb-stage")!.parentElement === document.querySelector(".wb-item"));
-    expect(sameParent).toBe(true);
+    await page.goto("/");
+    await page.waitForFunction(() => (document.querySelector<HTMLElement>(".preloader")?.style.display ?? "") === "none", null, { timeout: 40_000 });
+    await page.evaluate(() => {
+      const r = document.querySelector(".wb-deck")!.getBoundingClientRect();
+      window.scrollTo(0, window.scrollY + r.top - 60);
+    });
 
-    await bay(page, 2).dispatchEvent("click");
-    await expect(bay(page, 2)).toHaveAttribute("aria-expanded", "true");
-    await expect(page.locator(".wb-stage")).toHaveCount(1);
-    await bay(page, 2).dispatchEvent("click");
+    // The three cards, each with its brief and its stack, and nothing else: no stage, no instrument, no button.
+    await expect(page.locator(".wb-bay")).toHaveCount(3);
+    await expect(page.locator(".wb-bay-name")).toHaveText([/Frontend\s+Engineering/, /Backend\s*&\s*DevOps/, /Mobile\s*&\s*Game Dev/]);
+    await expect(page.locator(".wb-stack").first()).toContainText("TypeScript");
     await expect(page.locator(".wb-stage")).toHaveCount(0);
+    await expect(page.locator("button.wb-bay-btn")).toHaveCount(0);
+    await expect(page.locator(".wb-bay-live")).toHaveCount(0);
+    // The heading no longer promises instruments it does not show.
+    const eyebrow = await page.locator(".wb-eyebrow").innerText();
+    expect(eyebrow).toMatch(/THREE DISCIPLINES/i);
+    expect(eyebrow).not.toMatch(/INSTRUMENTS/i);
+    expect(await page.locator(".wb-lede").innerText()).not.toMatch(/instrument/i);
+
+    // A card is a card: a border, inside the screen's width, every one the same width.
+    const cards = await page.locator(".wb-bay").evaluateAll((els) =>
+      els.map((el) => {
+        const r = el.getBoundingClientRect();
+        return { left: Math.round(r.left), right: Math.round(r.right), border: getComputedStyle(el).borderTopWidth };
+      }),
+    );
+    for (const c of cards) {
+      expect(c.border).toBe("1px");
+      expect(c.left).toBeGreaterThanOrEqual(0);
+      expect(c.right).toBeLessThanOrEqual(390);
+    }
+    expect(new Set(cards.map((c) => c.right - c.left)).size).toBe(1);
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);
