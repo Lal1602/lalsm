@@ -47,6 +47,32 @@ test.describe("pages", () => {
     await page.goto("/cv");
     await expect(page.getByRole("link", { name: /Download PDF/ })).toHaveAttribute("href", "/cv.pdf");
   });
+
+  test("the other pages have no splash screen over them", async ({ page }) => {
+    for (const path of ["/cv", "/cv/id", "/blog", "/projects/mindpoint"]) {
+      await page.goto(path);
+      await expect(page.locator(".preloader"), path).toBeHidden();
+      await expect(page.locator("html"), path).not.toHaveAttribute("data-splash", /.*/);
+      expect(await page.evaluate(() => getComputedStyle(document.body).overflow), path).not.toBe("hidden");
+    }
+  });
+
+  test("the CV has an English and an Indonesian version, each with its own PDF", async ({ page }) => {
+    await page.goto("/cv");
+    await expect(page.locator("article.cvp-sheet")).toHaveAttribute("lang", "en");
+    await expect(page.getByRole("heading", { level: 2, name: "Education" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /^EN/ })).toHaveAttribute("aria-current", "page");
+
+    await page.getByRole("link", { name: /^ID/ }).click();
+    await expect(page).toHaveURL(/\/cv\/id$/);
+    await expect(page.locator("article.cvp-sheet")).toHaveAttribute("lang", "id");
+    await expect(page.getByRole("heading", { level: 2, name: "Pendidikan" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /^ID/ })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("link", { name: /Unduh PDF/ })).toHaveAttribute("href", "/cv-id.pdf");
+    // The facts are the supplied ones, in both.
+    await expect(page.getByText("D3 Teknik Informatika")).toBeVisible();
+    await expect(page.getByText("Sign Language Recognition System")).toBeVisible();
+  });
 });
 
 test.describe("machine-readable routes", () => {
@@ -58,11 +84,21 @@ test.describe("machine-readable routes", () => {
     expect(body.subarray(0, 5).toString("latin1")).toBe("%PDF-");
   });
 
+  test("cv-id.pdf is a real PDF too, and differs from the English one", async ({ request }) => {
+    const id = await request.get("/cv-id.pdf");
+    expect(id.status()).toBe(200);
+    expect(id.headers()["content-type"]).toContain("application/pdf");
+    const [idBody, enBody] = [await id.body(), await (await request.get("/cv.pdf")).body()];
+    expect(idBody.subarray(0, 5).toString("latin1")).toBe("%PDF-");
+    expect(idBody.equals(enBody)).toBe(false);
+  });
+
   test("sitemap and robots exist and agree", async ({ request }) => {
     const sitemap = await (await request.get("/sitemap.xml")).text();
     expect(sitemap).toContain("/projects/mindpoint");
     expect(sitemap).toContain("/blog/");
     expect(sitemap).toContain("/cv");
+    expect(sitemap).toContain("/cv/id");
 
     const robots = await (await request.get("/robots.txt")).text();
     expect(robots).toMatch(/Sitemap: .*\/sitemap\.xml/);

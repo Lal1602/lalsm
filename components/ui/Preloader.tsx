@@ -2,16 +2,22 @@
 import { useEffect } from "react";
 import { setEntrance } from "@/lib/entrance";
 import { holdQualityGovernor } from "@/lib/quality";
-import { DIAL_TICKS, SPLASH_TASKS, elapsedLabel, lockLabel, odometer } from "@/lib/splash";
-import { getWarmupSnapshot, getWarmupStatuses, startWarmup } from "@/lib/warmup";
+import { DIAL_TICKS, SPLASH_TASKS, arcFill, elapsedLabel, lockLabel, odometer, pacedTarget, progressCeiling, settleDigits, taskLabel } from "@/lib/splash";
+import { getWarmupStatuses, startWarmup } from "@/lib/warmup";
 import { registerWarmupTasks } from "@/lib/warmupTasks";
 
-/** The counter never finishes faster than this, so the screen is never just a flash. */
-const MIN_MS = 1700;
+/**
+ * The run is paced: slow in, slow out, so it can be watched. It never finishes faster than this, however fast the
+ * device is (the work behind it can only make it longer, never shorter).
+ */
+const MIN_MS = 6000;
 /** Calm visitors (Lite, reduced motion) get a short one: it is there to cover, not to perform. */
 const MIN_CALM_MS = 500;
 /** Give up waiting for warm-up after this long; sections fall back to their own setup. */
-const MAX_MS = 9000;
+const MAX_MS = 10000;
+/** The fastest the counter may move, in percent per millisecond: after a stall it glides on, it does not jump. */
+const MAX_RATE = 0.05;
+const MAX_RATE_CALM = 0.5;
 /** After the last system locks: the sweep fades, then the halves are made, then they part. */
 const FADE_SWEEP_MS = 200;
 const HOLD_MS = 380;
@@ -37,12 +43,16 @@ export default function Preloader() {
       return;
     }
 
+    // Arriving on the home page by a link from another page: the boot script did not flag it (it runs once, on load).
+    html.setAttribute("data-splash", "1");
+
     const calm = html.getAttribute("data-lite") === "1" || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const minMs = calm ? MIN_CALM_MS : MIN_MS;
     const q = <T extends Element = HTMLElement>(sel: string) => root.querySelector<T>(sel);
     const qa = <T extends Element = HTMLElement>(sel: string) => Array.from(root.querySelectorAll<T>(sel));
 
     const stage = q('[data-pl="stage"]');
+    const sweep = q('[data-pl="sweep"]');
     const horizon = q('[data-pl="horizon"]');
     const field = q('[data-pl="field"]');
     const read = q('[data-pl="read"]');
@@ -53,6 +63,8 @@ export default function Preloader() {
     const reels = qa('[data-pl="reel"]');
     const digits = qa(".pl-digit");
     const arcs = new Map(qa<SVGPathElement>(".pl-arc").map((a) => [a.getAttribute("data-task") ?? "", a] as const));
+    const fills = SPLASH_TASKS.map((task) => q<SVGPathElement>(`.pl-arc-fill[data-fill="${task.name}"]`));
+    const fillShown = SPLASH_TASKS.map(() => 0);
     const wrapper = document.getElementById("main-content-wrapper");
     const cells = [2, 11, 11];
 
@@ -85,6 +97,11 @@ export default function Preloader() {
     let last = startedAt;
     let shown = 0;
     let litTicks = 0;
+    let headTick = -1;
+    let lastSweep = -1;
+    /** Arcs the counter has run all the way round, and the one whose name the readout is showing. */
+    let bandsDone = 0;
+    let bandAnnounced = -1;
     let lastField = -Infinity;
     let lastElapsed = "";
     let lastValueNow = -1;
@@ -94,26 +111,53 @@ export default function Preloader() {
     const timers: number[] = [];
     const animations: Animation[] = [];
     const halves: HTMLElement[] = [];
-    const seen = new Set<string>();
     let lockedCount = 0;
     const later = (fn: () => void, ms: number) => {
       timers.push(window.setTimeout(fn, ms));
     };
 
     const writeOdometer = (value: number) => {
-      const pos = odometer(calm ? Math.round(value) : value);
+      const pos = odometer(calm ? Math.round(value) : settleDigits(value));
       reels.forEach((reel, i) => {
         reel.style.transform = `translate3d(0, ${(-(pos[i] / cells[i]) * 100).toFixed(3)}%, 0)`;
       });
       // The leading zeros are there to keep the width, but they are not part of the number.
-      digits[0]?.classList.toggle("is-ghost", value < 99.5);
-      digits[1]?.classList.toggle("is-ghost", value < 9.5);
+      const shownValue = calm ? Math.round(value) : settleDigits(value);
+      digits[0]?.classList.toggle("is-ghost", shownValue < 99.5);
+      digits[1]?.classList.toggle("is-ghost", shownValue < 9.5);
     };
 
+    /** Every tick behind the counter is lit and the one it is on glows half way. */
     const writeTicks = (value: number) => {
-      const n = Math.min(DIAL_TICKS, Math.round((value / 100) * DIAL_TICKS));
+      const n = Math.min(DIAL_TICKS, Math.floor((value / 100) * DIAL_TICKS));
       while (litTicks < n) ticks[litTicks++]?.classList.add("is-on");
       while (litTicks > n) ticks[--litTicks]?.classList.remove("is-on");
+      const head = n < DIAL_TICKS ? n : -1;
+      if (head !== headTick) {
+        if (headTick >= 0) ticks[headTick]?.classList.remove("is-head");
+        if (head >= 0) ticks[head]?.classList.add("is-head");
+        headTick = head;
+      }
+    };
+
+    /** The sweep's bright edge is where the counter is: one clock for the numbers, the ticks, the arcs and the sweep. */
+    const writeSweep = (value: number) => {
+      if (!sweep || calm) return;
+      const angle = Math.round(value * 3.6 * 20) / 20;
+      if (angle === lastSweep) return;
+      lastSweep = angle;
+      sweep.style.transform = `rotate(${angle}deg)`;
+    };
+
+    /** Each arc fills as the counter runs round it. */
+    const writeArcs = (value: number) => {
+      fills.forEach((fill, i) => {
+        if (!fill) return;
+        const f = arcFill(value, i, SPLASH_TASKS.length);
+        if (f === fillShown[i]) return;
+        fillShown[i] = f;
+        fill.style.strokeDashoffset = (1 - f).toFixed(4);
+      });
     };
 
     const writeField = (value: number, now: number, force = false) => {
@@ -122,23 +166,37 @@ export default function Preloader() {
       field.style.setProperty("--pl-r", `${(-22 + 122 * (value / 100)).toFixed(1)}%`);
     };
 
-    /** One arc and the readout for each system that has finished since the last look, as it really ended. */
-    const syncSystems = () => {
+    /**
+     * The readout and the lock of each arc follow the counter, not the work: an arc locks when the counter has run
+     * round it, and the counter cannot get there before the system has finished (progressCeiling). What the arc says
+     * is still what really happened to that system.
+     */
+    const syncSystems = (value: number, all = false) => {
       const statuses = getWarmupStatuses();
-      for (const task of SPLASH_TASKS) {
-        const s = statuses[task.name];
-        if (!s || s === "pending" || seen.has(task.name)) continue;
-        seen.add(task.name);
+      const n = SPLASH_TASKS.length;
+      const segment = 100 / n;
+      while (bandsDone < n && (all || value >= (bandsDone + 1) * segment - 0.6)) {
+        const task = SPLASH_TASKS[bandsDone];
+        const st = statuses[task.name];
         const arc = arcs.get(task.name);
-        if (s === "ok") {
+        if (st === "ok") {
           arc?.classList.add("is-locked");
           lockedCount += 1;
-        } else arc?.classList.add("is-late");
-        if (read) {
-          read.textContent = lockLabel(s, task.name);
+        } else {
+          arc?.classList.add("is-late");
+          fills[bandsDone]?.classList.add("is-late");
+        }
+        if (read && !all) {
+          read.textContent = lockLabel(st === "ok" ? "ok" : st === "error" ? "error" : "timeout", task.name);
           if (!calm) read.animate([{ opacity: 0.15 }, { opacity: 1 }], { duration: 260, easing: "ease-out" });
         }
-        if (lockedEl) lockedEl.textContent = `${lockedCount}/${SPLASH_TASKS.length} locked`;
+        if (lockedEl) lockedEl.textContent = `${lockedCount}/${n} locked`;
+        bandsDone += 1;
+      }
+      // Between locks the readout names the system the counter is on.
+      if (read && !all && bandsDone < n && bandAnnounced !== bandsDone && (bandsDone === 0 || value >= bandsDone * segment + segment * 0.12)) {
+        bandAnnounced = bandsDone;
+        read.textContent = `SYNCING · ${taskLabel(SPLASH_TASKS[bandsDone].name)}`;
       }
     };
 
@@ -146,7 +204,10 @@ export default function Preloader() {
       const value = Math.min(100, shown);
       writeOdometer(value);
       writeTicks(value);
+      writeSweep(value);
+      writeArcs(value);
       writeField(value, now);
+      syncSystems(value);
       const tenth = Math.floor(value / 10) * 10;
       if (tenth !== lastValueNow) {
         lastValueNow = tenth;
@@ -218,7 +279,7 @@ export default function Preloader() {
         animations.push(
           horizon.animate(
             [
-              { opacity: 0.34, transform: "scaleX(1) scaleY(1)" },
+              { opacity: 0, transform: "scaleX(1) scaleY(1)" },
               { opacity: 1, transform: "scaleX(1) scaleY(3)", offset: 0.3 },
               { opacity: 0, transform: "scaleX(1) scaleY(7)" },
             ],
@@ -237,7 +298,7 @@ export default function Preloader() {
       shown = 100;
       writeProgress(now);
       writeField(100, now, true);
-      syncSystems();
+      syncSystems(100, true);
       if (read) {
         read.textContent =
           lockedCount === SPLASH_TASKS.length ? `All ${lockedCount} systems locked` : `${lockedCount} of ${SPLASH_TASKS.length} locked, the rest on fallback`;
@@ -265,18 +326,19 @@ export default function Preloader() {
       const dt = Math.min(64, now - last);
       last = now;
       const elapsed = now - startedAt;
-      const snap = getWarmupSnapshot();
-      syncSystems();
 
       const forced = elapsed >= MAX_MS;
-      const ready = snap.finished && elapsed >= minMs;
-      // Real progress, but paced so a very fast device still shows a counter that is read, not a flash.
-      const target = forced || ready ? 1 : Math.min(snap.finished ? 1 : snap.progress * 0.97, elapsed / minMs);
-      // Frame-rate independent ease toward the target; the display never reaches 100 before the work does.
-      shown += (target * 100 - shown) * (1 - Math.pow(1 - 0.12, dt / 16.7));
-      if (!(forced || ready)) shown = Math.min(shown, 99);
+      // Where the counter is allowed to be: the paced clock, held back only by systems that have not finished yet
+      // (in the dial's order, so an arc never fills before its system is done). Past MAX_MS nothing holds it.
+      const statuses = getWarmupStatuses();
+      const ceiling = forced ? 100 : progressCeiling(SPLASH_TASKS.map((t) => (statuses[t.name] ?? "pending") !== "pending"));
+      const target = Math.min(ceiling, pacedTarget(elapsed, minMs));
+      // Frame-rate independent ease toward the target, never faster than MAX_RATE: after a stall it glides on.
+      const step = (target - shown) * (1 - Math.pow(1 - 0.1, dt / 16.7));
+      shown = Math.min(100, Math.max(shown, shown + Math.min(step, (calm ? MAX_RATE_CALM : MAX_RATE) * dt)));
       writeProgress(now);
 
+      const ready = ceiling >= 100 && elapsed >= minMs;
       if ((forced || ready) && 100 - shown < 0.6) {
         leave(now);
         return;

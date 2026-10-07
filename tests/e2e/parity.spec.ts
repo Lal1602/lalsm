@@ -68,13 +68,19 @@ test.describe("keyboard", () => {
 test.describe("on a phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
 
-  test("the resume link is a full-size tap target", async ({ page }) => {
+  test("the CV buttons are full-size tap targets", async ({ page }) => {
     await arrive(page);
+    // The one on the career slide, and the one in the hero.
     await scrollTo(page, "playground");
-    const resume = page.getByRole("link", { name: "Get Resume PDF" });
+    const resume = page.locator(".cv-mobile-download-card .cvd-trigger");
     await expect(resume).toBeVisible();
-    const box = (await resume.boundingBox())!;
-    expect(box.height).toBeGreaterThanOrEqual(44);
+    expect((await resume.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    for (const selector of [".hx-actions .hx-btn-cv", ".cvd-nav"]) {
+      const box = await page.locator(selector).boundingBox();
+      expect(box!.height, selector).toBeGreaterThanOrEqual(36);
+    }
+    expect((await page.locator(".hx-actions .hx-btn-cv").boundingBox())!.height).toBeGreaterThanOrEqual(44);
   });
 
   test("nothing in How I Work or What I Build pushes the page sideways", async ({ page }) => {
@@ -112,14 +118,17 @@ test.describe("a short laptop window", () => {
     }
   });
 
-  test("no instrument is clipped by its stage", async ({ page }) => {
+  test("the list, the view and the legend all stay inside the deck, whichever discipline is open", async ({ page }) => {
     await arrive(page);
     await scrollTo(page, "about");
     for (let i = 0; i < 3; i++) {
       await page.locator(".wb-bay-btn").nth(i).click();
       await page.waitForTimeout(500);
-      const over = await page.locator(".wb-stage-in").evaluate((el) => el.scrollHeight - el.clientHeight);
-      expect(over, `bay ${i} overflows its stage`).toBeLessThanOrEqual(0);
+      const over = await page.evaluate(() => {
+        const deck = document.querySelector(".wb-deck")!.getBoundingClientRect();
+        return [".wb-index", ".wb-canvas", ".wb-legend"].map((s) => Math.round(document.querySelector(s)!.getBoundingClientRect().bottom - deck.bottom));
+      });
+      for (const o of over) expect(o, `bay ${i} spills out of its deck`).toBeLessThanOrEqual(1);
     }
   });
 });

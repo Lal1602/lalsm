@@ -68,7 +68,7 @@ export function registerWarmupTasks(): void {
   });
 
   // The code of every part that is mounted lazily, fetched now instead of when the visitor gets near it: the
-  // three What I Build instruments, the CV slide of the Horizon, the chat panel, the tubes' component, and
+  // CV slide of the Horizon, the chat panel, the tubes' component, and
   // Framer Motion's feature bundle (drag, pan, gestures). The "m" components are inert until it has loaded, so
   // without it a motion-driven part of the page (the How I Work ship, its clock) sits at its server-rendered
   // start state until the chunk arrives, which on a slow connection or a busy device is seconds after the
@@ -78,13 +78,8 @@ export function registerWarmupTasks(): void {
     weight: taskWeight("chunks"),
     timeoutMs: 6500,
     run: async () => {
-      // A phone shows What I Build as three plain cards: it has no instruments to fetch (same 860px as the CSS).
-      const phone = window.matchMedia("(max-width: 860px)").matches;
       await Promise.all([
         import("../components/motion/features"),
-        phone ? undefined : import("../components/ui/wb/FrameMeter"),
-        phone ? undefined : import("../components/ui/wb/RequestTrace"),
-        phone ? undefined : import("../components/ui/wb/ProbeRun"),
         import("../components/ui/CvTimelineSlide"),
         import("../components/ui/AiChatOverlay"),
         // Lite has no tubes, and should not spend the bytes on their component.

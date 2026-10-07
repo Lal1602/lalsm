@@ -4,7 +4,7 @@ A single-page portfolio that is also a piece of engineering: every section on th
 instrument rather than a description, and the whole thing is held to a frame budget.
 
 Built with Next.js 16 (App Router), React 19, TypeScript, Motion, GSAP + Lenis, and a handful of
-hand-written WebGL renderers. Content, case studies, a blog, a printable CV and a Gemini-backed
+hand-written WebGL renderers. Content, case studies, a blog, a CV in English and Indonesian (page and PDF) and a Gemini-backed
 assistant sit behind the same data files.
 
 ---
@@ -13,12 +13,13 @@ assistant sit behind the same data files.
 
 | Section | What it is |
 | --- | --- |
-| **Hero** | Starfield (Three.js) behind a morphing portrait and glitch type. |
-| **What I Build** | Three bays, one live instrument each: a **frame-time meter** that measures this very tab (and can load it on request), a **request trace** that replays a simulated request through a stack with a fault you can inject, and a **probe game** on a fixed-step loop. Only the open bay's demo is mounted. |
+| **Hero** | A type-specimen headline over the starfield, with a **lens** that follows the pointer and shows each letter's skeleton as a constellation; over the **O** the lens finds a wall clock whose hands are the real time in Surabaya (the readout says `WIB hh:mm:ss`). A dot-matrix portrait with rings round it, and a ledger of facts that are true (archive size, local time, coordinates). |
+| **What I Build** | An **exploded view**: three plates, one for each discipline, tied by wires. Pick one and it rises while the plates above it open upward to uncover it; each tool of that discipline is a small drawing on it, and the legend beside it says what the tool is for and, where the public archive shows it, in how many of its projects it appears (a real count from `data/projects.ts`, the projects named). Pointing at a tool lights its drawing and the other way round; left alone it steps through the tools. The plates hold no text, and only the open plate moves by itself, and only on screen on a device that is not struggling. |
 | **How I Work** | The **Flight Deck**: four stages on a route map. Scroll flies the ship, drag the map to scrub, hold a bay's button to engage it. Built on Motion with springs and an odometer; on a phone the bays become a swipe rail. |
 | **Creative Playground** | A pinned horizontal run (GSAP ScrollTrigger on Lenis): an observation deck over a tube-cursor WebGL background, then the career pathway. |
 | **Projects** | The **Observatory Plates**: one draw call renders the plate carousel from a texture atlas. Every project also has a static case-study page. |
 | **Achievements / Contact** | Kinetic marquee; contact form (Web3Forms) and socials. |
+| **CV** | `/cv` and `/cv/id` (English and Indonesian) and the PDFs `/cv.pdf` and `/cv-id.pdf`, all from `data/cv.ts`. It is easy to find: a CV pill in the nav bar (on phones too), a third button in the hero, a tab on the right edge that follows the visitor (it says once per visit, when the achievements come into view, "Seen the work? Take the CV with you."), a row in Contact, and the card on the career slide. Every one opens the same chooser of the two editions: each card carries a thumbnail drawn from that CV's real sections and entries, and the chosen one is stamped as it downloads. |
 | **Ask Bilal** | Streaming chat drawer. Gemini when `GEMINI_API_KEY` is set, a local keyword simulation otherwise. |
 
 Light and dark themes, a **Lite mode** (below), and full keyboard and reduced-motion support.
@@ -95,20 +96,20 @@ app/
   page.tsx, layout.tsx          Home page and root layout (lite/theme boot script lives here)
   styles/                       The stylesheet, split by section. Numeric prefixes set the cascade order.
   api/ai/chat/                  Streaming assistant endpoint
-  projects/, blog/, cv/         Case studies, MDX blog, printable CV (+ cv.pdf)
+  projects/, blog/, cv/         Case studies, MDX blog, the CV (/cv, /cv/id) and its PDFs (/cv.pdf, /cv-id.pdf)
 components/
   ui/                           Sections and effects (AboutSection, ProcessSteps, HorizonShowcase, ...)
   ui/hiw/                       How I Work: FlightDeck, Station, Ship, StageBay, HiwSky
-  ui/wb/                        What I Build demos: FrameMeter, RequestTrace, ProbeRun
+  ui/wb/                        What I Build: the three plates (Plates.tsx) and the drawing of every tool (features.tsx)
   motion/                       MotionRoot (shared LazyMotion), feature bundle
   site/                         Shell for the non-home pages
 lib/
   space/, plates/               The two WebGL renderers (shaders, layout, atlas)
-  flight/, build/               Pure logic behind How I Work and What I Build (unit-tested)
+  flight/, build/               Pure logic behind How I Work and What I Build: the stack and archive counts, the isometric geometry (unit-tested)
   quality*.ts, warmup*.ts       Quality governor and the warm-up pipeline
   seamGrid.ts                   Section-boundary grid
-  chat/, cv/, blog/             Assistant, CV and blog plumbing
-data/                           projects.ts, achievements.ts, profile.ts: the single source of truth
+  chat/, cv/, blog/             Assistant, CV (the PDF builder) and blog plumbing
+data/                           projects.ts, achievements.ts, profile.ts, cv.ts (the CV in EN and ID): the single source of truth
 content/blog/                   MDX posts (each exports a `meta` object; the file name is the slug)
 stores/                         Zustand stores
 tests/unit, e2e, perf           Vitest, Playwright, frame-budget runs
@@ -146,7 +147,7 @@ robots.txt, Open Graph tags and JSON-LD.
 | --- | --- |
 | `npm run lint` | ESLint (Next, TypeScript, React Compiler rules) |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Vitest: chat validation, rate limiter, stream and action parsers, CV, Lite boot, quality governor, warm-up, seam grid, and the pure logic of the flight deck and the three demos |
+| `npm test` | Vitest: chat validation, rate limiter, stream and action parsers, CV, Lite boot, quality governor, warm-up, seam grid, and the pure logic of the flight deck and of What I Build (its stack, the archive counts, the isometric geometry) |
 | `npm run test:e2e` | Playwright against a production build (`npm run build` first; `PW_CHANNEL=chrome` reuses an installed Chrome). Covers the sections, seams at fractional pixel ratios, Lite, reduced motion, phones and keyboard |
 | `npm run perf` | Scrolls the whole page on a CPU-throttled Chrome and prints frame times per section; `PERF_ASSERT=1` fails over budget. Headless Chrome may use a software GL stack, so compare runs on the same machine rather than reading absolute GPU numbers |
 | `npm run check` | lint + typecheck + unit tests |
@@ -159,7 +160,8 @@ machine makes parallel runs flaky.
 ## Working in the code
 
 - **Content** lives in `data/`. Add a project once and it appears in the plates, the case-study pages,
-  the CV, the sitemap and the assistant's knowledge.
+  the sitemap and the assistant's knowledge. The CV is its own file, `data/cv.ts`, with every line in English
+  and Indonesian; the page and both PDFs read it, and a unit test keeps the two languages in step.
 - **Styles are one flat cascade.** Generic class names silently lose on source order, so namespace new
   sections (`hiw-`, `fd-`, `wb-`, `plate-`, `seam-`, `lite-`).
 - **Per-frame values** (anything driven by scroll, pointer or a loop) are written to leaf elements through

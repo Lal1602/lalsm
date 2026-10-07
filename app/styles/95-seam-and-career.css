@@ -174,30 +174,6 @@
   margin: 0;
 }
 
-.cv-download-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 14px;
-  border: 1px solid rgba(79, 184, 224, 0.3);
-  border-radius: 2px;
-  background: rgba(79, 184, 224, 0.07);
-  font-family: var(--font-code);
-  font-size: 0.66rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--accent-cyan);
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
-
-.cv-download-link:hover {
-  background: rgba(79, 184, 224, 0.16);
-  border-color: rgba(79, 184, 224, 0.6);
-  color: #ffffff;
-}
-
 /* Mobile-only Career Pathway elements — hidden by default (shown only in @media ≤ 968px) */
 .cv-mobile-sticky-header,
 .cv-mobile-cards-rail {

@@ -1,4 +1,5 @@
 import { animate } from "motion/react";
+import { formatClock, handAngles, jakartaTime } from "@/lib/hero/clock";
 import { letterOffset, rulerScale } from "@/lib/hero/proximity";
 import { atRest, stepSpring, type SpringState } from "@/lib/hero/spring";
 import type { PortraitDots } from "./portraitField";
@@ -54,6 +55,8 @@ interface Letter {
   lit: HTMLElement | null;
   cx: number;
   cy: number;
+  /** Half the letter's width: how close the lens has to be for a letter that has something to show. */
+  rad: number;
   x: SpringState;
   y: SpringState;
   r: SpringState;
@@ -79,6 +82,7 @@ export function createPointerField(root: HTMLElement, mode: PointerMode, portrai
   const lensCopy = q(".hx-lens-copy");
   const lensRing = q(".hx-lens-ring");
   const lensLabel = q(".hx-lens-label");
+  const dial = q(".hx-lens .hx-dial");
   const tilt = q(".hx-portrait-tilt");
   const rulerEl = q(".hx-ruler");
   const ticks = Array.from(root.querySelectorAll<HTMLElement>(".hx-ruler i"));
@@ -86,11 +90,14 @@ export function createPointerField(root: HTMLElement, mode: PointerMode, portrai
 
   const baseEls = Array.from(title.querySelectorAll<HTMLElement>(".hx-ch, .hx-stop"));
   const litEls = Array.from(root.querySelectorAll<HTMLElement>(".hx-title-lit .hx-ch, .hx-title-lit .hx-stop"));
+  // The letters that carry a clock: the O (there is one in the headline).
+  const dialLetters: Letter[] = [];
   const letters: Letter[] = baseEls.map((el, i) => ({
     el,
     lit: litEls[i] ?? null,
     cx: 0,
     cy: 0,
+    rad: 0,
     x: REST,
     y: REST,
     r: REST,
@@ -98,6 +105,8 @@ export function createPointerField(root: HTMLElement, mode: PointerMode, portrai
     wy: 0,
     wr: 0,
   }));
+
+  for (const L of letters) if (dial && L.el.textContent?.trim().toLowerCase() === "o") dialLetters.push(L);
 
   // Where the headline sits in the frame, from its letters (the h1 box is wider than its text).
   const extent = { l: 0, t: 0, r: 0, b: 0 };
@@ -111,6 +120,8 @@ export function createPointerField(root: HTMLElement, mode: PointerMode, portrai
   let lastLabel = 0;
   let hot = false;
   let lensOn = false;
+  let clockOn = false;
+  let clockSynced = 0;
   let sweep: { stop: () => void } | null = null;
   let disposed = false;
 
@@ -125,6 +136,7 @@ export function createPointerField(root: HTMLElement, mode: PointerMode, portrai
       // Take back what is currently applied (translation only; the tilt is a few degrees).
       L.cx = rect.left + rect.width / 2 - fr.left - L.x.x;
       L.cy = rect.top + rect.height / 2 - fr.top - L.y.x;
+      L.rad = rect.width / 2;
       l = Math.min(l, rect.left - fr.left - L.x.x);
       r = Math.max(r, rect.right - fr.left - L.x.x);
       t = Math.min(t, rect.top - fr.top - L.y.x);
@@ -143,9 +155,31 @@ export function createPointerField(root: HTMLElement, mode: PointerMode, portrai
     else root.removeAttribute("data-hot");
   };
 
+  /** The hands are set to the real time each time the dial wakes, and again every few seconds while it is awake. */
+  const syncDial = (now: number, force = false) => {
+    if (!dial || (!force && now - clockSynced < 8000)) return;
+    clockSynced = now;
+    const t = jakartaTime(new Date());
+    const a = handAngles(t);
+    dial.style.setProperty("--ck-h", `${round(a.hour)}deg`);
+    dial.style.setProperty("--ck-m", `${round(a.minute)}deg`);
+    // Written once per waking: the second hand's own animation carries it on from there, in step with the real one.
+    if (force) dial.style.setProperty("--ck-s", String(round(t.s + t.ms / 1000, 3)));
+  };
+
+  const setClock = (on: boolean, now: number) => {
+    if (on === clockOn || !lens) return;
+    clockOn = on;
+    if (on) {
+      syncDial(now, true);
+      lens.setAttribute("data-clock", "");
+    } else lens.removeAttribute("data-clock");
+  };
+
   const setLens = (on: boolean) => {
     if (on === lensOn || !lens) return;
     lensOn = on;
+    if (!on && clockOn) setClock(false, 0);
     if (on) lensPos.placed = false;
     if (on) lens.setAttribute("data-on", "");
     else lens.removeAttribute("data-on");
@@ -210,10 +244,30 @@ export function createPointerField(root: HTMLElement, mode: PointerMode, portrai
         lensWin.style.transform = place;
         lensRing.style.transform = place;
         lensCopy.style.transform = `translate3d(${tx - X}px,${ty - Y}px,0)`;
+        // Over the O the lens finds a wall clock (it wakes at 0.8 of the letter's half width, and sleeps again beyond 1.15).
+        if (dialLetters.length > 0) {
+          let over = false;
+          for (const L of dialLetters) {
+            const dx = lensPos.x.x - (L.cx + L.x.x);
+            const dy = lensPos.y.x - (L.cy + L.y.x);
+            const r = L.rad * (clockOn ? 1.15 : 0.8);
+            if (dx * dx + dy * dy < r * r) {
+              over = true;
+              break;
+            }
+          }
+          setClock(near && over, now);
+          if (clockOn) syncDial(now);
+        }
         if (near && lensLabel && now - lastLabel > LABEL_EVERY_MS) {
           lastLabel = now;
-          const pad = (n: number) => String(Math.max(0, Math.round(n))).padStart(4, "0");
-          lensLabel.textContent = `X ${pad(ptr.x)}  Y ${pad(ptr.y)}`;
+          if (clockOn) {
+            // The readout says the time it is showing, and what zone it is in.
+            lensLabel.textContent = `WIB ${formatClock(jakartaTime(new Date()))}`;
+          } else {
+            const pad = (n: number) => String(Math.max(0, Math.round(n))).padStart(4, "0");
+            lensLabel.textContent = `X ${pad(ptr.x)}  Y ${pad(ptr.y)}`;
+          }
         }
         if (near && mode !== "direct" && !(atRest(lensPos.x, px, 0.2) && atRest(lensPos.y, py, 0.2))) busy = true;
       }
@@ -392,6 +446,7 @@ export function createPointerField(root: HTMLElement, mode: PointerMode, portrai
     root.removeAttribute("data-hot");
     portrait?.release();
     lens?.removeAttribute("data-on");
+    lens?.removeAttribute("data-clock");
     letters.forEach((L) => {
       L.el.style.transform = "";
       if (L.lit) L.lit.style.transform = "";

@@ -14,6 +14,8 @@ const LenisSetup = dynamic(() => import("./LenisSetup"), { ssr: false });
 const AiChatOverlay = dynamic(() => import("./AiChatOverlay"), { ssr: false });
 const LiteToggle = dynamic(() => import("./LiteToggle"), { ssr: false });
 const PaperSun = dynamic(() => import("./PaperSun"), { ssr: false });
+const CvChooser = dynamic(() => import("./CvChooser"), { ssr: false });
+const CvTab = dynamic(() => import("./CvTab"), { ssr: false });
 
 export default function ClientShell() {
   // Lite mode skips the two always-on costs: the WebGL starfield behind the
@@ -37,6 +39,8 @@ export default function ClientShell() {
       <AiChatOverlay />
       <LiteToggle />
       <PaperSun />
+      <CvChooser />
+      <CvTab />
     </>
   );
 }

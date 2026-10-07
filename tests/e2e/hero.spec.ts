@@ -162,6 +162,80 @@ test.describe("hero: the lens", () => {
     await expect(lens).not.toHaveAttribute("data-on", "");
   });
 
+
+  /** The middle of a headline letter, in page coordinates. */
+  const centreOf = async (page: Page, letter: RegExp, nth = 0) => {
+    const box = await page.locator("h1.hx-title .hx-ch").filter({ hasText: letter }).nth(nth).boundingBox();
+    return { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 };
+  };
+
+  test("over the O the lens finds a wall clock set to the time in Surabaya; over any other letter it does not", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 810 });
+    await arrive(page);
+    const lens = page.locator(".hx-lens");
+    const label = page.locator(".hx-lens-label");
+
+    // On a C: the lens, its coordinates, and no clock.
+    const c = await centreOf(page, /^c$/i);
+    await page.mouse.move(c.x, c.y, { steps: 14 });
+    await expect(lens).toHaveAttribute("data-on", "");
+    await expect(lens).not.toHaveAttribute("data-clock", "");
+    await expect(label).toHaveText(/^X \d{4}\s+Y \d{4}$/);
+
+    // On the O: the clock wakes, and the readout says the time (and the zone) instead of where the pointer is.
+    const o = await centreOf(page, /^o$/i);
+    await page.mouse.move(o.x, o.y, { steps: 24 });
+    await expect(lens).toHaveAttribute("data-clock", "", { timeout: 5000 });
+    await expect(label).toHaveText(/^WIB \d\d:\d\d:\d\d$/);
+    await expect(page.locator(".hx-lens .hx-dial")).toHaveCSS("opacity", "1", { timeout: 3000 });
+
+    // The hands are set to the real time there (Surabaya, UTC+7), give or take the moments since.
+    const hands = await page.evaluate(() => {
+      const dial = document.querySelector<HTMLElement>(".hx-lens .hx-dial")!;
+      const num = (name: string) => parseFloat(dial.style.getPropertyValue(name));
+      const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jakarta", hourCycle: "h23", hour: "2-digit", minute: "2-digit", second: "2-digit" }).formatToParts(new Date());
+      const read = (t: string) => Number(parts.find((p) => p.type === t)!.value);
+      const h = read("hour") % 24;
+      const m = read("minute");
+      const s = read("second");
+      return {
+        hour: num("--ck-h"),
+        minute: num("--ck-m"),
+        second: num("--ck-s"),
+        wantHour: ((h % 12) + m / 60 + s / 3600) * 30,
+        wantMinute: (m + s / 60) * 6,
+      };
+    });
+    const apart = (a: number, b: number) => Math.min(Math.abs(a - b), 360 - Math.abs(a - b));
+    expect(apart(hands.hour, hands.wantHour)).toBeLessThanOrEqual(3);
+    expect(apart(hands.minute, hands.wantMinute)).toBeLessThanOrEqual(8);
+    expect(hands.second).toBeGreaterThanOrEqual(0);
+    expect(hands.second).toBeLessThan(60);
+
+    // The second hand really turns (one revolution a minute), and the face has its twelve ticks.
+    const sweep = await page.locator(".hx-lens .hx-ck-s").evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { name: cs.animationName, duration: cs.animationDuration };
+    });
+    expect(sweep).toEqual({ name: "hx-ck-sweep", duration: "60s" });
+    await expect(page.locator(".hx-lens .hx-ck-tick")).toHaveCount(12);
+
+    // Back to a C: the clock goes, and the readout is the coordinates again.
+    await page.mouse.move(c.x, c.y, { steps: 24 });
+    await expect(lens).not.toHaveAttribute("data-clock", "", { timeout: 5000 });
+    await expect(label).toHaveText(/^X \d{4}\s+Y \d{4}$/);
+  });
+
+  test("the clock is in the lit copy only: the page's own headline carries none, and nothing of it is read out", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 810 });
+    await arrive(page);
+    await expect(page.locator("h1.hx-title .hx-dial")).toHaveCount(0);
+    await expect(page.locator(".hx-lens .hx-dial")).toHaveCount(1);
+    await expect(page.locator(".hx-lens")).toHaveAttribute("aria-hidden", "true");
+    // The accessible headline is still just its words.
+    await expect(page.locator("h1.hx-title")).toHaveAttribute("aria-label", "Creative Developer");
+  });
+
   test("with Lite on there is no lens and nothing answers the pointer", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 810 });
     await arrive(page, "on");
@@ -201,6 +275,19 @@ test.describe("hero: reduced motion", () => {
     await expect(page.locator(".hx-lens")).toHaveAttribute("data-on", "");
     const letters = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>("h1.hx-title .hx-ch")].filter((e) => e.style.transform).length);
     expect(letters).toBe(0);
+  });
+
+  test("the O's clock still appears at the time, but nothing sweeps, locks on or draws itself", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 810 });
+    await arrive(page, "off");
+    const box = await page.locator("h1.hx-title .hx-ch").filter({ hasText: /^o$/i }).first().boundingBox();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2, { steps: 8 });
+    await expect(page.locator(".hx-lens")).toHaveAttribute("data-clock", "", { timeout: 5000 });
+    const motion = await page.evaluate(() => ({
+      sweep: getComputedStyle(document.querySelector(".hx-lens .hx-ck-s")!).animationName,
+      lock: getComputedStyle(document.querySelector(".hx-lens .hx-dial")!, "::before").animationName,
+    }));
+    expect(motion).toEqual({ sweep: "none", lock: "none" });
   });
 });
 

@@ -13,8 +13,9 @@ function Constellation({ letter }: { letter: string }) {
   const strokes = skeletonFor(letter);
   if (strokes.length === 0) return null;
   const nodes = nodesFor(letter);
+  const dial = letter.toUpperCase() === "O";
   return (
-    <span className="hx-sk" aria-hidden="true">
+    <span className={dial ? "hx-sk hx-sk--o" : "hx-sk"} aria-hidden="true">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
         {strokes.map((stroke, i) => (
           <polyline key={i} points={pointsAttr(stroke)} vectorEffect="non-scaling-stroke" />
@@ -23,6 +24,28 @@ function Constellation({ letter }: { letter: string }) {
       {nodes.map(([x, y], i) => (
         <i key={i} className="hx-node" style={{ left: `${x}%`, top: `${y}%` }} />
       ))}
+      {dial && <Dial />}
+    </span>
+  );
+}
+
+/**
+ * A wall clock for the O. The lens finds it when it is over the letter: the pointer loop (pointer.ts) sets
+ * data-clock on the lens and writes the real time of Surabaya into --ck-h, --ck-m and --ck-s, and everything
+ * else (the ring locking on, the ticks drawing themselves, the hands swinging to the time, the second hand
+ * sweeping) is CSS. It is in the lit copy only, so it can be seen only through the lens.
+ */
+function Dial() {
+  return (
+    <span className="hx-dial" aria-hidden="true">
+      <i className="hx-ck-ring" />
+      {Array.from({ length: 12 }, (_, n) => (
+        <i key={n} className={n % 3 === 0 ? "hx-ck-tick hx-ck-tick--q" : "hx-ck-tick"} style={{ ["--n" as string]: n } as CSSProperties} />
+      ))}
+      <i className="hx-ck-hand hx-ck-h" />
+      <i className="hx-ck-hand hx-ck-m" />
+      <i className="hx-ck-hand hx-ck-s" />
+      <i className="hx-ck-pin" />
     </span>
   );
 }

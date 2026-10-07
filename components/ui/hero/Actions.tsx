@@ -3,6 +3,7 @@ import * as m from "motion/react-m";
 import { useMotionValue, useSpring } from "motion/react";
 import type { ReactNode } from "react";
 import { useCalm, useHydrated } from "@/components/ui/hiw/hooks";
+import CvDownload from "@/components/ui/CvDownload";
 
 /** The glyph shared by both buttons: an arrow that leans into the click. */
 function Arrow() {
@@ -91,6 +92,7 @@ export default function Actions() {
         <Label>See my works</Label>
         <Arrow />
       </Button>
+      <CvDownload variant="hero" source="hero" label="Download CV" />
       <Button href="#contact" tone="ghost">
         <Label>Contact me</Label>
         <Arrow />

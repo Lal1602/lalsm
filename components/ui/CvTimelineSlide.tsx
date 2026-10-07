@@ -4,7 +4,7 @@ import gsap from "gsap";
 import horizonScrollState from "@/lib/horizonScrollState";
 import { useThemeStore } from "@/stores";
 import { timeline } from "@/data/profile";
-import { track } from "@/lib/analytics";
+import CvDownload from "@/components/ui/CvDownload";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 // Ordered OLDEST → NEWEST  (index 0 = first to fly out). Lives in data/profile.ts
@@ -347,18 +347,10 @@ export default function CvTimelineSlide() {
               CURRICULUM VITAE
             </h4>
             <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>
-              Download my resume as a PDF, always in sync with this site.
+              Download my resume as a PDF, in English or Indonesian.
             </p>
           </div>
-          <a
-            href="/cv.pdf"
-            download="Bilal-Sanayu-Majid-CV.pdf"
-            onClick={() => track("cv_download", { source: "career-mobile" })}
-            className="btn"
-            style={{ fontSize: "0.72rem", padding: "14px 12px", textAlign: "center", display: "block" }}
-          >
-            Get Resume PDF
-          </a>
+          <CvDownload source="career-mobile" />
         </div>
       </div>
 
@@ -490,18 +482,10 @@ export default function CvTimelineSlide() {
               <p className="cv-download-kicker">{`PAYLOAD · DOSSIER`}</p>
               <h4 className="cv-download-title">CURRICULUM VITAE</h4>
               <p className="cv-download-desc">
-                Resume as PDF, always in sync with this site.
+                Resume as PDF, in English or Indonesian.
               </p>
             </div>
-            <a
-              href="/cv.pdf"
-              download="Bilal-Sanayu-Majid-CV.pdf"
-              onClick={() => track("cv_download", { source: "career-desktop" })}
-              className="cv-download-link"
-            >
-              Download
-              <span aria-hidden="true">↓</span>
-            </a>
+            <CvDownload source="career-desktop" />
           </div>
         </div>
       </div>

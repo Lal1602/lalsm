@@ -1,0 +1,1261 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CV DOWNLOAD — the button and its chooser of two editions (components/ui/CvDownload.tsx)
+   Every class is cvd-. Nothing here animates per frame: it is state-driven transform and opacity, and the loops
+   (the sweep, the scan, the arrow) run only while the pointer or focus is on the thing they belong to.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cvd-trigger,
+.cvd-nav,
+.cvd-inline,
+.cvd-tab,
+.cvd-layer {
+  --cvd-ink: #eef2fb;
+  --cvd-mute: rgba(238, 242, 251, 0.56);
+  --cvd-paper: linear-gradient(180deg, #141b2d 0%, #0a0e19 100%);
+  --cvd-face: color-mix(in srgb, var(--accent-cyan) 9%, #070a12);
+  --cvd-edge: rgba(255, 255, 255, 0.13);
+  --cvd-edge-soft: rgba(255, 255, 255, 0.07);
+  --cvd-sheet: rgba(255, 255, 255, 0.035);
+  --cvd-line: rgba(238, 242, 251, 0.2);
+  --cvd-scrim: radial-gradient(ellipse at 50% 38%, rgba(10, 20, 36, 0.78), rgba(2, 4, 8, 0.94));
+  --cvd-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+}
+
+html[data-theme="light"] .cvd-trigger,
+html[data-theme="light"] .cvd-nav,
+html[data-theme="light"] .cvd-inline,
+html[data-theme="light"] .cvd-tab,
+html[data-theme="light"] .cvd-layer {
+  --cvd-ink: var(--ink);
+  --cvd-mute: var(--ink-2);
+  --cvd-paper: linear-gradient(180deg, var(--p0) 0%, var(--p1) 100%);
+  --cvd-face: color-mix(in srgb, var(--accent-cyan) 10%, var(--p0));
+  --cvd-edge: rgba(var(--ink-rgb), 0.16);
+  --cvd-edge-soft: rgba(var(--ink-rgb), 0.09);
+  --cvd-sheet: rgba(var(--ink-rgb), 0.04);
+  --cvd-line: rgba(var(--ink-rgb), 0.22);
+  /* Paper, not shade: the ink of the title and the cards has to read against it. */
+  --cvd-scrim: radial-gradient(ellipse at 50% 38%, rgba(var(--p0-rgb), 0.9), rgba(var(--p1-rgb, var(--p0-rgb)), 0.97));
+  --cvd-shadow: 0 28px 70px rgba(var(--shade-rgb), 0.42);
+}
+
+/* ── The button ───────────────────────────────────────────────────────────── */
+
+.cvd-trigger {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 1.5px;
+  border: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--accent-cyan) 28%, transparent);
+  color: var(--cvd-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A bright arc runs round the edge while the button is the thing in hand. The square is twice the button's width
+   and turns on its own layer; the face above it leaves only the border showing. */
+.cvd-sweep {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  width: 250%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(from 0deg, transparent 0 58%, var(--accent-cyan) 80%, var(--cvd-ink) 84%, transparent 86% 100%);
+  opacity: 0;
+  animation: cvd-turn 2.4s linear infinite;
+  animation-play-state: paused;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.cvd-trigger:hover .cvd-sweep,
+.cvd-trigger:focus-visible .cvd-sweep,
+.cvd-trigger[aria-expanded="true"] .cvd-sweep {
+  opacity: 1;
+  animation-play-state: running;
+  will-change: transform;
+}
+
+@keyframes cvd-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.cvd-trigger:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+}
+
+.cvd-face {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 10px;
+  border-radius: 2px;
+  background: var(--cvd-face);
+  overflow: hidden;
+}
+
+/* One pass of light across the face as the pointer arrives. */
+.cvd-face::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 38%;
+  background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--cvd-ink) 16%, transparent), transparent);
+  transform: translateX(-130%) skewX(-18deg);
+  pointer-events: none;
+}
+
+.cvd-trigger:hover .cvd-face::after,
+.cvd-trigger:focus-visible .cvd-face::after {
+  animation: cvd-sheen 0.9s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+
+@keyframes cvd-sheen {
+  to {
+    transform: translateX(380%) skewX(-18deg);
+  }
+}
+
+/* The icon: a sheet in a sleeve. Pointing at it slides the sheet out and writes its lines. */
+.cvd-icon {
+  flex: none;
+  width: 26px;
+  height: 30px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--accent-cyan);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cvd-icon-sheet {
+  transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.cvd-icon-sheet rect {
+  fill: color-mix(in srgb, var(--accent-cyan) 12%, transparent);
+}
+
+.cvd-icon-sleeve {
+  fill: var(--cvd-face);
+  stroke: var(--accent-cyan);
+}
+
+.cvd-handle:hover .cvd-icon-sheet,
+.cvd-handle:focus-visible .cvd-icon-sheet,
+.cvd-handle[aria-expanded="true"] .cvd-icon-sheet {
+  transform: translateY(-6px);
+}
+
+.cvd-icon-l1,
+.cvd-icon-l2,
+.cvd-icon-l3 {
+  stroke-dasharray: 10;
+}
+
+.cvd-handle:hover .cvd-icon-l1,
+.cvd-handle:focus-visible .cvd-icon-l1 {
+  animation: cvd-write 0.5s ease 0.12s both;
+}
+
+.cvd-handle:hover .cvd-icon-l2,
+.cvd-handle:focus-visible .cvd-icon-l2 {
+  animation: cvd-write 0.5s ease 0.24s both;
+}
+
+.cvd-handle:hover .cvd-icon-l3,
+.cvd-handle:focus-visible .cvd-icon-l3 {
+  animation: cvd-write 0.5s ease 0.36s both;
+}
+
+@keyframes cvd-write {
+  from {
+    stroke-dashoffset: 10;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.cvd-copy {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cvd-copy b {
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cvd-copy i {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-style: normal;
+  font-family: var(--font-code);
+  font-size: 0.54rem;
+  letter-spacing: 0.2em;
+  color: var(--cvd-mute);
+}
+
+.cvd-copy u {
+  text-decoration: none;
+}
+
+.cvd-copy i span {
+  padding: 1px 4px;
+  border: 1px solid color-mix(in srgb, var(--accent-cyan) 45%, transparent);
+  border-radius: 2px;
+  color: var(--accent-cyan);
+  letter-spacing: 0.12em;
+}
+
+.cvd-go {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid color-mix(in srgb, var(--accent-cyan) 50%, transparent);
+  border-radius: 50%;
+  color: var(--accent-cyan);
+  font-size: 0.82rem;
+  line-height: 1;
+  transition: background-color 0.3s ease, color 0.3s ease, rotate 0.45s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.cvd-trigger:hover .cvd-go,
+.cvd-trigger:focus-visible .cvd-go {
+  background: var(--accent-cyan);
+  color: var(--cvd-face);
+  animation: cvd-nudge 1.1s ease-in-out infinite;
+}
+
+.cvd-trigger[aria-expanded="true"] .cvd-go {
+  rotate: 180deg;
+}
+
+@keyframes cvd-nudge {
+  50% {
+    transform: translateY(2px);
+  }
+}
+
+/* ── The chooser ──────────────────────────────────────────────────────────── */
+
+.cvd-layer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-project-modal);
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cvd-scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--cvd-scrim);
+  animation: cvd-fade 0.3s ease both;
+}
+
+.cvd-layer[data-state="closing"] .cvd-scrim {
+  animation: cvd-fade 0.24s ease reverse both;
+}
+
+@keyframes cvd-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.cvd-dialog {
+  position: relative;
+  width: min(640px, 100%);
+  margin: auto;
+  color: var(--cvd-ink);
+  animation: cvd-rise 0.45s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+.cvd-layer[data-state="closing"] .cvd-dialog {
+  animation: cvd-sink 0.24s ease-in both;
+}
+
+@keyframes cvd-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.97);
+  }
+}
+
+@keyframes cvd-sink {
+  to {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+
+.cvd-head {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.cvd-kicker {
+  margin: 0;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--accent-cyan);
+}
+
+.cvd-title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 14px;
+  margin: 10px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 3.6vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--cvd-ink);
+  text-shadow: none;
+}
+
+.cvd-title span + span {
+  color: var(--cvd-mute);
+  font-weight: 500;
+}
+
+.cvd-title span + span::before {
+  content: "/";
+  margin-right: 14px;
+  color: var(--accent-cyan);
+}
+
+.cvd-deck {
+  display: flex;
+  gap: 18px;
+  align-items: stretch;
+}
+
+/* An edition: a card with its own thumbnail of the CV. They are dealt out of one stack, and the one in hand lifts. */
+.cvd-card {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  padding: 14px 14px 0;
+  border: 1px solid var(--cvd-edge);
+  border-radius: 6px;
+  background: var(--cvd-paper);
+  box-shadow: var(--cvd-shadow);
+  color: var(--cvd-ink);
+  text-decoration: none;
+  overflow: hidden;
+  transform-origin: 50% 100%;
+  transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.2, 1), border-color 0.3s ease, opacity 0.4s ease;
+  animation: cvd-deal 0.8s cubic-bezier(0.2, 1.12, 0.3, 1) backwards;
+  animation-delay: calc(var(--i) * 90ms + 90ms);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes cvd-deal {
+  from {
+    opacity: 0;
+    transform: translate(calc((1 - var(--i) * 2) * 54%), 70px) rotate(calc((1 - var(--i) * 2) * 7deg)) scale(0.84);
+  }
+}
+
+.cvd-card:hover,
+.cvd-card:focus-visible {
+  transform: translateY(-10px) rotate(calc((var(--i) * 2 - 1) * 1.2deg));
+  border-color: var(--accent-cyan);
+}
+
+.cvd-card:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+}
+
+.cvd-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cvd-mono {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 7vw, 3.1rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--accent-cyan);
+}
+
+.cvd-fmt {
+  font-family: var(--font-code);
+  font-size: 0.54rem;
+  letter-spacing: 0.2em;
+  color: var(--cvd-mute);
+  white-space: nowrap;
+}
+
+/* The thumbnail. Headings are the CV's real sections, lines its real entries (lib/cv/sheet.ts). */
+.cvd-sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 10px 10px 12px;
+  border: 1px solid var(--cvd-edge-soft);
+  border-radius: 3px;
+  background: var(--cvd-sheet);
+  overflow: hidden;
+}
+
+.cvd-sheet i {
+  display: block;
+  border-radius: 2px;
+}
+
+.cvd-sheet-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-bottom: 2px;
+}
+
+.cvd-sheet-name {
+  width: 58%;
+  height: 6px;
+  background: var(--cvd-ink);
+  opacity: 0.85;
+}
+
+.cvd-sheet-role {
+  width: 40%;
+  height: 3px;
+  background: var(--accent-cyan);
+}
+
+.cvd-blk {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5px;
+}
+
+.cvd-h {
+  width: 30%;
+  height: 3px;
+  margin-bottom: 1px;
+  background: var(--accent-cyan);
+  opacity: 0.85;
+}
+
+.cvd-l {
+  width: var(--w, 80%);
+  height: 2.5px;
+  background: var(--cvd-line);
+}
+
+/* A scan passes down the sheet while it is the one in hand. */
+.cvd-sheet::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 34px;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent-cyan) 20%, transparent) 78%, var(--accent-cyan));
+  opacity: 0;
+  transform: translateY(-40px);
+  pointer-events: none;
+}
+
+.cvd-card:hover .cvd-sheet::after,
+.cvd-card:focus-visible .cvd-sheet::after {
+  opacity: 0.8;
+  animation: cvd-scan 1.7s linear infinite;
+}
+
+@keyframes cvd-scan {
+  from {
+    transform: translateY(-40px);
+  }
+
+  to {
+    transform: translateY(300px);
+  }
+}
+
+.cvd-name {
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.cvd-sub {
+  margin-top: 3px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--cvd-mute);
+}
+
+.cvd-facts {
+  margin: 10px 0 14px;
+  font-family: var(--font-code);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  color: var(--cvd-mute);
+  text-wrap: balance;
+}
+
+.cvd-get {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: auto -14px 0;
+  padding: 12px 14px;
+  border-top: 1px solid var(--cvd-edge-soft);
+  font-family: var(--font-code);
+  font-size: 0.64rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.cvd-get i {
+  font-style: normal;
+  font-size: 0.9rem;
+}
+
+.cvd-card:hover .cvd-get,
+.cvd-card:focus-visible .cvd-get {
+  background: var(--accent-cyan);
+  color: var(--cvd-face);
+}
+
+/* The stamp, once an edition is chosen: struck from above, a little askew. */
+.cvd-stamp {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 18px;
+  border: 2px solid var(--accent-cyan);
+  border-radius: 6px;
+  outline: 1px solid color-mix(in srgb, var(--accent-cyan) 60%, transparent);
+  outline-offset: 3px;
+  background: color-mix(in srgb, var(--cvd-face) 82%, transparent);
+  color: var(--accent-cyan);
+  font-family: var(--font-code);
+  text-transform: uppercase;
+  translate: -50% -50%;
+  rotate: -12deg;
+  pointer-events: none;
+}
+
+.cvd-stamp b {
+  font-size: 0.95rem;
+  letter-spacing: 0.22em;
+}
+
+.cvd-stamp i {
+  font-style: normal;
+  font-size: 0.56rem;
+  letter-spacing: 0.24em;
+}
+
+.cvd-card[data-stamped] .cvd-stamp {
+  display: flex;
+  animation: cvd-strike 0.5s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+
+@keyframes cvd-strike {
+  from {
+    opacity: 0;
+    scale: 2.4;
+  }
+}
+
+.cvd-deck[data-stamped] .cvd-card:not([data-stamped]) {
+  opacity: 0.2;
+  transform: scale(0.97);
+}
+
+.cvd-deck[data-stamped] .cvd-card[data-stamped] {
+  transform: translateY(-10px);
+  border-color: var(--accent-cyan);
+}
+
+.cvd-hint {
+  margin: 18px 0 0;
+  text-align: center;
+  font-family: var(--font-code);
+  font-size: 0.56rem;
+  letter-spacing: 0.3em;
+  color: var(--cvd-mute);
+}
+
+.cvd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cvd-close {
+  position: absolute;
+  top: -6px;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--cvd-edge);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cvd-ink);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+.cvd-close:hover,
+.cvd-close:focus-visible {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.cvd-close:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* ── Smaller windows ──────────────────────────────────────────────────────── */
+
+@media (max-width: 520px) {
+  .cvd-deck {
+    gap: 10px;
+  }
+
+  .cvd-card {
+    padding: 10px 10px 0;
+  }
+
+  .cvd-get {
+    margin: auto -10px 0;
+    padding: 11px 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .cvd-fmt {
+    display: none;
+  }
+
+  .cvd-card:hover,
+  .cvd-card:focus-visible {
+    transform: translateY(-6px) rotate(calc((var(--i) * 2 - 1) * 0.6deg));
+  }
+
+  .cvd-name {
+    font-size: 0.84rem;
+  }
+
+  .cvd-sub {
+    font-size: 0.7rem;
+  }
+
+  .cvd-stamp {
+    padding: 8px 12px;
+  }
+
+  .cvd-stamp b {
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+  }
+}
+
+/* On a short window the thumbnail gives way before the choice does. */
+@media (max-height: 620px) {
+  .cvd-sheet {
+    display: none;
+  }
+
+  .cvd-head {
+    margin-bottom: 12px;
+  }
+}
+
+/* Calm: no sweep, no scan, no dealing and no stamp strike; the chooser simply appears. */
+@media (prefers-reduced-motion: reduce) {
+  .cvd-sweep,
+  .cvd-face::after {
+    display: none;
+  }
+
+  .cvd-scrim,
+  .cvd-dialog,
+  .cvd-card,
+  .cvd-sheet::after,
+  .cvd-card[data-stamped] .cvd-stamp,
+  .cvd-trigger .cvd-go,
+  .cvd-trigger .cvd-icon-l1,
+  .cvd-trigger .cvd-icon-l2,
+  .cvd-trigger .cvd-icon-l3 {
+    animation: none !important;
+  }
+
+  .cvd-card,
+  .cvd-icon-sheet,
+  .cvd-go {
+    transition: none;
+  }
+
+  .cvd-card:hover,
+  .cvd-card:focus-visible {
+    transform: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE OTHER HANDLES — nav pill, hero button, contact row, and the tab at the edge of the window.
+   They share the icon and the chips; they all open the one chooser.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cvd-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-code);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+}
+
+.cvd-chips span {
+  padding: 1px 4px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+/* ── Navigation bar: the loudest handle, a solid pill ─────────────────────── */
+
+.cvd-nav {
+  --cvd-face: var(--accent-cyan);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 0 11px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent-cyan);
+  color: #04141c;
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html[data-theme="light"] .cvd-nav {
+  color: var(--p0);
+}
+
+.cvd-nav .cvd-icon {
+  width: 16px;
+  height: 19px;
+  stroke: currentColor;
+}
+
+.cvd-nav .cvd-icon-sheet rect {
+  fill: rgba(4, 20, 28, 0.1);
+}
+
+.cvd-nav .cvd-icon-sleeve {
+  fill: var(--accent-cyan);
+  stroke: currentColor;
+}
+
+/* One pass of light across the pill while it is pointed at. */
+.cvd-nav::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: translateX(-140%) skewX(-18deg);
+  pointer-events: none;
+}
+
+.cvd-nav:hover::after,
+.cvd-nav:focus-visible::after {
+  animation: cvd-sheen 0.8s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+
+.cvd-nav:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+}
+
+.cvd-nav[aria-expanded="true"] {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-cyan) 35%, transparent);
+}
+
+@media (max-width: 480px) {
+  .cvd-nav {
+    gap: 6px;
+    padding: 0 10px 0 9px;
+  }
+
+  .cvd-nav .cvd-chips {
+    display: none;
+  }
+}
+
+/* The drawer's row on a phone. */
+.mobile-btn-cv {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--accent-cyan) !important;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent-cyan) 25%, transparent);
+}
+
+.mobile-btn-cv .link-num {
+  color: color-mix(in srgb, var(--accent-cyan) 45%, transparent) !important;
+}
+
+.mobile-btn-cv .cvd-chips {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+
+/* ── Hero: the third call to action ───────────────────────────────────────── */
+
+.hx-btn-cv {
+  --cvd-face: color-mix(in srgb, var(--hx-accent) 14%, var(--hx-btn-text));
+  gap: 12px;
+  padding: 0 18px 0 14px;
+  border-color: var(--hx-accent);
+  background: var(--cvd-face);
+  color: var(--hx-ink);
+}
+
+.hx-btn-cv .cvd-icon {
+  width: 18px;
+  height: 21px;
+  stroke: var(--hx-accent);
+}
+
+.hx-btn-cv .cvd-icon-sheet rect {
+  fill: color-mix(in srgb, var(--hx-accent) 14%, transparent);
+}
+
+.hx-btn-cv .cvd-icon-sleeve {
+  fill: var(--cvd-face);
+  stroke: var(--hx-accent);
+}
+
+.hx-btn-cv .cvd-chips {
+  margin-left: 2px;
+  color: var(--hx-accent);
+}
+
+/* The label's window must not give way to the chips beside it. */
+.hx-btn-cv .hx-btn-window {
+  flex: none;
+  white-space: nowrap;
+}
+
+/* The hero's text column is about 530px wide on a laptop screen, and three buttons in a row must stay in one row there
+   (a second row would push the ledger off a short window). The chips give way first; the sheet icon and the label stay. */
+@media (min-width: 861px) and (max-width: 1366px) {
+  .hx-btn-cv {
+    gap: 10px;
+    padding: 0 16px 0 12px;
+  }
+
+  .hx-btn-cv .cvd-chips {
+    display: none;
+  }
+}
+
+/* A button, unlike the two links beside it, does not stretch by itself in the phone layout's column. */
+@media (max-width: 860px) {
+  .hx-actions .hx-btn-cv {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .hx-actions .hx-btn-cv .cvd-chips {
+    margin-left: auto;
+  }
+}
+
+.hx-btn-cv:hover,
+.hx-btn-cv:focus-visible,
+.hx-btn-cv[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--hx-accent) 24%, var(--hx-btn-text));
+}
+
+/* ── Contact: a row among the channels ────────────────────────────────────── */
+
+.cvd-inline {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 0;
+  border: 0;
+  background: none;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cvd-inline .channel-key {
+  opacity: 1;
+}
+
+.cvd-inline:hover .channel-value,
+.cvd-inline:focus-visible .channel-value {
+  color: var(--accent-cyan);
+  translate: 3px 0;
+}
+
+.cvd-inline:hover .channel-arrow,
+.cvd-inline:focus-visible .channel-arrow {
+  opacity: 0.9;
+  translate: 0 0;
+}
+
+.cvd-inline:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* ── The tab at the edge of the window ────────────────────────────────────── */
+
+.cvd-tab {
+  position: fixed;
+  right: 0;
+  top: 46%;
+  z-index: 90;
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cvd-ink);
+  font: inherit;
+  cursor: pointer;
+  translate: 0 -50%;
+  transition: opacity 0.4s ease, translate 0.55s cubic-bezier(0.2, 0.9, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Out of the way: while the splash is up, while the chooser is open, while the assistant's sidebar is open. */
+.cvd-tab[data-hidden],
+html[data-splash] .cvd-tab,
+body.ai-chat-sidebar-open .cvd-tab {
+  opacity: 0;
+  translate: 110% -50%;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s ease, translate 0.5s cubic-bezier(0.2, 0.9, 0.2, 1), visibility 0s linear 0.5s;
+}
+
+.cvd-tab-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  width: 36px;
+  padding: 12px 0 11px;
+  border: 1px solid color-mix(in srgb, var(--accent-cyan) 60%, transparent);
+  border-right: 0;
+  border-radius: 10px 0 0 10px;
+  background: var(--cvd-face);
+  box-shadow: -6px 8px 26px rgba(0, 0, 0, 0.32);
+}
+
+html[data-theme="light"] .cvd-tab-body {
+  box-shadow: -6px 8px 26px rgba(var(--shade-rgb), 0.22);
+}
+
+.cvd-tab .cvd-icon {
+  width: 19px;
+  height: 23px;
+}
+
+.cvd-tab-v {
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  letter-spacing: 0.28em;
+  color: var(--accent-cyan);
+  white-space: nowrap;
+}
+
+.cvd-tab-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-code);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  color: var(--accent-cyan);
+}
+
+.cvd-tab-chips span {
+  padding: 1px 3px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  opacity: 0.85;
+}
+
+.cvd-tab:hover .cvd-tab-body,
+.cvd-tab:focus-visible .cvd-tab-body {
+  border-color: var(--accent-cyan);
+}
+
+.cvd-tab:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: -2px;
+  border-radius: 10px 0 0 10px;
+}
+
+/* What it is, slid out to the left of the tab. */
+.cvd-tab-out {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  display: block;
+  width: max-content;
+  max-width: 230px;
+  padding: 11px 16px 11px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent-cyan) 60%, transparent);
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  background: var(--cvd-face);
+  text-align: left;
+  opacity: 0;
+  translate: 14px -50%;
+  pointer-events: none;
+  transition: opacity 0.25s ease, translate 0.4s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.cvd-tab:hover .cvd-tab-out,
+.cvd-tab:focus-visible .cvd-tab-out {
+  opacity: 1;
+  translate: 0 -50%;
+  pointer-events: auto;
+}
+
+.cvd-tab-out b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.cvd-tab-out i {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-code);
+  font-style: normal;
+  font-size: 0.54rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cvd-mute);
+}
+
+.cvd-tab[data-nudge] .cvd-tab-hint,
+.cvd-tab:not([data-nudge]) .cvd-tab-say {
+  display: none;
+}
+
+.cvd-tab-say b {
+  color: var(--accent-cyan);
+}
+
+.cvd-tab-say i {
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: 0.66rem;
+  color: var(--cvd-ink);
+}
+
+/* The one nudge: out for a few seconds, a ring leaves the icon twice, then it settles back. */
+.cvd-tab[data-nudge] .cvd-tab-out {
+  animation: cvd-tab-say 4.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+.cvd-tab[data-nudge] .cvd-tab-body {
+  animation: cvd-tab-bob 4.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+.cvd-tab-ping {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border: 1.5px solid var(--accent-cyan);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cvd-tab[data-nudge] .cvd-tab-ping {
+  animation: cvd-ping 1.3s ease-out 0.5s 2;
+}
+
+@keyframes cvd-tab-say {
+  0% {
+    opacity: 0;
+    translate: 14px -50%;
+  }
+
+  9%,
+  88% {
+    opacity: 1;
+    translate: 0 -50%;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 14px -50%;
+  }
+}
+
+@keyframes cvd-tab-bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  9%,
+  88% {
+    translate: -5px 0;
+  }
+}
+
+@keyframes cvd-ping {
+  from {
+    opacity: 0.85;
+    scale: 0.6;
+  }
+
+  to {
+    opacity: 0;
+    scale: 2.6;
+  }
+}
+
+@media (max-width: 520px) {
+  .cvd-tab {
+    top: 58%;
+  }
+
+  .cvd-tab-body {
+    width: 30px;
+    gap: 9px;
+    padding: 10px 0 9px;
+  }
+
+  .cvd-tab .cvd-icon {
+    width: 16px;
+    height: 19px;
+  }
+
+  .cvd-tab-v {
+    font-size: 0.52rem;
+    letter-spacing: 0.22em;
+  }
+
+  .cvd-tab-out {
+    max-width: 190px;
+  }
+}
+
+/* Calm: no sheen, no ping, no nudge; the tab and the handles are simply there. */
+@media (prefers-reduced-motion: reduce) {
+  .cvd-nav::after {
+    display: none;
+  }
+
+  .cvd-tab,
+  .cvd-tab-out {
+    transition: none;
+  }
+
+  .cvd-tab[data-nudge] .cvd-tab-out,
+  .cvd-tab[data-nudge] .cvd-tab-body,
+  .cvd-tab[data-nudge] .cvd-tab-ping {
+    animation: none;
+  }
+}
+
+html[data-lite="1"] .cvd-tab[data-nudge] .cvd-tab-out,
+html[data-lite="1"] .cvd-tab[data-nudge] .cvd-tab-body,
+html[data-lite="1"] .cvd-tab[data-nudge] .cvd-tab-ping {
+  animation: none;
+}

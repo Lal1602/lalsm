@@ -271,7 +271,7 @@
 }
 
 .fd-st-label i {
-  font-size: 0.56rem;
+  font-size: 0.62rem;
   letter-spacing: 0.14em;
   opacity: 0.55;
 }
@@ -410,7 +410,7 @@
   flex-direction: column;
   gap: 3px;
   margin: 0 0 4px;
-  font-size: 0.56rem;
+  font-size: 0.62rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.4);
@@ -711,7 +711,7 @@
 
 .fd-data dt {
   margin-bottom: 4px;
-  font-size: 0.56rem;
+  font-size: 0.62rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.4);
@@ -775,7 +775,7 @@
 .fd-out small {
   display: block;
   margin-bottom: 2px;
-  font-size: 0.52rem;
+  font-size: 0.6rem;
   letter-spacing: 0.22em;
   color: rgba(255, 255, 255, 0.38);
 }
@@ -1318,7 +1318,11 @@ html[data-theme="light"] .fd-st-core {
 }
 
 html[data-theme="light"] .fd-st-label {
-  color: rgba(var(--ink-rgb), 0.6);
+  color: var(--ink-2);
+}
+
+html[data-theme="light"] .fd-st-label i {
+  opacity: 0.85;
 }
 
 html[data-theme="light"] .fd-st[data-active] .fd-st-label {
@@ -1338,7 +1342,7 @@ html[data-theme="light"] .fd-hud-k,
 html[data-theme="light"] .fd-hud-s,
 html[data-theme="light"] .fd-total,
 html[data-theme="light"] .fd-bay-code {
-  color: rgba(var(--ink-rgb), 0.55);
+  color: var(--ink-2);
 }
 
 html[data-theme="light"] .fd-hud-v {
@@ -1346,7 +1350,7 @@ html[data-theme="light"] .fd-hud-v {
 }
 
 html[data-theme="light"] .fd-hud-s b {
-  color: rgba(var(--ink-rgb), 0.78);
+  color: var(--ink);
 }
 
 html[data-theme="light"] .fd-auto {
@@ -1355,9 +1359,23 @@ html[data-theme="light"] .fd-auto {
   color: var(--ink);
 }
 
+/* The bays are sheets of paper, not glass. They were translucent over the nebula and, on the ones the ship is
+   not at, faded to 60% on top of that: lavender type on a lavender cloud. Now every sheet is opaque, the type is
+   the full ink at every bay, and the ship's position is told by the paper (the active bay is the raised sheet,
+   the others one step down), the border and the filled numeral: things that carry no words. */
 html[data-theme="light"] .fd-bay-in {
-  border-color: rgba(var(--tone-rgb), 0.35);
-  background: linear-gradient(180deg, rgba(var(--tone-rgb), 0.14) 0%, rgba(var(--p0-rgb), 0.9) 38%, rgba(var(--p0-rgb), 0.95) 100%);
+  border-color: rgba(var(--tone-rgb), 0.45);
+  background: linear-gradient(180deg, rgba(var(--tone-rgb), 0.12) 0%, rgba(var(--tone-rgb), 0) 44%), var(--p1);
+}
+
+html[data-theme="light"] .fd[data-ready] .fd-bay:not([data-active]) .fd-bay-in {
+  opacity: 1;
+}
+
+html[data-theme="light"] .fd-bay[data-active] .fd-bay-in {
+  border-color: rgba(var(--tone-rgb), 0.85);
+  background: linear-gradient(180deg, rgba(var(--tone-rgb), 0.14) 0%, rgba(var(--tone-rgb), 0) 44%), var(--p0);
+  box-shadow: 0 6px 18px -8px rgba(var(--shade-rgb), 0.45);
 }
 
 html[data-theme="light"] .fd-name,
@@ -1366,38 +1384,40 @@ html[data-theme="light"] .fd-data dd {
 }
 
 html[data-theme="light"] .fd-desc {
-  color: rgba(var(--ink-rgb), 0.78);
+  color: var(--ink-2);
 }
 
 html[data-theme="light"] .fd-data dt,
 html[data-theme="light"] .fd-out small,
 html[data-theme="light"] .fd-engage-text i {
-  color: rgba(var(--ink-rgb), 0.5);
+  color: var(--ink-2);
 }
 
 html[data-theme="light"] .fd-out {
-  color: rgba(var(--ink-rgb), 0.8);
+  color: var(--ink);
 }
 
 html[data-theme="light"] .fd-share {
-  background: rgba(var(--ink-rgb), 0.12);
+  background: rgba(var(--ink-rgb), 0.16);
 }
 
 html[data-theme="light"] .fd-share-mark {
-  background: rgba(var(--ink-rgb), 0.55);
+  background: rgba(var(--ink-rgb), 0.7);
 }
 
 html[data-theme="light"] .fd-engage {
   color: var(--ink);
+  border-color: rgba(var(--tone-rgb), 0.55);
+  background: rgba(var(--tone-rgb), 0.08);
 }
 
 html[data-theme="light"] .fd-engage-track {
-  stroke: rgba(var(--ink-rgb), 0.14);
+  stroke: rgba(var(--ink-rgb), 0.2);
 }
 
 html[data-theme="light"] .fd-count,
 html[data-theme="light"] .fd-count > span:first-child {
-  color: rgba(var(--ink-rgb), 0.6);
+  color: var(--ink-2);
 }
 
 html[data-theme="light"] .fd-dots i {

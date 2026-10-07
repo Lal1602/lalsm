@@ -1,6 +1,7 @@
 /**
  * Personal facts that more than one place needs: the footer, the CV, the SEO
  * JSON-LD, the AI assistant's mailto hand-off. Edit here, not in the components.
+ * (The CV's own content, in English and Indonesian, is data/cv.ts.)
  */
 
 export const profile = {
@@ -10,7 +11,7 @@ export const profile = {
   location: "Surabaya, Indonesia",
   /** PENS Surabaya. The hero ledger and the Horizon manifest both show these. */
   coordinates: { lat: -7.2756, lon: 112.7937 },
-  email: "bilal.lalsm@gmail.com",
+  email: "bilalsanayumajid@gmail.com",
   github: "https://github.com/Lal1602",
   instagram: "https://www.instagram.com/chocolal_s/",
   discord: "https://discordapp.com/users/535780117792817152",
@@ -57,48 +58,6 @@ export const timeline: TimelineItem[] = [
     badge: "Current",
   },
 ];
-
-export interface SkillGroup {
-  label: string;
-  items: string[];
-}
-
-export const skillGroups: SkillGroup[] = [
-  { label: "Frontend", items: ["TypeScript", "React", "Next.js", "GSAP", "Three.js", "Tailwind CSS"] },
-  { label: "Backend & DevOps", items: ["Node.js", "Laravel", "PHP", "MySQL", "PostgreSQL", "Docker"] },
-  { label: "Mobile & Game", items: ["React Native", "Flutter", "Phaser.js", "Canvas API", "Figma"] },
-];
-
-export interface EducationItem {
-  school: string;
-  program: string;
-  period: string;
-}
-
-export const education: EducationItem[] = [
-  {
-    school: "Politeknik Elektronika Negeri Surabaya (PENS)",
-    program: "D3 Informatics Engineering",
-    period: "Present",
-  },
-  {
-    school: "SMKN 10 Surabaya",
-    program: "Software Engineering (RPL)",
-    period: "2022 – 2025",
-  },
-];
-
-/** Projects shown on the CV, in order. Must match slugs in data/projects.ts. */
-export const featuredProjectSlugs = [
-  "noir-photography",
-  "lumiera-visual-poetry",
-  "digital-craftsman",
-  "creative-programmer",
-  "mindpoint",
-  "aether-dreamscape",
-  "ghost-buster",
-  "herbal-mart",
-] as const;
 
 /**
  * Headline numbers shown in the hero badge and the kinetic marquee. Kept in one

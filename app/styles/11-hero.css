@@ -607,6 +607,19 @@ html[data-theme="light"] .hx-portrait-in {
   mask-image: none;
 }
 
+/* The disc has a ground of its own. The photograph steps back once the dots are ready, and a canvas of dots is
+   transparent between them: the specimen's guides (cap lines and baselines of the headline) ran through the portrait
+   and the stars showed through it. The ground is the canvas's own background, so it comes in with the dots, under the same
+   wave, and the portrait is a solid disc in front of everything that is drawn behind it. */
+.hx-dots {
+  border-radius: 50%;
+  background: #090c15;
+}
+
+html[data-theme="light"] .hx-dots {
+  background: var(--p2);
+}
+
 /* The portrait's lens: the headline's, made the same way. A window holding a copy of the photograph,
    both moved by whole-pixel translations from the pointer loop; the ring, ticks and readout ride with it. */
 .hx-pl {
@@ -783,6 +796,210 @@ html[data-theme="light"] .hx-portrait-in {
 @media (prefers-reduced-motion: reduce) {
   .hx-sk .hx-node {
     animation: none !important;
+  }
+}
+
+/* ── The O's wall clock ─────────────────────────────────────────────────────
+   With the lens over the O, the letter's constellation becomes the bezel of a clock: the ring locks on, twelve ticks draw
+   themselves, the hands swing to the real time in Surabaya and the second hand sweeps from where the real one is. The
+   pointer loop only sets data-clock on the lens and writes --ck-h, --ck-m and --ck-s; all of this is CSS, and every moving
+   part is a transform on its own element (the lens window already has its own layer). */
+
+.hx-dial {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* The face is a circle inside the O's counter (the hole of the letter): 44% of the cap height, which is what fits. */
+  height: 44%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.hx-lens[data-clock] .hx-dial {
+  opacity: 1;
+}
+
+/* The constellation steps back to be the bezel. (!important: the twinkling stars are animated, and an animation would win.) */
+.hx-sk--o svg,
+.hx-sk--o .hx-node {
+  transition: opacity 0.3s ease;
+}
+
+.hx-lens[data-clock] .hx-sk--o svg {
+  opacity: 0.55;
+}
+
+.hx-lens[data-clock] .hx-sk--o .hx-node {
+  opacity: 0.3 !important;
+}
+
+.hx-ck-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--hx-accent) 60%, transparent);
+  transform: scale(0.55);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.hx-lens[data-clock] .hx-ck-ring {
+  transform: none;
+}
+
+/* Locking on: a ring leaves the face once, as the lens finds the letter. */
+.hx-lens[data-clock] .hx-dial::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--hx-accent);
+  animation: hx-ck-lock 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes hx-ck-lock {
+  from {
+    opacity: 0.9;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+/* Twelve ticks: each is a full-size box turned to its hour, with the mark itself at its top. */
+.hx-ck-tick {
+  position: absolute;
+  inset: 0;
+  rotate: calc(var(--n) * 30deg);
+}
+
+.hx-ck-tick::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 3%;
+  width: 1px;
+  height: 8%;
+  margin-left: -0.5px;
+  background: var(--hx-accent);
+  opacity: 0;
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+}
+
+.hx-ck-tick--q::before {
+  width: 1.6px;
+  margin-left: -0.8px;
+  height: 14%;
+}
+
+.hx-lens[data-clock] .hx-ck-tick::before {
+  opacity: 1;
+  transform: none;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+  transition-delay: calc(0.1s + var(--n) * 45ms);
+}
+
+/* The hands: each turns on a pivot at the bottom of its own box, which is the middle of the face. */
+.hx-ck-hand {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  border-radius: 1px;
+  background: var(--hx-accent);
+  transform-origin: 50% 100%;
+  rotate: 0deg;
+  transition: rotate 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.hx-ck-h {
+  width: 2.6px;
+  height: 24%;
+  margin-left: -1.3px;
+}
+
+.hx-ck-m {
+  width: 1.8px;
+  height: 36%;
+  margin-left: -0.9px;
+}
+
+.hx-ck-s {
+  width: 1px;
+  height: 41%;
+  margin-left: -0.5px;
+  background: var(--hx-ink);
+  transition: none;
+}
+
+/* A short tail behind the second hand. */
+.hx-ck-s::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  height: 14%;
+  background: inherit;
+}
+
+.hx-lens[data-clock] .hx-ck-h {
+  rotate: var(--ck-h, 0deg);
+}
+
+.hx-lens[data-clock] .hx-ck-m {
+  rotate: var(--ck-m, 0deg);
+  transition-delay: 0.08s;
+}
+
+/* The second hand starts a whole turn's worth of seconds in, so it is where the real one is the moment the clock wakes. */
+.hx-lens[data-clock] .hx-ck-s {
+  animation: hx-ck-sweep 60s linear infinite;
+  animation-delay: calc(var(--ck-s, 0) * -1s);
+}
+
+@keyframes hx-ck-sweep {
+  from {
+    rotate: 0deg;
+  }
+
+  to {
+    rotate: 360deg;
+  }
+}
+
+.hx-ck-pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--hx-accent);
+}
+
+/* Reduced motion: the face and the hands appear at the time, and nothing sweeps, locks or draws. */
+@media (prefers-reduced-motion: reduce) {
+  .hx-ck-ring,
+  .hx-ck-hand,
+  .hx-ck-tick::before,
+  .hx-dial {
+    transition: none !important;
+  }
+
+  .hx-lens[data-clock] .hx-dial::before,
+  .hx-lens[data-clock] .hx-ck-s {
+    animation: none;
+  }
+
+  .hx-lens[data-clock] .hx-ck-s {
+    rotate: calc(var(--ck-s, 0) * 6deg);
   }
 }
 

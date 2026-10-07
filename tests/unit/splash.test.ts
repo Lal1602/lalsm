@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DIAL_TICKS, SPLASH_BOOT_SCRIPT, SPLASH_TASKS, elapsedLabel, lockLabel, odometer, taskLabel, taskWeight } from "@/lib/splash";
+import { DIAL_TICKS, SPLASH_BOOT_SCRIPT, SPLASH_TASKS, arcFill, elapsedLabel, lockLabel, odometer, pacedTarget, progressCeiling, settleDigits, taskLabel, taskWeight } from "@/lib/splash";
 
 describe("the splash's systems", () => {
   it("are eight, each named once, with a label and a weight", () => {
@@ -77,6 +77,53 @@ describe("the odometer", () => {
   });
 });
 
+describe("one clock for the whole dial", () => {
+  it("settles every digit on its whole value, rolls to the next, and stays inside the unit the value is in", () => {
+    expect(settleDigits(0)).toBe(0);
+    expect(settleDigits(42)).toBe(42);
+    expect(settleDigits(42.3)).toBe(42);
+    expect(settleDigits(100)).toBe(100);
+    let prev = 0;
+    for (let v = 0; v <= 100; v += 0.05) {
+      const d = settleDigits(v);
+      expect(d).toBeGreaterThanOrEqual(prev);
+      expect(d).toBeGreaterThanOrEqual(Math.floor(v));
+      expect(d).toBeLessThanOrEqual(Math.floor(v) + 1);
+      expect(v - d).toBeLessThan(0.45);
+      expect(d - v).toBeLessThan(0.1);
+      prev = d;
+    }
+  });
+
+  it("paces the counter slow in and slow out, from 0 to 100 over the run", () => {
+    expect(pacedTarget(0, 6000)).toBe(0);
+    expect(pacedTarget(6000, 6000)).toBe(100);
+    expect(pacedTarget(99999, 6000)).toBe(100);
+    expect(pacedTarget(3000, 6000)).toBeCloseTo(50, 5);
+    // Gentle at both ends: the first and last tenth of the run cover well under a tenth each.
+    expect(pacedTarget(600, 6000)).toBeLessThan(5);
+    expect(100 - pacedTarget(5400, 6000)).toBeLessThan(5);
+  });
+
+  it("holds the counter inside the arc of the first system that has not finished", () => {
+    const all = Array(8).fill(true) as boolean[];
+    expect(progressCeiling(all)).toBe(100);
+    expect(progressCeiling(Array(8).fill(false))).toBeCloseTo(0.85 * 12.5, 5);
+    // The third system is late, the ones after it are done: the counter still waits in the third arc.
+    expect(progressCeiling([true, true, false, true, true, true, true, true])).toBeCloseTo(2.85 * 12.5, 5);
+  });
+
+  it("fills each arc only while the counter is inside it", () => {
+    expect(arcFill(0, 0, 8)).toBe(0);
+    expect(arcFill(6.25, 0, 8)).toBeCloseTo(0.5, 5);
+    expect(arcFill(12.5, 0, 8)).toBe(1);
+    expect(arcFill(12.5, 1, 8)).toBe(0);
+    expect(arcFill(50, 3, 8)).toBe(1);
+    expect(arcFill(50, 4, 8)).toBe(0);
+    expect(arcFill(100, 7, 8)).toBe(1);
+  });
+});
+
 describe("the dial and the boot script", () => {
   it("has ticks that divide the circle evenly, a long one every fifth", () => {
     expect(DIAL_TICKS % 5).toBe(0);
@@ -95,5 +142,23 @@ describe("the dial and the boot script", () => {
     expect(SPLASH_BOOT_SCRIPT).toContain("scrollTo(0,0)");
     // It is inlined into <head>: it must be one self-contained expression that cannot throw.
     expect(() => new Function(SPLASH_BOOT_SCRIPT)).not.toThrow();
+  });
+
+  it("flags the home page only: /cv, /blog and the case studies have no splash to lift", () => {
+    const run = (pathname: string) => {
+      const attrs: Record<string, string> = {};
+      const env = {
+        document: { documentElement: { setAttribute: (k: string, v: string) => (attrs[k] = v) } },
+        location: { pathname },
+        history: {} as { scrollRestoration?: string },
+        window: { scrollTo: () => undefined },
+      };
+      new Function("document", "location", "history", "window", SPLASH_BOOT_SCRIPT)(env.document, env.location, env.history, env.window);
+      return { attrs, restoration: env.history.scrollRestoration };
+    };
+    expect(run("/")).toEqual({ attrs: { "data-splash": "1" }, restoration: "manual" });
+    for (const path of ["/cv", "/cv/id", "/blog", "/projects/mindpoint"]) {
+      expect(run(path), path).toEqual({ attrs: {}, restoration: undefined });
+    }
   });
 });

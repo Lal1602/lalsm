@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { profile } from "@/data/profile";
+import CvDownload from "@/components/ui/CvDownload";
 import { PREFILL_CONTACT_EVENT, type PrefillContactDetail } from "@/lib/events";
 import { track } from "@/lib/analytics";
 
@@ -409,9 +410,9 @@ export default function ContactSection() {
 
               <ul className="station-channels">
                 <li>
-                  <a href="mailto:bilal.lalsm@gmail.com">
+                  <a href={`mailto:${profile.email}`}>
                     <span className="channel-key">Email</span>
-                    <span className="channel-value">bilal.lalsm@gmail.com</span>
+                    <span className="channel-value">{profile.email}</span>
                     <span className="channel-arrow" aria-hidden="true">↗</span>
                   </a>
                 </li>
@@ -421,6 +422,9 @@ export default function ContactSection() {
                     <span className="channel-value">+62 895-3401-80343</span>
                     <span className="channel-arrow" aria-hidden="true">↗</span>
                   </a>
+                </li>
+                <li>
+                  <CvDownload variant="inline" source="contact" />
                 </li>
                 <li>
                   <span className="channel-static">

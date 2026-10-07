@@ -58,7 +58,7 @@ export default function PreloaderShell() {
         <div className="pl-field" data-pl="field" aria-hidden="true" />
 
         <div className="pl-dial" aria-hidden="true">
-          <div className="pl-sweep" />
+          <div className="pl-sweep" data-pl="sweep" />
           <svg viewBox="0 0 400 400" focusable="false">
             <g className="pl-ticks">
               {ticks.map((t, i) => (
@@ -77,6 +77,18 @@ export default function PreloaderShell() {
             <g className="pl-arcs">
               {SPLASH_TASKS.map((task, i) => (
                 <path key={task.name} className="pl-arc" data-task={task.name} d={arcPath(i, count)} />
+              ))}
+              {/* The same arcs again, drawn on top as the counter runs round them (pathLength 1: dashoffset is the unfilled share). */}
+              {SPLASH_TASKS.map((task, i) => (
+                <path
+                  key={task.name}
+                  className="pl-arc-fill"
+                  data-fill={task.name}
+                  d={arcPath(i, count)}
+                  pathLength={1}
+                  strokeDasharray="1 2"
+                  strokeDashoffset={1}
+                />
               ))}
             </g>
           </svg>

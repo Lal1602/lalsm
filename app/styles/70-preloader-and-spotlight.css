@@ -35,7 +35,13 @@
   font-family: var(--font-display);
   overflow: hidden;
   /* If nothing ever lifts it (a script that failed to load), it gives way by itself. */
-  animation: pl-failsafe 0.01s linear 16s forwards;
+  animation: pl-failsafe 0.01s linear 20s forwards;
+}
+
+/* Shown only while the page is flagged (the boot script flags the home page alone; see lib/splash.ts). Elsewhere the
+   layout's copy of the markup would cover a page that nothing ever uncovers. */
+html:not([data-splash]) .preloader {
+  display: none;
 }
 
 html[data-theme="light"] .preloader {
@@ -49,7 +55,7 @@ html[data-theme="light"] .preloader {
 /* The page is locked and covered from the first paint until the curtain has opened. */
 html[data-splash] body {
   overflow: hidden;
-  animation: pl-unlock 0.01s linear 16s forwards;
+  animation: pl-unlock 0.01s linear 20s forwards;
 }
 
 /* The two floating controls sit above the splash in the stack; they have nothing to do until it opens. */
@@ -92,7 +98,8 @@ html[data-splash] .ai-chat-toggle-btn {
   mask-image: radial-gradient(circle at 50% 50%, #000 var(--pl-r), transparent calc(var(--pl-r) + 22%));
 }
 
-/* The horizon: the line the curtain will open along. Under the stage, over nothing else. */
+/* The horizon: the line the curtain opens along. It is not on the screen while the work is done (a line through the
+   middle of the dial was only noise); it is drawn by the controller when the halves part, in the gap between them. */
 .pl-horizon {
   position: absolute;
   left: 0;
@@ -101,19 +108,7 @@ html[data-splash] .ai-chat-toggle-btn {
   height: 1px;
   margin-top: -0.5px;
   background: linear-gradient(90deg, transparent, var(--pl-lit) 20%, var(--pl-lit) 80%, transparent);
-  opacity: 0.34;
-  animation: pl-draw 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
-
-@keyframes pl-draw {
-  from {
-    transform: scaleX(0);
-    opacity: 0;
-  }
-  to {
-    transform: scaleX(1);
-    opacity: 0.34;
-  }
+  opacity: 0;
 }
 
 .pl-dial {
@@ -155,7 +150,7 @@ html[data-splash] .ai-chat-toggle-btn {
   stroke: var(--pl-dim);
   stroke-width: 1.4;
   stroke-linecap: round;
-  transition: stroke 0.3s ease-out;
+  transition: stroke 0.12s ease-out, stroke-opacity 0.12s ease-out;
 }
 
 .pl-tick--long {
@@ -164,6 +159,12 @@ html[data-splash] .ai-chat-toggle-btn {
 
 .pl-tick.is-on {
   stroke: var(--pl-lit);
+}
+
+/* The tick the counter is on: half lit, so the ring advances in a glide and not a click per tick. */
+.pl-tick.is-head {
+  stroke: var(--pl-lit);
+  stroke-opacity: 0.55;
 }
 
 /* One arc per system. Dim until its work is done, lit when it is; one that ran out of time says so. */
@@ -184,13 +185,25 @@ html[data-splash] .ai-chat-toggle-btn {
   stroke-dasharray: 2 5;
 }
 
+/* The arc as the counter runs round it (the controller writes its dashoffset; pathLength is 1). */
+.pl-arc-fill {
+  fill: none;
+  stroke: var(--pl-lit);
+  stroke-width: 3;
+}
+
+.pl-arc-fill.is-late {
+  stroke: var(--pl-mute);
+}
+
 @keyframes pl-lock {
   35% {
     stroke-width: 8;
   }
 }
 
-/* The sweep: turns on the compositor, so the screen is alive even while the main thread is busy compiling. */
+/* The sweep: its bright edge points at the counter (the controller writes the rotation), so the dial, the digits and
+   the arcs all read the same number. */
 .pl-sweep {
   position: absolute;
   width: 76%;
@@ -204,13 +217,7 @@ html[data-splash] .ai-chat-toggle-btn {
   );
   opacity: 0.85;
   transition: opacity 0.25s ease-out;
-  animation: pl-turn 7s linear infinite;
-}
-
-@keyframes pl-turn {
-  to {
-    transform: rotate(360deg);
-  }
+  will-change: transform;
 }
 
 /* The odometer. Three reels of digits (0..9 and a 0 again, so 9 rolls into 0 without a jump). */
@@ -231,7 +238,7 @@ html[data-splash] .ai-chat-toggle-btn {
   height: 1em;
   overflow: hidden;
   text-align: center;
-  transition: opacity 0.3s ease-out;
+  transition: opacity 0.12s ease-out;
 }
 
 .pl-digit.is-ghost {

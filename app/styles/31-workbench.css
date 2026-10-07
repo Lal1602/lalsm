@@ -1,17 +1,17 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   WHAT I BUILD: the systems bay (components/ui/AboutSection + components/ui/wb)
+   WHAT I BUILD: an exploded view (components/ui/AboutSection, components/ui/wb)
 
-   Three bays and, for the open one, a working instrument on a drafting plate.
-   Wide screens: the bays are a list on the left, the open bay's instrument is
-   the stage on the right. The stage is placed by grid, not by JS: every <li> is
-   `display: contents`, so its bay lands in column 1 on its own row and its stage
-   spans all three rows of column 2. Phones: three plain cards, and no
-   stage.
+   Three plates, one for each discipline, one above the other and tied by wires. The plate being
+   inspected rises and the ones above it open upward (that is what uncovers it). Beside the view is
+   the legend: the plate's tools, each with what it is for and its count in the public archive.
+   Wide screens: the list of disciplines, the view, the legend, in three columns. Phones: the
+   disciplines as tabs, then the view, then the legend.
 
-   Nothing here uses filter, backdrop-filter or an animated box-shadow, the page
-   is compositing-bound. What moves is transform and opacity, driven from JS on
-   leaf elements; CSS transitions are limited to colour and border on state
-   changes, never to anything written per frame.
+   The plates are three composited layers moved by transforms from JS; the plate's own marks move by
+   CSS keyframes, only on the active plate and only while the section is on screen and motion is
+   welcome (data-run). Nothing here uses filter, backdrop-filter or an animated box-shadow: the page
+   is compositing-bound. CSS transitions are limited to colour, opacity and small transforms on
+   state changes, never to anything written per frame.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .wb-section {
@@ -19,24 +19,35 @@
   z-index: 2;
   padding: clamp(56px, 8vh, 88px) 0 clamp(44px, 7vh, 88px);
 
-  --wb-ok: #5be0b2;
-  --wb-warn: #f3c15f;
-  --wb-bad: #ff6e86;
-  --wb-ink: rgba(236, 240, 255, 0.88);
-  --wb-dim: rgba(190, 200, 232, 0.5);
-  --wb-grid: rgba(255, 255, 255, 0.07);
-  --wb-line: rgba(255, 255, 255, 0.55);
+  --wb-line-rgb: 255, 255, 255;
   --wb-hair: rgba(255, 255, 255, 0.11);
-  --wb-plate: #070913;
-  --wb-lane-edge: #5fd0ff;
-  --wb-lane-api: #a98bff;
-  --wb-lane-cache: #f3c15f;
-  --wb-lane-db: #5be0b2;
+  --wb-dim: rgba(190, 200, 232, 0.6);
+  --wb-ink: rgba(240, 244, 255, 0.92);
+  --wb-ink-soft: rgba(226, 232, 245, 0.6);
+  --wb-plate-fill: #0a0e1c;
+  --wb-plate-edge: #060914;
+  --wb-plate-edge-r: #080c19;
 }
 
 .wb-section .parallax-text {
   font-size: clamp(4.5rem, 11vw, 11rem);
   color: rgba(255, 255, 255, 0.022);
+}
+
+/* The tone of a discipline: on the list's items, the plates, the open one's deck and its tools. */
+.wb-section [data-tone="cyan"] {
+  --wb-tone: #4fb8e0;
+  --wb-tone-rgb: 79, 184, 224;
+}
+
+.wb-section [data-tone="violet"] {
+  --wb-tone: #8b7cf6;
+  --wb-tone-rgb: 139, 124, 246;
+}
+
+.wb-section [data-tone="gold"] {
+  --wb-tone: #f0a868;
+  --wb-tone-rgb: 240, 168, 104;
 }
 
 /* ── Header (shares its grid with the How I Work header) ───────────────── */
@@ -89,57 +100,27 @@
   color: var(--text-muted);
 }
 
-/* ── The deck: bays on the left, the open instrument on the right ───────── */
+/* ── The deck: disciplines, the exploded view, the legend ───────────────── */
 
 .wb-deck {
+  --wb-h: clamp(400px, calc(100svh - 240px), 700px);
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(250px, 0.86fr) minmax(0, 1fr) minmax(310px, 1.16fr);
+  align-items: center;
+  column-gap: clamp(18px, 2.6vw, 44px);
+  min-height: var(--wb-h);
 }
 
+/* The list of disciplines. */
 .wb-index {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.4fr);
-  /* One height for the whole deck, whichever bay is open: the open bay takes what it needs
-     (the rows are set from AboutSection) and the others share the rest, and the stage is as
-     tall as the list. Neither moves when another bay opens. */
-  --wb-h: clamp(500px, 70vh, 800px);
-  min-height: var(--wb-h);
-  grid-template-rows: repeat(3, minmax(auto, 1fr));
-  column-gap: 44px;
-}
-
-.wb-item {
-  display: contents;
-}
-
-.wb-item:nth-child(1) .wb-bay { grid-row: 1; }
-.wb-item:nth-child(2) .wb-bay { grid-row: 2; }
-.wb-item:nth-child(3) .wb-bay { grid-row: 3; }
-
-.wb-item[data-tone="cyan"] {
-  --wb-tone: #4fb8e0;
-  --wb-tone-rgb: 79, 184, 224;
-}
-
-.wb-item[data-tone="violet"] {
-  --wb-tone: #8b7cf6;
-  --wb-tone-rgb: 139, 124, 246;
-}
-
-.wb-item[data-tone="gold"] {
-  --wb-tone: #f0a868;
-  --wb-tone-rgb: 240, 168, 104;
-}
-
-.wb-bay {
-  grid-column: 1;
-  position: relative;
   border-top: 1px solid var(--wb-hair);
 }
 
-.wb-item:last-child .wb-bay {
+.wb-item {
   border-bottom: 1px solid var(--wb-hair);
 }
 
@@ -147,7 +128,7 @@
   position: relative;
   display: block;
   width: 100%;
-  padding: clamp(14px, 2.2vh, 22px) 12px 8px 26px;
+  padding: clamp(14px, 2.4vh, 24px) 12px clamp(14px, 2.4vh, 24px) 26px;
   text-align: left;
   color: inherit;
   background: none;
@@ -161,13 +142,12 @@
   outline-offset: -2px;
 }
 
-/* The lit edge. On a wide screen it is one element that glides between bays
-   (layoutId); on a phone each bay owns a static one. */
+/* The lit edge: one element that glides between disciplines (layoutId). */
 .wb-lit {
   position: absolute;
   left: 0;
-  top: 18px;
-  bottom: 12px;
+  top: 16px;
+  bottom: 16px;
   width: 2px;
   background: var(--wb-tone);
   border-radius: 1px;
@@ -178,27 +158,23 @@
   opacity: 0;
 }
 
-.wb-item[data-active] .wb-lit--static {
-  opacity: 1;
-}
-
 .wb-bay-top {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: clamp(8px, 1.4vh, 14px);
+  margin-bottom: clamp(8px, 1.4vh, 12px);
 }
 
 .wb-glyph {
   flex: none;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  color: rgba(var(--wb-tone-rgb), 0.55);
+  color: rgba(var(--wb-tone-rgb), 0.5);
   transition: color 0.3s ease;
 }
 
@@ -217,7 +193,7 @@
   color: var(--wb-tone);
 }
 
-/* A bay drawing itself when it opens: the one flourish the list needs. */
+/* A discipline drawing itself when it is picked: the one flourish the list needs. */
 .wb-item[data-active] .g-line,
 .wb-item[data-active] .g-arc {
   animation: wbDraw 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -266,52 +242,14 @@
   color: var(--wb-tone);
 }
 
-.wb-bay-live {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-family: var(--font-code);
-  font-size: 0.56rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.wb-bay-live i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.wb-item[data-active] .wb-bay-live {
-  color: var(--wb-tone);
-}
-
-.wb-item[data-active] .wb-bay-live i {
-  animation: wbLive 1.8s ease-in-out infinite;
-}
-
-@keyframes wbLive {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.25;
-  }
-}
-
 .wb-bay-name {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(1.3rem, min(2.2vw, 3.6vh), 1.7rem);
+  font-size: clamp(1.3rem, min(2.2vw, 3.6vh), 1.75rem);
   font-weight: 500;
   line-height: 1.12;
   letter-spacing: -0.01em;
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(255, 255, 255, 0.6);
   transition: color 0.3s ease;
 }
 
@@ -323,9 +261,9 @@
 
 .wb-bay-brief {
   display: block;
-  max-width: 46ch;
+  max-width: 44ch;
   margin-top: clamp(5px, 1vh, 9px);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   line-height: 1.55;
   color: rgba(255, 255, 255, 0.42);
   transition: color 0.3s ease;
@@ -333,846 +271,603 @@
 
 .wb-bay-btn:hover .wb-bay-name,
 .wb-item[data-active] .wb-bay-name {
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .wb-bay-btn:hover .wb-bay-brief,
 .wb-item[data-active] .wb-bay-brief {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .wb-bay-btn:hover .wb-glyph {
   color: rgba(var(--wb-tone-rgb), 0.85);
 }
 
-.wb-stack {
-  list-style: none;
-  margin: 0;
-  padding: 2px 12px clamp(12px, 2vh, 18px) 26px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.wb-stack li {
-  padding: 2px 8px;
-  font-family: var(--font-code);
-  font-size: 0.6rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.42);
-  border: 1px solid var(--wb-hair);
-  border-radius: 2px;
-  transition: color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
-}
-
-.wb-stack li:hover {
-  color: var(--wb-tone);
-  border-color: rgba(var(--wb-tone-rgb), 0.55);
-  transform: translateY(-1px);
-}
-
-.wb-item[data-active] .wb-stack li {
-  color: rgba(255, 255, 255, 0.66);
-  border-color: rgba(var(--wb-tone-rgb), 0.3);
-}
-
-/* ── The stage ─────────────────────────────────────────────────────────── */
-
-.wb-stage {
-  grid-column: 2;
-  grid-row: 1 / span 3;
-  align-self: stretch;
-  position: relative;
-  min-height: var(--wb-h);
-  /* The instrument inside must not decide how tall the stage is: contain: size ignores its
-     content, so the stage is the height of the list beside it (at least --wb-h). */
-  contain: size;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(var(--wb-tone-rgb), 0.07), rgba(var(--wb-tone-rgb), 0) 46%),
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 100% 28px,
-    var(--wb-plate);
-  border: 1px solid rgba(var(--wb-tone-rgb), 0.26);
-}
+/* ── The exploded view ──────────────────────────────────────────────────── */
 
 .wb-stage {
   display: flex;
-  flex-direction: column;
-}
-
-.wb-stage-in {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 24px 26px 22px;
-}
-
-.wb-bk {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: var(--wb-tone);
-  stroke-width: 1.5;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.wb-bk--tl { top: -1px; left: -1px; }
-.wb-bk--tr { top: -1px; right: -1px; transform: rotate(90deg); }
-.wb-bk--br { bottom: -1px; right: -1px; transform: rotate(180deg); }
-.wb-bk--bl { bottom: -1px; left: -1px; transform: rotate(270deg); }
-
-.wb-stage-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px 18px;
-  margin: 0;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--wb-hair);
-  font-family: var(--font-code);
-  font-size: 0.66rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-.wb-stage-head span {
-  color: var(--wb-tone);
-}
-
-.wb-stage-head i {
-  font-style: normal;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.36);
-}
-
-/* ── Shared demo parts ─────────────────────────────────────────────────── */
-
-.wb-demo {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  gap: 16px;
-  min-height: 0;
-}
-
-/* The trace has the most to show, so it packs a little closer to fit the same stage. */
-.wb-trace {
-  gap: 10px;
-}
-
-.wb-skeleton i {
-  display: block;
-  height: 12px;
-  background: var(--wb-hair);
-  border-radius: 2px;
-}
-
-.wb-skeleton i:nth-child(1) { width: 62%; }
-.wb-skeleton i:nth-child(2) { width: 100%; height: 120px; opacity: 0.6; }
-.wb-skeleton i:nth-child(3) { width: 44%; }
-
-.wb-demo-note {
-  margin: 0;
-  max-width: 62ch;
-  font-size: 0.82rem;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.wb-sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.wb-ctl-label {
-  margin: 0 0 8px;
-  font-family: var(--font-code);
-  font-size: 0.58rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
-}
-
-.wb-seg {
-  display: inline-flex;
-  max-width: 100%;
-  border: 1px solid var(--wb-hair);
-  border-radius: 2px;
-}
-
-.wb-seg-btn {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  padding: 8px 14px;
-  text-align: left;
-  color: rgba(255, 255, 255, 0.55);
-  background: none;
-  border: 0;
-  border-left: 1px solid var(--wb-hair);
-  cursor: pointer;
-  font: inherit;
-  transition: color 0.2s ease, background-color 0.2s ease;
-}
-
-.wb-seg-btn:first-child {
-  border-left: 0;
-}
-
-.wb-seg-btn b {
-  font-family: var(--font-code);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.wb-seg-btn i {
-  font-style: normal;
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.34);
-}
-
-.wb-seg-btn:hover {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.wb-seg-btn[aria-pressed="true"] {
-  color: var(--wb-tone);
-  background: rgba(var(--wb-tone-rgb), 0.12);
-}
-
-.wb-seg-btn:focus-visible,
-.wb-go:focus-visible {
-  outline: 2px solid var(--wb-tone);
-  outline-offset: 2px;
-}
-
-.wb-go {
-  align-self: flex-end;
-  padding: 11px 18px;
-  font-family: var(--font-code);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--wb-tone);
-  background: none;
-  border: 1px solid rgba(var(--wb-tone-rgb), 0.5);
-  border-radius: 2px;
-  cursor: pointer;
-  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.wb-go:hover:not(:disabled) {
-  background: rgba(var(--wb-tone-rgb), 0.14);
-  border-color: var(--wb-tone);
-}
-
-.wb-go:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-.wb-go--solid {
-  align-self: center;
-  color: #04060c;
-  background: var(--wb-tone);
-  border-color: var(--wb-tone);
-}
-
-.wb-go--solid:hover:not(:disabled) {
-  color: #04060c;
-  background: var(--wb-tone);
-  border-color: #fff;
-}
-
-/* ── HELM: frame-time meter ────────────────────────────────────────────── */
-
-.wb-meter-read {
-  display: grid;
-  grid-template-columns: 1.5fr repeat(4, 1fr);
-  gap: 10px;
-}
-
-.wb-stat {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
 }
 
-.wb-stat b {
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 500;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.wb-stat--big b {
-  font-size: 2.6rem;
-  letter-spacing: -0.02em;
-}
-
-.wb-stat span {
-  font-family: var(--font-code);
-  font-size: 0.54rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.36);
-}
-
-.wb-meter-read[data-grade="ok"] .wb-stat--big b {
-  color: var(--wb-ok);
-}
-
-.wb-meter-read[data-grade="warn"] .wb-stat--big b {
-  color: var(--wb-warn);
-}
-
-.wb-meter-read[data-grade="bad"] .wb-stat--big b {
-  color: var(--wb-bad);
-}
-
-.wb-meter-chart {
+/* 381 x 660: the stage's own units (lib/build/iso.ts). Its height is the deck's; the width follows. */
+.wb-canvas {
   position: relative;
-  flex: 1 1 132px;
-  min-height: 132px;
-  border: 1px solid var(--wb-hair);
-  background: rgba(255, 255, 255, 0.012);
+  width: min(100%, calc(var(--wb-h) * 381 / 660));
+  aspect-ratio: 381 / 660;
 }
 
-.wb-meter-canvas {
+.wb-plate {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  /* 232 of 660 stage units: the diamond and its edge. */
+  height: 35.15%;
+  cursor: pointer;
+  will-change: transform;
+  transition: opacity 0.5s ease 0.1s;
+}
+
+.wb-plate svg {
   position: absolute;
   inset: 0;
-  display: block;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
-/* 16.7 of the chart's 50 ms: 66.6% of the way up. */
-.wb-meter-budget {
-  position: absolute;
-  right: 8px;
-  top: 66.6%;
-  transform: translateY(-100%);
-  padding-bottom: 3px;
-  font-family: var(--font-code);
-  font-size: 0.54rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--wb-dim);
-  pointer-events: none;
+.wb-plate-in {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.wb-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 18px;
-  margin: -6px 0 0;
-  padding: 0;
-  list-style: none;
-  font-family: var(--font-code);
-  font-size: 0.56rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
+.wb-plate:hover .wb-plate-in {
+  transform: translateY(-3px);
 }
 
-.wb-legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
+.wb-face,
+.wb-edge,
+.wb-grid,
+.wb-frame {
+  vector-effect: non-scaling-stroke;
 }
 
-.wb-legend li::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 1px;
-  background: var(--wb-ok);
+.wb-face {
+  fill: var(--wb-plate-fill);
+  stroke: rgba(var(--wb-line-rgb), 0.26);
+  stroke-width: 1;
+  transition: stroke 0.4s ease;
 }
 
-.wb-legend li[data-g="warn"]::before {
-  background: var(--wb-warn);
+.wb-edge {
+  fill: var(--wb-plate-edge);
+  stroke: rgba(var(--wb-line-rgb), 0.16);
+  stroke-width: 1;
+  transition: stroke 0.4s ease;
 }
 
-.wb-legend li[data-g="bad"]::before {
-  background: var(--wb-bad);
+.wb-edge-r {
+  fill: var(--wb-plate-edge-r);
 }
 
-.wb-meter-ctl .wb-seg {
-  width: 100%;
+.wb-grid {
+  fill: none;
+  stroke: rgba(var(--wb-line-rgb), 0.055);
+  stroke-width: 1;
 }
 
-.wb-meter-ctl .wb-seg-btn {
-  flex: 1;
+.wb-frame {
+  fill: none;
+  stroke: rgba(var(--wb-tone-rgb), 0.28);
+  stroke-width: 1;
 }
 
-.wb-meter[data-load="1"] .wb-seg-btn[aria-pressed="true"] {
-  color: var(--wb-warn);
-  background: rgba(243, 193, 95, 0.12);
+.wb-plate[data-active="true"] .wb-face {
+  stroke: rgba(var(--wb-tone-rgb), 0.9);
 }
 
-.wb-meter[data-load="2"] .wb-seg-btn[aria-pressed="true"] {
-  color: var(--wb-bad);
-  background: rgba(255, 110, 134, 0.12);
+.wb-plate[data-active="true"] .wb-edge {
+  stroke: rgba(var(--wb-tone-rgb), 0.5);
 }
 
-/* ── REACTOR: request trace ────────────────────────────────────────────── */
-
-.wb-rail {
-  position: relative;
-  padding-top: 2px;
+/* The stage opens the first time it is seen: until then the plates are put away, in a stack. */
+.wb-canvas[data-phase="armed"] .wb-plate {
+  opacity: 0;
+  transition: none;
 }
 
-.wb-rail-nodes {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+/* The marks. Their strokes are hairlines in screen space (the plate's shear would otherwise thicken them one way). */
+.wb-ft .wb-ln {
+  fill: none;
+  stroke: rgba(var(--wb-line-rgb), 0.62);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 0.3s ease;
 }
 
-.wb-rail-line {
-  position: absolute;
-  left: 10%;
-  right: 10%;
-  top: 8px;
-  height: 1px;
-  background: var(--wb-hair);
+.wb-ft .wb-fill {
+  fill: rgba(var(--wb-line-rgb), 0.78);
+  stroke: none;
+  transition: fill 0.3s ease;
 }
 
-.wb-node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  text-align: center;
+.wb-ft .wb-faint {
+  opacity: 0.45;
+}
+
+.wb-ft {
   transition: opacity 0.3s ease;
 }
 
-.wb-node-dot {
-  width: 11px;
-  height: 11px;
-  margin-bottom: 5px;
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  background: var(--wb-plate);
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+.wb-plate[data-active="false"] .wb-ft {
+  opacity: 0.55;
 }
 
-.wb-node b {
-  font-family: var(--font-code);
-  font-size: 0.64rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.78);
+.wb-plate[data-active="true"] .wb-ft .wb-ln {
+  stroke: rgba(var(--wb-tone-rgb), 0.92);
 }
 
-.wb-node span {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.34);
+.wb-plate[data-active="true"] .wb-ft .wb-fill {
+  fill: rgba(var(--wb-tone-rgb), 0.92);
 }
 
-.wb-node[data-on] .wb-node-dot {
-  background: var(--wb-tone);
-  border-color: var(--wb-tone);
+/* Something is being pointed at: the rest of the plate steps back, and the mark is lit and a little larger. */
+.wb-plate[data-lit] .wb-ft:not([data-hot]) {
+  opacity: 0.32;
 }
 
-.wb-node[data-bad] .wb-node-dot {
-  border-color: var(--wb-bad);
+.wb-ft-in {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.wb-node[data-skipped] {
-  opacity: 0.38;
+.wb-ft[data-hot] .wb-ft-in {
+  transform: scale(1.16);
 }
 
-.wb-node[data-skipped] .wb-node-dot {
-  border-style: dashed;
+.wb-plate[data-active="true"] .wb-ft[data-hot] .wb-ln {
+  stroke: rgba(var(--wb-line-rgb), 0.98);
 }
 
-.wb-packet {
+.wb-plate[data-active="true"] .wb-ft[data-hot] .wb-fill {
+  fill: rgba(var(--wb-line-rgb), 0.98);
+}
+
+.wb-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.wb-pin,
+.wb-pin-ring {
+  display: none;
+  fill: rgba(var(--wb-tone-rgb), 0.7);
+}
+
+.wb-pin-ring {
+  fill: none;
+  stroke: var(--wb-tone);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wb-plate[data-active="true"] .wb-pin,
+.wb-plate[data-active="true"] .wb-pin-ring {
+  display: block;
+}
+
+.wb-ft[data-hot] .wb-pin {
+  fill: var(--wb-tone);
+}
+
+.wb-ft[data-hot] .wb-pin-ring {
+  animation: wbRing 1.5s ease-out infinite;
+}
+
+@keyframes wbRing {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(5);
+  }
+}
+
+/* The marks come in one by one after the plates have opened (opacity only: their transform is placement). */
+.wb-canvas[data-phase="in"] .wb-ft {
+  animation: wbFtIn 0.6s ease both;
+  animation-delay: calc(0.45s + var(--k, 0) * 0.08s);
+}
+
+@keyframes wbFtIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* What moves on its own: only the active plate, only while the section is on screen (data-run). */
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wbSpin 16s linear infinite;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-spin.wb-slow {
+  animation-duration: 26s;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-blink {
+  animation: wbBlink 1.8s ease-in-out infinite alternate;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-flow {
+  stroke-dasharray: 4 3;
+  animation: wbFlow 1.1s linear infinite;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-flow-ring {
+  stroke-dasharray: 30 14;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-rise {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: wbRise 3.2s ease-in-out infinite alternate;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-fall {
+  animation: wbFall 2.4s linear infinite;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-late {
+  animation-delay: -1.2s;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-later {
+  animation-delay: -0.6s;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-sway {
+  animation: wbSway 2.6s ease-in-out infinite alternate;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-scroll {
+  animation: wbScroll 2.6s ease-in-out infinite alternate;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-bob {
+  animation: wbBob 2.8s ease-in-out infinite alternate;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-dotx {
+  animation: wbDotX 2.6s linear infinite alternate;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-doty {
+  animation: wbDotY 2.6s ease-in-out infinite alternate;
+}
+
+.wb-canvas[data-run] .wb-plate[data-active="true"] .wb-draw {
+  vector-effect: none;
+  stroke-dasharray: 1;
+  animation: wbCurve 3.4s ease-in-out infinite;
+}
+
+@keyframes wbSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wbBlink {
+  from {
+    opacity: 0.25;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wbFlow {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+@keyframes wbRise {
+  from {
+    transform: scaleY(0.3);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes wbFall {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(40px);
+  }
+}
+
+@keyframes wbSway {
+  from {
+    transform: translateX(-2px);
+  }
+
+  to {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes wbScroll {
+  from {
+    transform: translateY(2px);
+  }
+
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes wbBob {
+  from {
+    transform: translateX(-12px);
+  }
+
+  to {
+    transform: translateX(12px);
+  }
+}
+
+@keyframes wbDotX {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(44px);
+  }
+}
+
+@keyframes wbDotY {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-32px);
+  }
+}
+
+@keyframes wbCurve {
+  0% {
+    stroke-dashoffset: 1;
+  }
+
+  55%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The wires. Each is placed and stretched from JS so it always ends on the plates; a pulse runs along it. */
+.wb-pole {
   position: absolute;
-  z-index: 2;
-  top: 3.5px;
-  width: 10px;
-  height: 10px;
-  margin-left: -5px;
-  border-radius: 50%;
-  background: var(--wb-tone);
-  box-shadow: 0 0 0 4px rgba(var(--wb-tone-rgb), 0.18);
+  top: 0;
+  /* 100 of 660 stage units, at rest. */
+  height: 15.15%;
+  width: 1px;
+  margin-left: -0.5px;
+  background: rgba(var(--wb-line-rgb), 0.2);
   pointer-events: none;
 }
 
-.wb-trace-head {
+.wb-pole b {
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 3px;
+  height: 14%;
+  background: linear-gradient(transparent, rgba(var(--wb-tone-rgb), 0.95), transparent);
+  opacity: 0;
+}
+
+.wb-deck[data-tone] .wb-canvas[data-run] .wb-pole b {
+  animation: wbPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes wbPulse {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  15%,
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(620%);
+    opacity: 0;
+  }
+}
+
+/* ── The legend ─────────────────────────────────────────────────────────── */
+
+.wb-legend {
+  min-width: 0;
+}
+
+.wb-legend-head {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 6px 18px;
-  padding-top: 4px;
-  font-family: var(--font-code);
-}
-
-.wb-trace-req {
+  gap: 14px;
   margin: 0;
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.78);
-}
-
-.wb-trace-req b {
-  margin-right: 6px;
-  font-weight: 500;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--wb-hair);
+  font-family: var(--font-code);
+  font-size: 0.64rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
   color: var(--wb-tone);
 }
 
-.wb-trace-result {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  margin: 0;
-  font-size: 0.74rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
+.wb-legend-head i {
+  font-style: normal;
+  color: var(--wb-dim);
 }
 
-.wb-trace-result[data-ok] .wb-trace-status {
-  color: var(--wb-ok);
-}
-
-.wb-trace-total {
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.88);
-}
-
-.wb-trace-total b {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 500;
-  letter-spacing: 0;
-}
-
-.wb-spans {
+.wb-tools {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  height: 200px;
 }
 
-.wb-span {
-  height: 16px;
-  display: grid;
-  grid-template-columns: minmax(110px, 190px) minmax(0, 1fr) 36px;
-  align-items: center;
-  gap: 12px;
-}
-
-.wb-span-label {
-  font-family: var(--font-code);
-  font-size: 0.62rem;
-  letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.56);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.wb-span-track {
+.wb-tool {
   position: relative;
-  height: 9px;
-  background: var(--wb-hair);
-  border-radius: 1px;
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  column-gap: 14px;
+  row-gap: 4px;
+  align-items: baseline;
+  width: 100%;
+  padding: clamp(8px, 1.4vh, 12px) 10px clamp(8px, 1.4vh, 12px) 4px;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--wb-hair);
+  cursor: pointer;
+  font: inherit;
+  transition: background-color 0.25s ease;
 }
 
-.wb-span-bar {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  background: var(--bar, var(--wb-tone));
-  border-radius: 1px;
-  transform-origin: 0 50%;
+.wb-tool:focus-visible {
+  outline: 2px solid var(--wb-tone);
+  outline-offset: -2px;
 }
 
-.wb-span[data-lane="edge"] { --bar: var(--wb-lane-edge); }
-.wb-span[data-lane="api"] { --bar: var(--wb-lane-api); }
-.wb-span[data-lane="cache"] { --bar: var(--wb-lane-cache); }
-.wb-span[data-lane="db"] { --bar: var(--wb-lane-db); }
-.wb-span[data-ok="false"] { --bar: var(--wb-bad); }
-
-.wb-span[data-idle] .wb-span-bar {
-  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0 2px, transparent 2px 5px);
+.wb-tool-pin {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  width: 7px;
+  height: 7px;
+  border: 1px solid rgba(var(--wb-tone-rgb), 0.7);
+  border-radius: 50%;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.wb-span-ms {
-  font-family: var(--font-code);
-  font-size: 0.62rem;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.wb-trace-note {
-  margin: 0;
-  min-height: 2.9em;
-  font-size: 0.84rem;
-  line-height: 1.55;
-  color: rgba(255, 255, 255, 0.58);
-}
-
-.wb-trace-note[data-tone="bad"] {
-  color: rgba(255, 190, 200, 0.85);
-}
-
-.wb-trace-note code {
-  font-family: var(--font-code);
-  font-size: 0.78rem;
-  color: var(--wb-tone);
-}
-
-.wb-trace-ctl {
-  /* Docked at the foot of the stage, so the stage reads the same however many rows the waterfall has. */
-  margin-top: auto;
+.wb-tool-main {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 14px 22px;
+  align-items: baseline;
+  gap: 2px 12px;
+  min-width: 0;
 }
 
-.wb-trace-ctl .wb-go {
-  margin-left: auto;
+.wb-tool-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--wb-ink);
 }
 
-.wb-log {
-  list-style: none;
-  margin: auto 0 0;
-  padding: 10px 0 0;
-  min-height: 62px;
-  border-top: 1px solid var(--wb-hair);
+.wb-tool-tag {
   font-family: var(--font-code);
   font-size: 0.6rem;
-  line-height: 1.8;
-  color: rgba(255, 255, 255, 0.3);
-  overflow: hidden;
-}
-
-.wb-log li {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.wb-log li[data-latest] {
-  color: rgba(255, 255, 255, 0.62);
-}
-
-/* ── PROBE: the game ───────────────────────────────────────────────────── */
-
-.wb-game {
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 26px;
-}
-
-.wb-field {
-  position: relative;
-  flex: none;
-  /* As tall as the stage allows, within reason; the stage's own height sets --wb-h. */
-  width: clamp(240px, calc((var(--wb-h, 560px) - 190px) * 0.857), 420px);
-  max-width: 100%;
-  aspect-ratio: 360 / 420;
-  background:
-    radial-gradient(ellipse at 50% 100%, rgba(var(--wb-tone-rgb), 0.12), transparent 62%),
-    #04060c;
-  border: 1px solid rgba(var(--wb-tone-rgb), 0.3);
-  cursor: crosshair;
-  touch-action: pan-y; /* a vertical swipe still scrolls the page; sideways steers */
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-}
-
-.wb-field:focus-visible {
-  outline: 2px solid var(--wb-tone);
-  outline-offset: 3px;
-}
-
-.wb-field-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.wb-field-veil {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 20px;
-  text-align: center;
-  background: rgba(4, 6, 12, 0.74);
-}
-
-.wb-veil-kicker {
-  margin: 0;
-  font-family: var(--font-code);
-  font-size: 0.7rem;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--wb-tone);
-}
-
-.wb-veil-score {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 3.4rem;
-  font-weight: 500;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.94);
-}
-
-.wb-veil-sub {
-  margin: 0 0 12px;
-  max-width: 24ch;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.wb-game-side {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.wb-game-stats {
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 12px;
-}
-
-.wb-game-stats dt {
-  margin-bottom: 5px;
-  font-family: var(--font-code);
-  font-size: 0.54rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.36);
-}
-
-.wb-game-stats dd {
-  margin: 0;
-}
-
-.wb-game-stats b {
-  font-family: var(--font-display);
-  font-size: 1.7rem;
-  font-weight: 500;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--wb-dim);
 }
 
 .wb-pips {
-  display: inline-flex;
-  gap: 5px;
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .wb-pips i {
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid rgba(var(--wb-tone-rgb), 0.6);
-  border-radius: 2px;
+  width: 3px;
+  height: 10px;
+  background: rgba(var(--wb-line-rgb), 0.14);
+  border-radius: 1px;
 }
 
 .wb-pips i[data-on] {
   background: var(--wb-tone);
 }
 
-.wb-loop {
-  padding: 12px 0;
-  border-top: 1px solid var(--wb-hair);
-  border-bottom: 1px solid var(--wb-hair);
-}
-
-.wb-loop-row {
-  display: flex;
-  justify-content: space-between;
-  margin: 0;
+.wb-pips em {
+  margin-left: 8px;
   font-family: var(--font-code);
-  font-size: 0.64rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  line-height: 2;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.wb-loop-row b {
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.wb-loop-row em {
+  font-size: 0.62rem;
   font-style: normal;
+  letter-spacing: 0.08em;
+  color: var(--wb-dim);
+}
+
+.wb-tool-role {
+  grid-column: 2 / -1;
+  grid-row: 2;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--wb-ink-soft);
+  transition: color 0.25s ease;
+}
+
+.wb-tool[data-hot] {
+  background: linear-gradient(90deg, rgba(var(--wb-tone-rgb), 0.11), rgba(var(--wb-tone-rgb), 0) 82%);
+}
+
+.wb-tool[data-hot] .wb-tool-pin {
+  background: var(--wb-tone);
+  box-shadow: 0 0 0 3px rgba(var(--wb-tone-rgb), 0.22);
+}
+
+.wb-tool[data-hot] .wb-tool-role {
+  color: var(--wb-ink);
+}
+
+.wb-seen {
+  min-height: 2.9em;
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--wb-dim);
+}
+
+.wb-seen b {
+  font-weight: 500;
   color: var(--wb-tone);
 }
 
-/* ── Short laptop screens ─────────────────────────────────────────────────
-   Header, list and instrument should be on one screen, so below 1100px of height
-   the bays that are not open fold their brief (and below 780px their stack too).
-   Exactly one bay is open, so the list is the same height whichever it is. The
-   fold is a max-height transition: it runs once per click, never per frame. */
+/* ── The header on a short window (it is shared with How I Work, whose own deck relies on it) ──────────── */
 
 @media (min-width: 861px) and (max-height: 1100px) {
-  .wb-log {
-    display: none;
-  }
-
-  .wb-bay-brief {
-    max-height: 0;
-    margin-top: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), margin-top 0.35s ease, opacity 0.25s ease, color 0.3s ease;
-  }
-
-  .wb-item[data-active] .wb-bay-brief {
-    max-height: 7em;
-    margin-top: clamp(5px, 1vh, 9px);
-    opacity: 1;
-  }
-
   .wb-lede,
   .ascent-lede {
     max-width: 62ch;
@@ -1185,61 +880,14 @@
 }
 
 @media (min-width: 861px) and (max-height: 780px) {
-  .wb-item:not([data-active]) .wb-stack {
-    display: none;
-  }
-
-  .wb-spans {
-    height: 158px;
-    gap: 4px;
-  }
-
-  .wb-span {
-    height: 14px;
-  }
-
-  .wb-node span {
-    display: none;
-  }
-
-  .wb-trace {
-    gap: 8px;
-  }
-
-  .wb-trace-note {
-    min-height: 2.4em;
-    font-size: 0.8rem;
-  }
-
   .wb-eyebrow {
     margin-bottom: 8px;
   }
-
-  .wb-bay-top {
-    margin-bottom: 6px;
-  }
-
-  .wb-bay-btn {
-    padding-bottom: 12px;
-  }
-
-  .wb-stage-in {
-    padding: 16px 20px 14px;
-    gap: 12px;
-  }
-
-  .wb-demo {
-    gap: 12px;
-  }
 }
 
-/* A laptop window with the browser's own bars (1366x768 leaves ~620px): the header and the deck of
-   both sections tighten once more so that title, bays and the open instrument still fit in one view. */
+/* A laptop window with the browser's own bars (1366x768 leaves ~620px): the header of both sections tightens once
+   more so that the title and the deck still fit in one view. */
 @media (min-width: 861px) and (max-height: 680px) {
-  .wb-index {
-    --wb-h: 430px;
-  }
-
   .wb-title {
     font-size: 2.1rem;
   }
@@ -1253,44 +901,81 @@
   .ascent-head {
     margin-bottom: 12px;
   }
+}
 
-  .wb-field {
-    width: clamp(160px, calc((var(--wb-h, 560px) - 190px) * 0.857), 420px);
+/* ── Short laptop screens ─────────────────────────────────────────────────
+   The deck is as tall as the window allows (--wb-h); below that the legend, which is text, is what has to give. */
+
+@media (min-width: 861px) and (max-height: 820px) {
+  .wb-tool {
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
 
-  .wb-stage-in {
-    padding: 12px 18px 10px;
-    gap: 8px;
+  .wb-tool-role {
+    font-size: 0.78rem;
+    line-height: 1.38;
   }
 
-  .wb-demo {
-    gap: 8px;
+  .wb-bay-brief {
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
 
   .wb-bay-btn {
     padding-top: 10px;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
+  }
+
+  .wb-seen {
+    min-height: 2.6em;
+    margin-top: 8px;
   }
 }
 
-/* ── Phones and tablets: three cards ──────────────────────────────────────
-   No instruments here (AboutSection renders none below this width, and the stage is hidden in case
-   a render of the wider layout is still on its way out): each bay is a card with its brief and its stack,
-   lit in its own colour. */
+@media (min-width: 861px) and (max-height: 700px) {
+  .wb-deck {
+    --wb-h: clamp(340px, calc(100svh - 240px), 700px);
+  }
 
-.wb-narrow {
-  display: none;
+  .wb-tool-role {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .wb-bay-top {
+    margin-bottom: 4px;
+  }
+
+  .wb-bay-brief {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .wb-bay-btn {
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
 }
 
-@media (max-width: 860px) {
-  .wb-wide {
+@media (min-width: 861px) and (max-height: 620px) {
+  /* The shortest window we support: the sentences give way, the names and the counts stay. */
+  .wb-tool-role {
     display: none;
   }
 
-  .wb-narrow {
-    display: inline;
+  .wb-seen {
+    min-height: 1.6em;
   }
+}
 
+/* ── Phones and tablets: tabs, the view, the legend ─────────────────────── */
+
+@media (max-width: 860px) {
   .wb-head,
   .ascent-head {
     grid-template-columns: 1fr;
@@ -1298,59 +983,43 @@
     gap: 22px;
   }
 
-  .wb-index {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 14px;
+  .wb-deck {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 26px;
     min-height: 0;
+    --wb-h: 520px;
   }
 
-  .wb-item {
-    display: block;
-  }
-
+  /* The view first: a tab is picked just under it, and what it does is seen without scrolling. */
   .wb-stage {
+    order: -1;
+  }
+
+  .wb-canvas {
+    width: min(72vw, 280px);
+  }
+
+  /* Only the picked discipline spells itself out; the other two are a line each. */
+  .wb-item:not([data-active]) .wb-bay-brief {
     display: none;
   }
 
-  .wb-bay {
-    grid-column: auto;
-    overflow: hidden;
-    border: 1px solid var(--wb-hair);
-    border-radius: 6px;
-    background: linear-gradient(180deg, rgba(var(--wb-tone-rgb), 0.08), rgba(var(--wb-tone-rgb), 0) 60%),
-      rgba(255, 255, 255, 0.02);
-  }
-
-  .wb-item:last-child .wb-bay {
-    border-bottom: 1px solid var(--wb-hair);
-  }
-
   .wb-bay-btn {
-    padding: 22px 18px 8px 24px;
-    cursor: default;
+    padding: 16px 12px 16px 24px;
   }
 
-  .wb-lit {
-    top: 22px;
-    bottom: 14px;
-  }
-
-  .wb-bay-brief {
-    max-width: none;
-  }
-
-  .wb-stack {
-    padding: 4px 18px 20px 24px;
-  }
-
-  /* No hover to lean on, and nothing to open: every card carries its own colour. */
   .wb-glyph {
     color: var(--wb-tone);
   }
 
   .wb-bay-code b {
     color: var(--wb-tone);
+  }
+
+  .wb-tool-tag {
+    display: none;
   }
 }
 
@@ -1364,56 +1033,55 @@
     margin-bottom: 34px;
   }
 
-  .wb-bay-brief {
-    font-size: 0.9rem;
+  .wb-pips i {
+    width: 2px;
   }
 }
 
 /* ── Reduced motion ────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .wb-item[data-active] .g-line,
-  .wb-item[data-active] .g-arc,
-  .wb-item[data-active] .wb-bay-live i {
-    animation: none;
+  .wb-plate,
+  .wb-plate-in,
+  .wb-ft-in,
+  .wb-tool,
+  .wb-bay-name,
+  .wb-bay-brief {
+    transition-duration: 0.01ms;
   }
 
-  .wb-stack li:hover {
-    transform: none;
+  .wb-ft[data-hot] .wb-pin-ring,
+  .wb-item[data-active] .g-line,
+  .wb-item[data-active] .g-arc {
+    animation: none;
   }
 }
 
 /* ── Light theme ───────────────────────────────────────────────────────────
-   Only what assumes a dark ground is restated; the tones are the paper theme's pigments (C0). */
+   The plates are sheets of paper with ink on them; the tones are the paper theme's pigments (C0). */
 
 html[data-theme="light"] .wb-section {
-  --wb-ok: #0b6b49;
-  --wb-warn: var(--amber);
-  --wb-bad: #a81c3a;
-  --wb-ink: rgba(var(--ink-rgb), 0.88);
-  --wb-dim: rgba(var(--ink-rgb), 0.56);
-  --wb-grid: rgba(var(--ink-rgb), 0.07);
-  --wb-line: rgba(var(--ink-rgb), 0.5);
-  --wb-hair: rgba(var(--ink-rgb), 0.14);
-  /* The instrument's plate is a raised sheet of paper, not white. */
-  --wb-plate: var(--p0);
-  --wb-lane-edge: var(--teal);
-  --wb-lane-api: var(--violet);
-  --wb-lane-cache: var(--amber);
-  --wb-lane-db: #0b6b49;
+  --wb-line-rgb: var(--ink-rgb);
+  --wb-hair: rgba(var(--ink-rgb), 0.16);
+  --wb-dim: var(--ink-2);
+  --wb-ink: var(--ink);
+  --wb-ink-soft: var(--ink-2);
+  --wb-plate-fill: var(--p0);
+  --wb-plate-edge: var(--p3);
+  --wb-plate-edge-r: var(--p2);
 }
 
-html[data-theme="light"] .wb-item[data-tone="cyan"] {
+html[data-theme="light"] .wb-section [data-tone="cyan"] {
   --wb-tone: var(--teal);
   --wb-tone-rgb: var(--teal-rgb);
 }
 
-html[data-theme="light"] .wb-item[data-tone="violet"] {
+html[data-theme="light"] .wb-section [data-tone="violet"] {
   --wb-tone: var(--violet);
   --wb-tone-rgb: var(--violet-rgb);
 }
 
-html[data-theme="light"] .wb-item[data-tone="gold"] {
+html[data-theme="light"] .wb-section [data-tone="gold"] {
   --wb-tone: var(--amber);
   --wb-tone-rgb: var(--amber-rgb);
 }
@@ -1423,160 +1091,41 @@ html[data-theme="light"] .ascent-eyebrow {
   color: rgba(var(--ink-rgb), 0.42);
 }
 
-html[data-theme="light"] .wb-bay-code,
-html[data-theme="light"] .wb-bay-live,
-html[data-theme="light"] .wb-ctl-label,
-html[data-theme="light"] .wb-stat span,
-html[data-theme="light"] .wb-game-stats dt,
-html[data-theme="light"] .wb-stage-head i {
-  color: rgba(var(--ink-rgb), 0.42);
+html[data-theme="light"] .wb-bay-code {
+  color: rgba(var(--ink-rgb), 0.5);
 }
 
 html[data-theme="light"] .wb-item[data-active] .wb-bay-code {
-  color: rgba(var(--ink-rgb), 0.7);
+  color: rgba(var(--ink-rgb), 0.78);
 }
 
-html[data-theme="light"] .wb-item[data-active] .wb-bay-live,
-html[data-theme="light"] .wb-item[data-active] .wb-bay-code b {
-  color: var(--wb-tone);
+html[data-theme="light"] .wb-bay-name {
+  color: rgba(var(--ink-rgb), 0.66);
 }
 
-html[data-theme="light"] .wb-bay-name,
 html[data-theme="light"] .wb-bay-btn:hover .wb-bay-name,
 html[data-theme="light"] .wb-item[data-active] .wb-bay-name {
   color: var(--ink);
 }
 
-html[data-theme="light"] .wb-bay-name {
-  color: rgba(var(--ink-rgb), 0.62);
-}
-
 html[data-theme="light"] .wb-bay-name em {
-  color: rgba(var(--ink-rgb), 0.42);
+  color: rgba(var(--ink-rgb), 0.46);
 }
 
 html[data-theme="light"] .wb-bay-brief {
-  color: rgba(var(--ink-rgb), 0.5);
+  color: rgba(var(--ink-rgb), 0.58);
 }
 
 html[data-theme="light"] .wb-bay-btn:hover .wb-bay-brief,
 html[data-theme="light"] .wb-item[data-active] .wb-bay-brief {
-  color: rgba(var(--ink-rgb), 0.74);
+  color: var(--ink-2);
 }
 
-html[data-theme="light"] .wb-stack li {
-  color: rgba(var(--ink-rgb), 0.5);
+html[data-theme="light"] .wb-ft[data-hot] .wb-ln,
+html[data-theme="light"] .wb-plate[data-active="true"] .wb-ft[data-hot] .wb-ln {
+  stroke: var(--ink);
 }
 
-html[data-theme="light"] .wb-item[data-active] .wb-stack li {
-  color: rgba(var(--ink-rgb), 0.74);
-}
-
-@media (max-width: 860px) {
-  html[data-theme="light"] .wb-bay {
-    background: linear-gradient(180deg, rgba(var(--wb-tone-rgb), 0.09), rgba(var(--wb-tone-rgb), 0) 60%), var(--p0);
-  }
-}
-
-html[data-theme="light"] .wb-stage {
-  background: linear-gradient(180deg, rgba(var(--wb-tone-rgb), 0.07), rgba(var(--wb-tone-rgb), 0) 46%),
-    linear-gradient(rgba(var(--ink-rgb), 0.03) 1px, transparent 1px) 0 0 / 100% 28px,
-    var(--wb-plate);
-}
-
-html[data-theme="light"] .wb-legend,
-html[data-theme="light"] .wb-demo-note,
-html[data-theme="light"] .wb-trace-note {
-  color: rgba(var(--ink-rgb), 0.55);
-}
-
-html[data-theme="light"] .wb-trace-note[data-tone="bad"] {
-  color: var(--rust);
-}
-
-html[data-theme="light"] .wb-stat b,
-html[data-theme="light"] .wb-game-stats b,
-html[data-theme="light"] .wb-trace-total,
-html[data-theme="light"] .wb-trace-req,
-html[data-theme="light"] .wb-node b,
-html[data-theme="light"] .wb-loop-row b,
-html[data-theme="light"] .wb-veil-score {
-  color: var(--ink);
-}
-
-html[data-theme="light"] .wb-meter-read[data-grade="ok"] .wb-stat--big b {
-  color: var(--wb-ok);
-}
-
-html[data-theme="light"] .wb-meter-read[data-grade="warn"] .wb-stat--big b {
-  color: var(--wb-warn);
-}
-
-html[data-theme="light"] .wb-meter-read[data-grade="bad"] .wb-stat--big b {
-  color: var(--wb-bad);
-}
-
-html[data-theme="light"] .wb-seg-btn {
-  color: rgba(var(--ink-rgb), 0.55);
-}
-
-html[data-theme="light"] .wb-seg-btn i,
-html[data-theme="light"] .wb-node span,
-html[data-theme="light"] .wb-span-ms,
-html[data-theme="light"] .wb-loop-row,
-html[data-theme="light"] .wb-trace-result,
-html[data-theme="light"] .wb-log {
-  color: rgba(var(--ink-rgb), 0.42);
-}
-
-html[data-theme="light"] .wb-span-label,
-html[data-theme="light"] .wb-log li[data-latest] {
-  color: rgba(var(--ink-rgb), 0.66);
-}
-
-html[data-theme="light"] .wb-seg-btn:hover {
-  color: rgba(var(--ink-rgb), 0.9);
-}
-
-html[data-theme="light"] .wb-seg-btn[aria-pressed="true"] {
-  color: var(--wb-tone);
-}
-
-html[data-theme="light"] .wb-meter[data-load="1"] .wb-seg-btn[aria-pressed="true"] {
-  color: var(--wb-warn);
-}
-
-html[data-theme="light"] .wb-meter[data-load="2"] .wb-seg-btn[aria-pressed="true"] {
-  color: var(--wb-bad);
-}
-
-html[data-theme="light"] .wb-node-dot {
-  border-color: rgba(var(--ink-rgb), 0.35);
-}
-
-html[data-theme="light"] .wb-span[data-idle] .wb-span-bar {
-  background: repeating-linear-gradient(135deg, rgba(var(--ink-rgb), 0.35) 0 2px, transparent 2px 5px);
-}
-
-/* The playfield stays a dark window in either theme: it is a picture of space,
-   so it carries its own dark-ground palette (the canvas reads these). */
-html[data-theme="light"] .wb-field {
-  --wb-tone: #f0a868;
-  --wb-tone-rgb: 240, 168, 104;
-  --wb-ink: rgba(236, 240, 255, 0.88);
-  --wb-dim: rgba(190, 200, 232, 0.5);
-  --wb-grid: rgba(255, 255, 255, 0.07);
-  --wb-warn: #f3c15f;
-}
-
-html[data-theme="light"] .wb-field-veil {
-  background: rgba(var(--ink-rgb), 0.78);
-}
-
-html[data-theme="light"] .wb-field-veil .wb-veil-score {
-  color: rgba(255, 255, 255, 0.94);
-}
-
-html[data-theme="light"] .wb-field-veil .wb-veil-sub {
-  color: rgba(255, 255, 255, 0.62);
+html[data-theme="light"] .wb-plate[data-active="true"] .wb-ft[data-hot] .wb-fill {
+  fill: var(--ink);
 }

@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useThemeStore } from "@/stores";
 import { switchTheme } from "@/lib/themeTransition";
+import CvDownload from "@/components/ui/CvDownload";
+import { openCvChooser } from "@/lib/cv/chooser";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -77,6 +79,8 @@ export default function Navbar() {
 
         {/* Group Controls (Theme Toggle + Hamburger) */}
         <div className="navbar-actions">
+          {/* The CV is an action, not a section: it is in the bar at every size. */}
+          <CvDownload variant="nav" source="nav" />
           <button
             className={`theme-toggle-switch ${theme.type}`}
             onClick={toggleTheme}
@@ -152,6 +156,20 @@ export default function Navbar() {
             <a href="#contact" className="mobile-nav-link">
               <span className="link-num">{"// 05"}</span> Contact
             </a>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="mobile-nav-link mobile-btn-cv"
+              aria-haspopup="dialog"
+              onClick={(e) => openCvChooser("nav-drawer", e.currentTarget)}
+            >
+              <span className="link-num">{"// CV"}</span> Download CV
+              <span className="cvd-chips" aria-hidden="true">
+                <span>EN</span>
+                <span>ID</span>
+              </span>
+            </button>
           </li>
         </ul>
 
