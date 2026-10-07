@@ -4,15 +4,18 @@
  * stays easy to test.
  */
 
-export const SECTION_IDS = ["home", "about", "projects", "achievements", "contact"] as const;
+export const SECTION_IDS = ["home", "about", "workflow", "playground", "projects", "achievements", "contact"] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
 export type ChatAction =
   | { type: "scroll"; sectionId: SectionId }
   | { type: "project"; title: string }
-  | { type: "achievement"; title: string };
+  | { type: "achievement"; title: string }
+  /** Open the CV chooser (English or Indonesian). */
+  | { type: "cv" };
 
-const TAG = /\[ACTION:([A-Z_]+):([^\]]*)\]/gi;
+/** [ACTION:KIND:argument], or [ACTION:KIND] for the kinds that need none. */
+const TAG = /\[ACTION:([A-Z_]+)(?::([^\]]*))?\]/gi;
 /** A tag that has started but whose closing bracket has not streamed in yet. */
 const DANGLING_TAG = /\[ACTION:[^\]]*$/i;
 /** Even just "[ACT" at the very end could be the start of a tag. */
@@ -32,8 +35,8 @@ export function extractActions(reply: string): ExtractedActions {
   const actions: ChatAction[] = [];
 
   const text = reply
-    .replace(TAG, (_match, kind: string, rawArg: string) => {
-      const arg = rawArg.trim();
+    .replace(TAG, (_match, kind: string, rawArg: string | undefined) => {
+      const arg = (rawArg ?? "").trim();
       switch (kind.toUpperCase()) {
         case "SCROLL_AND_HIGHLIGHT": {
           const id = arg.toLowerCase();
@@ -45,6 +48,9 @@ export function extractActions(reply: string): ExtractedActions {
           break;
         case "OPEN_ACHIEVEMENT":
           if (arg) actions.push({ type: "achievement", title: arg });
+          break;
+        case "OPEN_CV":
+          actions.push({ type: "cv" });
           break;
       }
       return "";

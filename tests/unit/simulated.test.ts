@@ -34,3 +34,30 @@ describe("getSimulatedReply", () => {
     expect(everything).not.toMatch(/Wulandari/i);
   });
 });
+
+describe('getSimulatedReply: the CV and the tone', () => {
+  it('opens the CV chooser when asked for the CV, the resume or the curriculum vitae', () => {
+    for (const ask of ['mana CV nya?', 'boleh minta resume?', 'unduh curriculum vitae', 'Tunjukkan CV-nya']) {
+      expect(extractActions(getSimulatedReply(ask).reply).actions, ask).toEqual([{ type: 'cv' }]);
+    }
+  });
+
+  it('does not mistake a word that merely contains cv for the CV', () => {
+    expect(extractActions(getSimulatedReply('arcvision').reply).actions).toEqual([]);
+  });
+
+  it('dresses the answer in the chosen tone and leaves the default as it was', () => {
+    const base = getSimulatedReply('tunjukkan sertifikat toeic');
+    expect(getSimulatedReply('tunjukkan sertifikat toeic', [], { tone: 'default' })).toEqual(base);
+    const bro = getSimulatedReply('tunjukkan sertifikat toeic', [], { tone: 'bro' });
+    expect(bro.reply).not.toBe(base.reply);
+    expect(extractActions(bro.reply).actions).toEqual(extractActions(base.reply).actions);
+    expect(bro.suggestions).toEqual(base.suggestions);
+  });
+
+  it('suggests what fits the section the visitor is in when nothing in the question matched', () => {
+    const { suggestions } = getSimulatedReply('qwerty zxcv', [], { section: 'projects' });
+    expect(suggestions).toHaveLength(3);
+    expect(suggestions.join(' ')).toMatch(/proyek/i);
+  });
+});

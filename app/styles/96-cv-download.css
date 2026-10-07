@@ -269,7 +269,7 @@ html[data-theme="light"] .cvd-layer {
 .cvd-layer {
   position: fixed;
   inset: 0;
-  z-index: var(--z-project-modal);
+  z-index: var(--z-cv-chooser, var(--z-project-modal));
   display: grid;
   place-items: center;
   padding: 24px 16px;

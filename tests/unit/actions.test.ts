@@ -42,3 +42,20 @@ describe("stripActionTagsForDisplay", () => {
     expect(stripActionTagsForDisplay("pakai array [1, 2] ya")).toBe("pakai array [1, 2] ya");
   });
 });
+
+describe('the CV action', () => {
+  it('opens the CV chooser, with or without an argument', () => {
+    expect(extractActions('Ini CV-nya. [ACTION:OPEN_CV]').actions).toEqual([{ type: 'cv' }]);
+    expect(extractActions('[action:open_cv:]').actions).toEqual([{ type: 'cv' }]);
+    expect(extractActions('Ini CV-nya. [ACTION:OPEN_CV]').text).toBe('Ini CV-nya.');
+  });
+
+  it('knows the two sections the assistant could not point at before', () => {
+    expect(extractActions('[ACTION:SCROLL_AND_HIGHLIGHT:workflow]').actions).toEqual([{ type: 'scroll', sectionId: 'workflow' }]);
+    expect(extractActions('[ACTION:SCROLL_AND_HIGHLIGHT:playground]').actions).toEqual([{ type: 'scroll', sectionId: 'playground' }]);
+  });
+
+  it('hides a half-received CV tag while it streams', () => {
+    expect(stripActionTagsForDisplay('Ini CV-nya. [ACTION:OPEN_C')).toBe('Ini CV-nya.');
+  });
+});

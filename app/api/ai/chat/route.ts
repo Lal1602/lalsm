@@ -1,6 +1,6 @@
 import { GoogleGenAI, type Content } from "@google/genai";
 import { NextResponse } from "next/server";
-import { SYSTEM_INSTRUCTION } from "@/lib/chat/prompt";
+import { buildSystemInstruction } from "@/lib/chat/prompt";
 import { checkRateLimit, getClientKey } from "@/lib/chat/rateLimit";
 import { getSimulatedReply } from "@/lib/chat/simulated";
 import { createReplySplitter } from "@/lib/chat/stream";
@@ -52,6 +52,15 @@ function json(body: unknown, status = 200, headers: Record<string, string> = {})
   return NextResponse.json(body, { status, headers: { ...NO_STORE, ...headers } });
 }
 
+/**
+ * GET /api/ai/chat: whether a live model is configured, so the interface can say so before the first question
+ * (and say "offline" when it is not) instead of finding out from an answer. Reveals no key and no setting.
+ */
+export async function GET() {
+  const live = Boolean(process.env.GEMINI_API_KEY);
+  return json({ live });
+}
+
 export async function POST(request: Request) {
   if (isForeignOrigin(request)) return json({ error: "Forbidden." }, 403);
 
@@ -64,7 +73,7 @@ export async function POST(request: Request) {
 
   const parsed = parseChatBody(payload);
   if (!parsed.ok) return json({ error: parsed.error }, 400);
-  const { message, history } = parsed;
+  const { message, history, tone, section } = parsed;
 
   const limit = await checkRateLimit(getClientKey(request.headers));
   if (!limit.allowed) {
@@ -78,11 +87,13 @@ export async function POST(request: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     console.warn("GEMINI_API_KEY is not set; answering from the local simulation.");
-    return json({ ...getSimulatedReply(message, history), source: "simulated" });
+    return json({ ...getSimulatedReply(message, history, { tone, section }), source: "simulated" });
   }
 
   const ai = new GoogleGenAI({ apiKey });
   const contents = toContents(history, message);
+  // The base instruction plus what the interface knows: the tone the visitor chose, the section they are looking at.
+  const systemInstruction = buildSystemInstruction({ tone, section });
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream<Uint8Array>({
@@ -112,7 +123,7 @@ export async function POST(request: Request) {
               model,
               contents,
               config: {
-                systemInstruction: SYSTEM_INSTRUCTION,
+                systemInstruction,
                 temperature: 0.7,
                 maxOutputTokens: 1200,
                 abortSignal: attempt.signal,
@@ -154,7 +165,7 @@ export async function POST(request: Request) {
         }
 
         // Every model failed or timed out: answer locally so the chat never dead-ends.
-        const fallback = getSimulatedReply(message, history);
+        const fallback = getSimulatedReply(message, history, { tone, section });
         send({ type: "done", ...fallback, model: "simulated" });
       } finally {
         clearTimeout(overallTimer);

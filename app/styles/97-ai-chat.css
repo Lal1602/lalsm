@@ -1,0 +1,1838 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   B.I.L.A.L. — the portfolio's assistant (components/ui/AiChatOverlay.tsx and components/ui/chat/*)
+   Every class is ai-. Dark is the night sky with a gold hairline; light is the same panel as paper. Nothing moves
+   per frame: it is transform and opacity in CSS, and the loops (the orb) are small and on their own layers.
+   The panel and the launcher are marked data-motion where they are rendered, so the page's blanket colour transition
+   (C0-nav-and-theme.css) leaves them alone and their own transitions are the ones that apply.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Between the page's own layers and the preloader; the CV chooser (opened from a card) sits above the panel. */
+  --z-assistant: 9200;
+  --z-cv-chooser: 9300;
+}
+
+.ai-panel,
+.ai-chat-toggle-btn,
+.ai-teaser {
+  --ai-ink: #eaf0ff;
+  --ai-mute: rgba(234, 240, 255, 0.6);
+  --ai-faint: rgba(234, 240, 255, 0.36);
+  --ai-bg: linear-gradient(180deg, #0c1122 0%, #070a15 100%);
+  --ai-edge: rgba(255, 255, 255, 0.1);
+  --ai-gold: #e8c779;
+  --ai-hair: rgba(232, 199, 121, 0.24);
+  --ai-line: rgba(255, 255, 255, 0.07);
+  --ai-accent: var(--accent-cyan, #4fb8e0);
+  --ai-a: #8b5cf6;
+  --ai-b: #22d3ee;
+  --ai-field: rgba(255, 255, 255, 0.05);
+  --ai-field-hover: rgba(255, 255, 255, 0.09);
+  --ai-user: linear-gradient(135deg, rgba(34, 211, 238, 0.16), rgba(139, 92, 246, 0.22));
+  --ai-user-edge: rgba(139, 190, 255, 0.22);
+  --ai-card: rgba(255, 255, 255, 0.04);
+  --ai-code: rgba(0, 0, 0, 0.38);
+  --ai-warn: #f2b84b;
+  --ai-hot: #ff8c8c;
+  --ai-shadow: 0 34px 90px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+html[data-theme="light"] .ai-panel,
+html[data-theme="light"] .ai-chat-toggle-btn,
+html[data-theme="light"] .ai-teaser {
+  --ai-ink: var(--ink);
+  --ai-mute: var(--ink-2);
+  --ai-faint: rgba(var(--ink-rgb), 0.45);
+  --ai-bg: linear-gradient(180deg, var(--p0) 0%, var(--p1) 100%);
+  --ai-edge: rgba(var(--ink-rgb), 0.14);
+  --ai-gold: var(--amber);
+  --ai-hair: rgba(var(--amber-rgb), 0.4);
+  --ai-line: rgba(var(--ink-rgb), 0.09);
+  --ai-accent: var(--teal);
+  --ai-a: var(--violet);
+  --ai-b: var(--teal);
+  --ai-field: rgba(var(--ink-rgb), 0.05);
+  --ai-field-hover: rgba(var(--ink-rgb), 0.09);
+  --ai-user: linear-gradient(135deg, rgba(var(--teal-rgb), 0.14), rgba(var(--violet-rgb), 0.16));
+  --ai-user-edge: rgba(var(--teal-rgb), 0.3);
+  --ai-card: rgba(var(--ink-rgb), 0.045);
+  --ai-code: rgba(var(--ink-rgb), 0.08);
+  --ai-warn: #a86a00;
+  --ai-hot: #a8323a;
+  --ai-shadow: 0 30px 80px rgba(var(--shade-rgb), 0.35), 0 0 0 1px rgba(var(--ink-rgb), 0.04);
+}
+
+/* ── The orb ──────────────────────────────────────────────────────────────── */
+
+.ai-orb {
+  --s: 36px;
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--s);
+  height: var(--s);
+}
+
+.ai-orb[data-size="sm"] {
+  --s: 20px;
+}
+
+.ai-orb[data-size="lg"] {
+  --s: 52px;
+}
+
+.ai-orb[data-size="xl"] {
+  --s: 92px;
+}
+
+.ai-orb > span {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ai-orb-halo {
+  inset: -48%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--ai-b) 34%, transparent) 0, transparent 62%);
+  opacity: 0.5;
+  animation: ai-halo 5.5s ease-in-out infinite;
+}
+
+.ai-orb-core {
+  inset: 13%;
+  overflow: hidden;
+  background: radial-gradient(circle at 34% 28%, #fff 0, color-mix(in srgb, var(--ai-b) 70%, #fff) 13%, var(--ai-b) 38%, var(--ai-a) 74%, #1a1048 100%);
+  box-shadow: inset -5px -7px 12px rgba(8, 6, 30, 0.5), 0 0 16px color-mix(in srgb, var(--ai-a) 50%, transparent);
+  animation: ai-breath 5.5s ease-in-out infinite;
+}
+
+/* A slow light turning over the surface, so the sphere reads as something alive and not a flat gradient. */
+.ai-orb-core::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  background: conic-gradient(from 0deg, transparent 0 52%, rgba(255, 255, 255, 0.42) 68%, transparent 84%);
+  animation: ai-swirl 9s linear infinite;
+}
+
+.ai-orb-ring {
+  inset: 0;
+  border: 1px solid color-mix(in srgb, var(--ai-b) 38%, transparent);
+  animation: ai-orbit 16s linear infinite;
+}
+
+.ai-orb-ring::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--ai-gold);
+  box-shadow: 0 0 6px var(--ai-gold);
+}
+
+.ai-orb-ripple {
+  inset: 13%;
+  border: 1.5px solid var(--ai-b);
+  opacity: 0;
+}
+
+.ai-orb-bars {
+  inset: 31% 29%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.ai-orb-bars i {
+  display: block;
+  width: 2px;
+  height: 100%;
+  border-radius: 2px;
+  background: #fff;
+  transform: scaleY(0.25);
+}
+
+.ai-orb[data-size="sm"] .ai-orb-ring::after,
+.ai-orb[data-size="sm"] .ai-orb-bars {
+  display: none;
+}
+
+/* Thinking: the ring races and the core pulses. */
+.ai-orb[data-state="thinking"] .ai-orb-ring {
+  animation-duration: 1.5s;
+  border-color: var(--ai-b);
+}
+
+.ai-orb[data-state="thinking"] .ai-orb-core {
+  animation: ai-think 0.8s ease-in-out infinite alternate;
+}
+
+.ai-orb[data-state="thinking"] .ai-orb-halo {
+  opacity: 0.85;
+}
+
+/* Listening: ripples leave the core. */
+.ai-orb[data-state="listening"] .ai-orb-ripple {
+  animation: ai-ripple 1.4s ease-out infinite;
+}
+
+.ai-orb[data-state="listening"] .ai-orb-core {
+  animation: ai-think 0.6s ease-in-out infinite alternate;
+}
+
+/* Speaking: bars, moving. */
+.ai-orb[data-state="speaking"] .ai-orb-bars {
+  opacity: 1;
+}
+
+.ai-orb[data-state="speaking"] .ai-orb-bars i {
+  animation: ai-bar 0.7s ease-in-out infinite alternate;
+}
+
+.ai-orb[data-state="speaking"] .ai-orb-bars i:nth-child(2) {
+  animation-delay: -0.2s;
+}
+
+.ai-orb[data-state="speaking"] .ai-orb-bars i:nth-child(3) {
+  animation-delay: -0.45s;
+}
+
+.ai-orb[data-state="speaking"] .ai-orb-bars i:nth-child(4) {
+  animation-delay: -0.1s;
+}
+
+.ai-orb[data-state="speaking"] .ai-orb-bars i:nth-child(5) {
+  animation-delay: -0.35s;
+}
+
+.ai-orb[data-state="speaking"] .ai-orb-core {
+  animation: ai-think 1.1s ease-in-out infinite alternate;
+}
+
+/* Still: the small one beside a message. */
+.ai-orb[data-state="still"] * {
+  animation: none !important;
+}
+
+.ai-orb[data-state="still"] .ai-orb-halo {
+  opacity: 0.35;
+}
+
+@keyframes ai-breath {
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes ai-halo {
+  50% {
+    opacity: 0.8;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes ai-swirl {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ai-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ai-think {
+  from {
+    transform: scale(0.92);
+  }
+
+  to {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes ai-ripple {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+@keyframes ai-bar {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ── The launcher and its invitation ──────────────────────────────────────── */
+
+.ai-chat-toggle-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: var(--z-assistant);
+  display: block;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.ai-chat-toggle-btn .ai-orb {
+  --s: 56px;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 38%, #171d3a 0, #070a15 78%);
+  border: 1px solid var(--ai-hair);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 4px color-mix(in srgb, var(--ai-b) 8%, transparent);
+  transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.3s ease;
+}
+
+html[data-theme="light"] .ai-chat-toggle-btn .ai-orb {
+  background: radial-gradient(circle at 50% 38%, var(--p0) 0, var(--p2) 100%);
+  box-shadow: 0 10px 28px rgba(var(--shade-rgb), 0.28), 0 0 0 4px rgba(var(--teal-rgb), 0.1);
+}
+
+.ai-chat-toggle-btn:hover .ai-orb,
+.ai-chat-toggle-btn:focus-visible .ai-orb {
+  transform: scale(1.07);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.55), 0 0 0 5px color-mix(in srgb, var(--ai-b) 18%, transparent);
+}
+
+.ai-chat-toggle-btn:focus-visible {
+  outline: 2px solid var(--ai-accent);
+  outline-offset: 5px;
+}
+
+.ai-chat-toggle-btn.active {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.6);
+}
+
+/* Its name, to its left, when it is pointed at (absolute: the button's own box stays the size of the orb). */
+.ai-launcher-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border: 1px solid var(--ai-hair);
+  border-radius: 999px;
+  background: var(--ai-bg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  color: var(--ai-ink);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  translate: 10px -50%;
+  transition: opacity 0.25s ease, translate 0.35s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.ai-chat-toggle-btn:hover .ai-launcher-label,
+.ai-chat-toggle-btn:focus-visible .ai-launcher-label {
+  opacity: 1;
+  translate: 0 -50%;
+}
+
+.ai-launcher-label kbd,
+.ai-keys kbd,
+.ai-menu kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--ai-line);
+  border-radius: 4px;
+  background: var(--ai-field);
+  color: var(--ai-mute);
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+}
+
+.ai-teaser {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  z-index: var(--z-assistant);
+  display: flex;
+  align-items: stretch;
+  max-width: min(300px, calc(100vw - 48px));
+  border: 1px solid var(--ai-hair);
+  border-radius: 16px 16px 4px 16px;
+  background: var(--ai-bg);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5);
+  color: var(--ai-ink);
+  animation: ai-rise 0.6s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+.ai-teaser-open {
+  padding: 12px 6px 12px 16px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: 600 0.9rem/1.35 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ai-teaser-open:hover {
+  color: var(--ai-accent);
+}
+
+.ai-teaser-x {
+  display: grid;
+  place-items: start center;
+  width: 32px;
+  padding: 10px 0 0;
+  border: 0;
+  background: none;
+  color: var(--ai-faint);
+  cursor: pointer;
+}
+
+.ai-teaser-x svg,
+.ai-icon-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.ai-teaser-x:hover {
+  color: var(--ai-ink);
+}
+
+/* ── The panel ────────────────────────────────────────────────────────────── */
+
+.ai-panel {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: var(--z-assistant);
+  display: flex;
+  width: min(448px, calc(100vw - 28px));
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--ai-edge);
+  border-radius: 22px;
+  background: var(--ai-bg);
+  box-shadow: var(--ai-shadow);
+  color: var(--ai-ink);
+  font-family: var(--font-body);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(calc(100% + 28px)) scale(0.98);
+  transition: transform 0.55s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.3s ease, visibility 0s linear 0.55s;
+  will-change: transform;
+}
+
+.ai-panel[data-open] {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition: transform 0.55s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.3s ease, visibility 0s;
+}
+
+/* A thread of gold along the top edge. */
+.ai-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ai-gold), transparent);
+  opacity: 0.7;
+  z-index: 3;
+}
+
+/* Closed, nothing in it moves. */
+.ai-panel:not([data-open]) * {
+  animation-play-state: paused !important;
+}
+
+.ai-panel-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 38% at 100% 0%, color-mix(in srgb, var(--ai-a) 20%, transparent), transparent 70%),
+    radial-gradient(55% 34% at 0% 100%, color-mix(in srgb, var(--ai-b) 14%, transparent), transparent 70%),
+    radial-gradient(circle at 1px 1px, var(--ai-line) 1px, transparent 1.4px) 0 0 / 22px 22px;
+}
+
+.ai-panel > *:not(.ai-panel-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* The header holds the menu, which hangs over the conversation: it has to be above it. */
+.ai-panel > .ai-head {
+  z-index: 5;
+}
+
+/* Header */
+.ai-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 16px 14px 20px;
+  flex: none;
+}
+
+.ai-head-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.ai-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  color: var(--ai-ink);
+  text-shadow: none;
+}
+
+.ai-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 5px 0 0;
+  overflow: hidden;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ai-mute);
+}
+
+.ai-status span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-status i {
+  position: relative;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ai-faint);
+}
+
+.ai-status[data-live="live"] i {
+  background: #3ddc97;
+  box-shadow: 0 0 8px #3ddc97;
+}
+
+.ai-status[data-live="offline"] i {
+  background: var(--ai-warn);
+}
+
+.ai-status[data-busy] i::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  animation: ai-ping 1.2s ease-out infinite;
+}
+
+@keyframes ai-ping {
+  from {
+    opacity: 0.8;
+    transform: scale(0.6);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+.ai-head-actions {
+  display: flex;
+  flex: none;
+  gap: 4px;
+}
+
+.ai-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: none;
+  color: var(--ai-mute);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.ai-icon-btn:hover,
+.ai-icon-btn[aria-expanded="true"] {
+  border-color: var(--ai-line);
+  background: var(--ai-field);
+  color: var(--ai-ink);
+}
+
+.ai-icon-btn:active {
+  transform: scale(0.92);
+}
+
+.ai-icon-btn:focus-visible,
+.ai-chip:focus-visible,
+.ai-quick-tile:focus-visible,
+.ai-card:focus-visible,
+.ai-tools button:focus-visible,
+.ai-jump:focus-visible,
+.ai-slash:focus-visible,
+.ai-mic:focus-visible,
+.ai-send:focus-visible,
+.ai-menu button:focus-visible,
+.ai-menu a:focus-visible,
+.ai-code button:focus-visible {
+  outline: 2px solid var(--ai-accent);
+  outline-offset: 2px;
+}
+
+/* Menu */
+.ai-menu {
+  position: absolute;
+  top: calc(100% - 4px);
+  right: 14px;
+  z-index: 6;
+  width: 276px;
+  padding: 12px;
+  border: 1px solid var(--ai-hair);
+  border-radius: 16px;
+  background: var(--ai-bg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  animation: ai-pop 0.28s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  transform-origin: 100% 0;
+}
+
+@keyframes ai-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+}
+
+.ai-menu-label {
+  margin: 4px 0 6px;
+  font-family: var(--font-code);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ai-gold);
+}
+
+.ai-seg {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  margin-bottom: 8px;
+  border: 1px solid var(--ai-line);
+  border-radius: 12px;
+  background: var(--ai-field);
+}
+
+.ai-seg button {
+  flex: 1;
+  padding: 7px 4px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--ai-mute);
+  font: 600 0.78rem var(--font-body);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.ai-seg button[aria-checked="true"] {
+  background: color-mix(in srgb, var(--ai-accent) 22%, transparent);
+  color: var(--ai-ink);
+}
+
+.ai-menu-sep {
+  height: 1px;
+  margin: 6px 0;
+  background: var(--ai-line);
+}
+
+.ai-menu > button,
+.ai-menu > a {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ai-ink);
+  font: 500 0.88rem var(--font-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ai-menu > button:hover,
+.ai-menu > a:hover {
+  background: var(--ai-field-hover);
+}
+
+.ai-menu [data-danger] {
+  color: var(--ai-hot);
+}
+
+.ai-menu-keys {
+  margin: 8px 4px 0;
+  font-family: var(--font-code);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--ai-faint);
+}
+
+/* Where the visitor is */
+.ai-ctx {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+  padding: 0 20px;
+  border-top: 1px solid var(--ai-line);
+  border-bottom: 1px solid var(--ai-line);
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ai-mute);
+}
+
+.ai-ctx-here {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ai-ctx-here i {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ai-accent);
+  box-shadow: 0 0 8px var(--ai-accent);
+}
+
+.ai-ctx-tour,
+.ai-ctx-tone {
+  flex: none;
+  padding: 2px 8px;
+  border: 1px solid var(--ai-hair);
+  border-radius: 999px;
+  color: var(--ai-gold);
+}
+
+/* ── The conversation ─────────────────────────────────────────────────────── */
+
+.ai-scroll {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 20px 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ai-line) transparent;
+}
+
+.ai-scroll:focus {
+  outline: none;
+}
+
+.ai-msg {
+  animation: ai-rise 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+@keyframes ai-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.ai-time {
+  font-family: var(--font-code);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--ai-faint);
+}
+
+/* The visitor */
+.ai-msg-user {
+  display: flex;
+  max-width: 88%;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  align-self: flex-end;
+}
+
+.ai-user-bubble {
+  padding: 10px 15px;
+  border: 1px solid var(--ai-user-edge);
+  border-radius: 18px 18px 4px 18px;
+  background: var(--ai-user);
+  font-size: 1.02rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* The assistant: not a bubble, a column of text on a thread of gold. */
+.ai-bot-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.ai-bot-name {
+  font-family: var(--font-serif);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.ai-tag {
+  padding: 1px 7px;
+  border: 1px solid var(--ai-line);
+  border-radius: 999px;
+  font-family: var(--font-code);
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ai-mute);
+}
+
+.ai-msg[data-failed] .ai-bot-body {
+  border-left-color: var(--ai-hot);
+  color: var(--ai-mute);
+}
+
+.ai-bot-body {
+  margin-left: 9px;
+  padding-left: 18px;
+  border-left: 1px solid var(--ai-hair);
+  font-size: 1.04rem;
+  line-height: 1.58;
+  overflow-wrap: anywhere;
+}
+
+.ai-bot-body > * + * {
+  margin-top: 0.7em;
+}
+
+.ai-bot-body strong {
+  font-weight: 700;
+  color: var(--ai-ink);
+}
+
+.ai-bot-body em {
+  color: var(--ai-mute);
+}
+
+.ai-bot-body a {
+  color: var(--ai-accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--ai-accent) 40%, transparent);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.ai-bot-body a:hover {
+  text-decoration-color: var(--ai-accent);
+}
+
+.ai-bot-body h4 {
+  font-family: var(--font-code);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ai-gold);
+}
+
+.ai-bot-body blockquote {
+  padding-left: 12px;
+  border-left: 2px solid var(--ai-gold);
+  color: var(--ai-mute);
+}
+
+.ai-bot-body ul,
+.ai-bot-body ol {
+  padding: 0;
+  list-style: none;
+  counter-reset: ai-li;
+}
+
+.ai-bot-body li {
+  position: relative;
+  padding-left: 20px;
+}
+
+.ai-bot-body li + li {
+  margin-top: 0.3em;
+}
+
+.ai-bot-body ul > li::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  background: var(--ai-gold);
+  rotate: 45deg;
+}
+
+.ai-bot-body ol > li {
+  counter-increment: ai-li;
+}
+
+.ai-bot-body ol > li::before {
+  content: counter(ai-li);
+  position: absolute;
+  left: 0;
+  top: 0.16em;
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  color: var(--ai-gold);
+}
+
+.ai-bot-body :not(pre) > code {
+  padding: 1px 6px;
+  border: 1px solid var(--ai-line);
+  border-radius: 6px;
+  background: var(--ai-code);
+  font-family: var(--font-code);
+  font-size: 0.82em;
+}
+
+/* Code */
+.ai-code {
+  margin-left: 0;
+  overflow: hidden;
+  border: 1px solid var(--ai-line);
+  border-radius: 12px;
+  background: var(--ai-code);
+}
+
+.ai-code figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px 6px 14px;
+  border-bottom: 1px solid var(--ai-line);
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ai-mute);
+}
+
+.ai-code button {
+  padding: 3px 9px;
+  border: 1px solid var(--ai-line);
+  border-radius: 999px;
+  background: none;
+  color: var(--ai-mute);
+  font: 500 0.58rem var(--font-code);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.ai-code button:hover,
+.ai-code button[data-copied] {
+  border-color: var(--ai-accent);
+  color: var(--ai-accent);
+}
+
+.ai-code pre {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  tab-size: 2;
+  scrollbar-width: thin;
+}
+
+.ai-code pre:focus-visible {
+  outline: 2px solid var(--ai-accent);
+  outline-offset: -2px;
+}
+
+/* The text is still arriving */
+.ai-caret {
+  display: inline-block;
+  width: 7px;
+  height: 1.05em;
+  vertical-align: -0.15em;
+  background: var(--ai-accent);
+  animation: ai-blink 1s step-end infinite;
+}
+
+.ai-bot-body[data-streaming] > p:last-child::after,
+.ai-bot-body[data-streaming] > ul:last-child > li:last-child::after,
+.ai-bot-body[data-streaming] > ol:last-child > li:last-child::after {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 1.05em;
+  margin-left: 3px;
+  vertical-align: -0.15em;
+  background: var(--ai-accent);
+  animation: ai-blink 1s step-end infinite;
+}
+
+@keyframes ai-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Waiting for the first word */
+.ai-dots {
+  display: flex;
+  gap: 7px;
+  margin-left: 9px;
+  padding: 6px 0 6px 18px;
+  border-left: 1px solid var(--ai-hair);
+}
+
+.ai-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ai-accent);
+  animation: ai-dot 1.2s ease-in-out infinite both;
+}
+
+.ai-dots i:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.ai-dots i:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+@keyframes ai-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.7);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* What a reply pointed at */
+.ai-cards {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0 27px;
+}
+
+.ai-card {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px 8px 8px;
+  border: 1px solid var(--ai-line);
+  border-radius: 14px;
+  background: var(--ai-card);
+  color: var(--ai-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  animation: ai-rise 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 120ms);
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1), border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.ai-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--ai-hair);
+  background: var(--ai-field-hover);
+}
+
+.ai-card:active {
+  transform: scale(0.985);
+}
+
+.ai-card-thumb,
+.ai-card-sheet {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--ai-code);
+}
+
+.ai-card-sheet {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ai-line);
+  color: var(--ai-accent);
+}
+
+.ai-card-sheet svg {
+  width: 22px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ai-card-cv .cvd-icon {
+  width: 22px;
+  height: 26px;
+}
+
+.ai-card-body {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ai-card-body b {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ai-card-body i {
+  overflow: hidden;
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ai-mute);
+}
+
+.ai-card-go {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-code);
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ai-accent);
+}
+
+.ai-card-go svg,
+.ai-tools svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Copy, read aloud, answer again */
+.ai-tools {
+  display: flex;
+  gap: 2px;
+  margin: 8px 0 0 23px;
+  opacity: 0.5;
+  transition: opacity 0.25s ease;
+}
+
+.ai-msg-bot:hover .ai-tools,
+.ai-tools:focus-within {
+  opacity: 1;
+}
+
+.ai-tools button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 30px;
+  height: 30px;
+  justify-content: center;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--ai-mute);
+  font: 500 0.74rem var(--font-body);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.ai-tools button:hover,
+.ai-tools button[data-on] {
+  background: var(--ai-field-hover);
+  color: var(--ai-ink);
+}
+
+.ai-tools button[data-on] {
+  color: var(--ai-accent);
+}
+
+.ai-tools button:active {
+  transform: scale(0.9);
+}
+
+/* Things to say next */
+.ai-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 14px 0 0 27px;
+}
+
+.ai-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border: 1px solid var(--ai-line);
+  border-radius: 999px;
+  background: var(--ai-field);
+  color: var(--ai-ink);
+  font: 500 0.88rem/1.25 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  animation: ai-rise 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 160ms);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.2, 1), border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.ai-chip em {
+  font-family: var(--font-code);
+  font-size: 0.5rem;
+  font-style: normal;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ai-gold);
+}
+
+.ai-chip:hover {
+  transform: translateY(-2px);
+  border-color: var(--ai-hair);
+  background: var(--ai-field-hover);
+}
+
+.ai-chip:active {
+  transform: scale(0.97);
+}
+
+/* ── The first screen ─────────────────────────────────────────────────────── */
+
+.ai-welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 0 4px;
+  text-align: center;
+}
+
+.ai-welcome > * {
+  animation: ai-rise 0.7s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+.ai-welcome-orb {
+  margin: 14px 0 22px;
+  animation-delay: 0.05s;
+}
+
+.ai-welcome-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  color: var(--ai-ink);
+  text-shadow: none;
+  animation-delay: 0.14s;
+}
+
+.ai-welcome-expansion {
+  margin: 8px 0 0;
+  font-family: var(--font-code);
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ai-gold);
+  animation-delay: 0.2s;
+}
+
+.ai-welcome-body {
+  max-width: 34ch;
+  margin: 14px 0 0;
+  font-size: 1.04rem;
+  line-height: 1.5;
+  color: var(--ai-mute);
+  animation-delay: 0.26s;
+}
+
+.ai-quick {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 24px;
+  animation: none;
+}
+
+.ai-quick-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 12px 11px;
+  border: 1px solid var(--ai-line);
+  border-radius: 14px;
+  background: var(--ai-card);
+  color: var(--ai-ink);
+  text-align: left;
+  cursor: pointer;
+  animation: ai-rise 0.6s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 320ms);
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1), border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.ai-quick-tile b {
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.ai-quick-tile i {
+  font-family: var(--font-code);
+  font-size: 0.54rem;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ai-mute);
+}
+
+.ai-quick-tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--ai-hair);
+  background: var(--ai-field-hover);
+}
+
+.ai-quick-tile:active {
+  transform: scale(0.97);
+}
+
+.ai-chips-welcome {
+  justify-content: center;
+  margin: 18px 0 0;
+  animation: none;
+}
+
+.ai-panel .ai-jump {
+  position: absolute;
+  left: 50%;
+  bottom: 122px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--ai-hair);
+  border-radius: 999px;
+  background: var(--ai-bg);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+  color: var(--ai-ink);
+  font: 600 0.8rem var(--font-body);
+  cursor: pointer;
+  translate: -50% 0;
+  animation: ai-pop 0.3s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+/* ── The box you write in ─────────────────────────────────────────────────── */
+
+.ai-composer {
+  position: relative;
+  flex: none;
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--ai-line);
+}
+
+.ai-composer-box {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 7px 7px 7px 8px;
+  border: 1px solid var(--ai-edge);
+  border-radius: 20px;
+  background: var(--ai-field);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.ai-composer-box[data-focus] {
+  border-color: color-mix(in srgb, var(--ai-accent) 60%, transparent);
+  background: var(--ai-field-hover);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ai-accent) 14%, transparent);
+}
+
+.ai-composer-box[data-listening] {
+  border-color: var(--ai-gold);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ai-gold) 16%, transparent);
+}
+
+.ai-composer textarea {
+  flex: 1;
+  min-width: 0;
+  max-height: 132px;
+  padding: 8px 4px;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--ai-ink);
+  font: 400 1.04rem/1.4 var(--font-body);
+  resize: none;
+}
+
+.ai-composer textarea::placeholder {
+  color: var(--ai-faint);
+}
+
+.ai-slash,
+.ai-mic,
+.ai-send {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ai-mute);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.ai-slash {
+  font: 500 1rem var(--font-code);
+}
+
+.ai-slash:hover,
+.ai-mic:hover {
+  background: var(--ai-field-hover);
+  color: var(--ai-ink);
+}
+
+.ai-mic svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.ai-mic[data-on] {
+  background: color-mix(in srgb, var(--ai-gold) 22%, transparent);
+  color: var(--ai-gold);
+}
+
+.ai-send svg {
+  width: 36px;
+  height: 36px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+.ai-send-track {
+  stroke: var(--ai-line);
+  stroke-width: 2;
+}
+
+.ai-send-fill,
+.ai-send-spin {
+  stroke: var(--ai-accent);
+  stroke-width: 2;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 0.15s linear, stroke 0.2s ease;
+}
+
+.ai-send-spin {
+  stroke-dasharray: 22 80;
+  animation: ai-spin 0.9s linear infinite;
+}
+
+.ai-stop svg rect {
+  fill: currentColor;
+  stroke: none;
+}
+
+@keyframes ai-spin {
+  to {
+    transform: rotate(270deg);
+  }
+}
+
+.ai-send:not(:disabled) {
+  background: radial-gradient(circle, color-mix(in srgb, var(--ai-accent) 24%, transparent), transparent 72%);
+  color: var(--ai-accent);
+}
+
+.ai-send:not(:disabled):hover {
+  transform: scale(1.08);
+}
+
+.ai-send:not(:disabled):active {
+  transform: scale(0.92);
+}
+
+.ai-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ai-send[data-warn="warm"] .ai-send-fill {
+  stroke: var(--ai-warn);
+}
+
+.ai-send[data-warn="hot"] .ai-send-fill {
+  stroke: var(--ai-hot);
+}
+
+.ai-composer-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 18px;
+  margin: 8px 6px 0;
+  font-family: var(--font-code);
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  color: var(--ai-faint);
+}
+
+.ai-keys {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.ai-keys kbd + kbd {
+  margin-left: 6px;
+}
+
+.ai-left {
+  color: var(--ai-warn);
+}
+
+.ai-left[data-hot] {
+  color: var(--ai-hot);
+}
+
+/* The list of commands */
+.ai-palette {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: calc(100% - 4px);
+  z-index: 5;
+  max-height: 268px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  border: 1px solid var(--ai-hair);
+  border-radius: 16px;
+  background: var(--ai-bg);
+  box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.5);
+  list-style: none;
+  animation: ai-pop-up 0.25s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  transform-origin: 50% 100%;
+}
+
+@keyframes ai-pop-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
+.ai-palette li {
+  display: grid;
+  grid-template-columns: 26px auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.ai-palette li[data-active] {
+  background: color-mix(in srgb, var(--ai-accent) 16%, transparent);
+}
+
+.ai-palette-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--ai-line);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: var(--ai-gold);
+}
+
+.ai-palette-name {
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  color: var(--ai-ink);
+}
+
+.ai-palette-name small {
+  color: var(--ai-faint);
+  font-size: 0.7rem;
+}
+
+.ai-palette-hint {
+  overflow: hidden;
+  font-size: 0.86rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ai-mute);
+}
+
+/* ── Phones: the panel is the screen ──────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .ai-panel {
+    inset: 0;
+    width: auto;
+    border: 0;
+    border-radius: 0;
+    transform: translateY(100%);
+  }
+
+  .ai-panel[data-open] {
+    transform: none;
+  }
+
+  .ai-head {
+    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  }
+
+  .ai-icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .ai-composer {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ai-composer textarea {
+    font-size: 16px;
+  }
+
+  .ai-slash,
+  .ai-mic,
+  .ai-send {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ai-send svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ai-keys {
+    display: none;
+  }
+
+  /* The Lite toggle floats over the panel on a phone: it can wait. */
+  body.ai-chat-sidebar-open .lite-root {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ai-chat-toggle-btn {
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .ai-launcher-label {
+    display: none;
+  }
+
+  .ai-teaser {
+    right: 16px;
+    bottom: 84px;
+  }
+
+  .ai-jump {
+    bottom: 112px;
+  }
+
+  .ai-tools {
+    opacity: 1;
+  }
+
+  .ai-menu {
+    right: 10px;
+    width: min(300px, calc(100vw - 20px));
+  }
+}
+
+@media (max-width: 400px) {
+  .ai-quick {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ai-card-go {
+    display: none;
+  }
+
+  .ai-welcome-title {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-height: 640px) {
+  .ai-welcome-orb {
+    margin: 4px 0 12px;
+  }
+
+  .ai-welcome-orb .ai-orb {
+    --s: 64px;
+  }
+
+  .ai-welcome-body {
+    margin-top: 8px;
+  }
+
+  .ai-quick {
+    margin-top: 14px;
+  }
+}
+
+/* Lite: the orb keeps its shape and loses its loops. */
+html[data-lite="1"] .ai-orb-halo,
+html[data-lite="1"] .ai-orb-core,
+html[data-lite="1"] .ai-orb-core::before,
+html[data-lite="1"] .ai-orb-ring {
+  animation: none;
+}
+
+html[data-lite="1"] .ai-orb[data-state="thinking"] .ai-orb-ring,
+html[data-lite="1"] .ai-orb[data-state="speaking"] .ai-orb-bars i {
+  animation: revert;
+}
+
+/* Calm: nothing moves by itself and nothing slides; everything is simply there. */
+@media (prefers-reduced-motion: reduce) {
+  .ai-panel,
+  .ai-panel *,
+  .ai-teaser,
+  .ai-teaser *,
+  .ai-chat-toggle-btn,
+  .ai-chat-toggle-btn * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .ai-panel {
+    transform: none;
+  }
+
+  .ai-orb-bars {
+    opacity: 0;
+  }
+
+  .ai-orb[data-state="speaking"] .ai-orb-bars {
+    opacity: 1;
+  }
+
+  .ai-orb[data-state="speaking"] .ai-orb-bars i {
+    transform: scaleY(0.7);
+  }
+}

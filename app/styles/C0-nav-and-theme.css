@@ -465,6 +465,15 @@ html[data-theme="light"] body::before {
   opacity: 1;
 }
 
+/* While the theme changes (lib/themeTransition.ts sets the attribute) nothing transitions: the new theme is final the
+   moment it is applied, and the 0.4s colour fades above would make every element re-style and repaint for nothing. */
+html[data-theme-switching],
+html[data-theme-switching] *,
+html[data-theme-switching] *::before,
+html[data-theme-switching] *::after {
+  transition: none !important;
+}
+
 /* The theme switch (lib/themeTransition.ts): the browser holds the old page as a picture and the new one
    is revealed through a growing circle (animated from script), so neither picture may fade or blend. */
 ::view-transition-old(root),

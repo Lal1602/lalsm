@@ -27,6 +27,8 @@ uniform sampler2D uConst; // constellations, painted once on a 2D canvas (premul
 uniform vec2  uNebMap;    // scale and offset into the (taller) nebula texture, see SpaceRenderer
 uniform vec4  uComet;     // start x, start y, direction x, direction y (world css px)
 uniform float uPaper;     // 1 on the light theme: stars are specks of ink, not points of light
+uniform vec2  uLens;      // the pointer in this slot's own css px (y down)
+uniform vec2  uLensAmp;   // how far the gas leans away from the pointer at its centre, css px (0 = no lens)
 
 float hash21(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -46,7 +48,18 @@ vec3 tone(float pick, float xN) {
 
 void main() {
   vec2 uv = gl_FragCoord.xy / uRes;
-  vec4 neb = texture2D(uNeb, vec2(uv.x, uv.y * uNebMap.x + uNebMap.y));
+
+  // The pointer's push: the gas is read from a little further out than where it is drawn, so it leans toward
+  // the pointer's side of the lens, softly (this is where the old shader pushed its noise coordinates).
+  vec2 nuv = uv;
+  if (uLensAmp.x > 0.0) {
+    vec2 cp = vec2(uv.x, 1.0 - uv.y) * uCss;
+    vec2 dp = cp - uLens;
+    float dl = length(dp) + 0.001;
+    vec2 sh = (dp / dl) * exp(-dl * dl / 32000.0) * uLensAmp;
+    nuv += vec2(sh.x / uCss.x, -sh.y / uCss.y);
+  }
+  vec4 neb = texture2D(uNeb, vec2(nuv.x, nuv.y * uNebMap.x + uNebMap.y));
 
   vec2 css = vec2(uv.x, 1.0 - uv.y) * uCss;
   vec2 w = vec2(css.x, css.y + uOrigin.y);

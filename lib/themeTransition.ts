@@ -6,23 +6,46 @@
  */
 interface ViewTransitionLike {
   ready: Promise<void>;
+  finished: Promise<void>;
 }
 
 const DURATION_MS = 900;
 
+/**
+ * While the theme is changing, `data-theme-switching` is on <html> and the stylesheet switches off every CSS
+ * transition (C0-nav-and-theme.css). The page has a 0.4s colour transition on nearly every element, which is right
+ * for a hover and wrong here: the new theme is captured the moment it is applied, and every element underneath
+ * would otherwise spend the next 0.4s re-styling and re-painting itself on the way to a colour the picture already
+ * shows. That, on thousands of elements at once, is what made the switch a slideshow.
+ */
+const SWITCHING = "data-theme-switching";
+
 export function switchTheme(change: () => void, origin?: { x: number; y: number }): void {
   const doc = document as Document & { startViewTransition?: (update: () => void) => ViewTransitionLike };
-  const calm =
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-    document.documentElement.getAttribute("data-lite") === "1";
+  const root = document.documentElement;
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches || root.getAttribute("data-lite") === "1";
+
+  root.setAttribute(SWITCHING, "");
+  let released = false;
+  const release = () => {
+    if (released) return;
+    released = true;
+    root.removeAttribute(SWITCHING);
+  };
+  // Whatever happens, the switch is over after this.
+  window.setTimeout(release, DURATION_MS + 1200);
+
   if (!doc.startViewTransition || calm) {
     change();
+    // The change is applied in this frame; the transitions come back once it has been painted.
+    requestAnimationFrame(() => requestAnimationFrame(release));
     return;
   }
   const x = origin?.x ?? window.innerWidth - 80;
   const y = origin?.y ?? 40;
   const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
   const transition = doc.startViewTransition(change);
+  void transition.finished.then(release, release);
   void transition.ready
     .then(() => {
       document.documentElement.animate(

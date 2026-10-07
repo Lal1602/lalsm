@@ -16,6 +16,7 @@ import "./styles/80-achievements.css";
 import "./styles/90-horizon.css";
 import "./styles/95-seam-and-career.css";
 import "./styles/96-cv-download.css";
+import "./styles/97-ai-chat.css";
 import "./styles/A0-projects.css";
 import "./styles/B0-responsive.css";
 import "./styles/C0-nav-and-theme.css";

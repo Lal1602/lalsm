@@ -1,4 +1,5 @@
 import type { ChatAction } from "./actions";
+import { openCvChooser } from "@/lib/cv/chooser";
 
 /**
  * Applies the assistant's navigation actions to the live page. Client only.
@@ -43,6 +44,11 @@ function runAction(action: ChatAction) {
       // The film strip is a WebGL scene with no DOM cards to click, so the
       // projects section listens for this event and opens its own modal.
       window.dispatchEvent(new CustomEvent(OPEN_PROJECT_EVENT, { detail: { title: action.title } }));
+      return;
+
+    case "cv":
+      // The same chooser as the nav pill, the hero button and the edge tab.
+      openCvChooser("assistant");
       return;
 
     case "achievement": {

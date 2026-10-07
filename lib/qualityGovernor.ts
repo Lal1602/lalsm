@@ -118,6 +118,8 @@ export interface QualityPreset {
   nebulaOctaves: number;
   /** Frame cap for ambient (non-interactive) animation. Slow drift needs no more. */
   idleFps: number;
+  /** Frame cap for the pointer's push on the nebula, which is interactive and so runs well above the ambient rate. */
+  lensFps: number;
   /** Multiplier on particle counts. */
   particles: number;
   /** Resolution multiplier for the Horizon tube background (a soft glow, so it takes less before it shows). */
@@ -125,8 +127,8 @@ export interface QualityPreset {
 }
 
 export const QUALITY_PRESETS: Record<QualityTier, QualityPreset> = {
-  0: { dpr: 1.5, nebulaScale: 0.46, nebulaOctaves: 3, idleFps: 12, particles: 1, tubeScale: 1 },
-  1: { dpr: 1.25, nebulaScale: 0.4, nebulaOctaves: 3, idleFps: 12, particles: 0.8, tubeScale: 0.85 },
-  2: { dpr: 1, nebulaScale: 0.32, nebulaOctaves: 2, idleFps: 10, particles: 0.55, tubeScale: 0.7 },
-  3: { dpr: 1, nebulaScale: 0.26, nebulaOctaves: 2, idleFps: 8, particles: 0.35, tubeScale: 0.55 },
+  0: { dpr: 1.5, nebulaScale: 0.46, nebulaOctaves: 3, idleFps: 12, lensFps: 60, particles: 1, tubeScale: 1 },
+  1: { dpr: 1.25, nebulaScale: 0.4, nebulaOctaves: 3, idleFps: 12, lensFps: 60, particles: 0.8, tubeScale: 0.85 },
+  2: { dpr: 1, nebulaScale: 0.32, nebulaOctaves: 2, idleFps: 10, lensFps: 40, particles: 0.55, tubeScale: 0.7 },
+  3: { dpr: 1, nebulaScale: 0.26, nebulaOctaves: 2, idleFps: 8, lensFps: 30, particles: 0.35, tubeScale: 0.55 },
 };

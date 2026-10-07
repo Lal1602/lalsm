@@ -17,6 +17,9 @@
  *   3. dust: soft dark patches that dim layers 1 and 2;
  *   4. wisps: thin, soft, brighter threads of a second hue in front of the dust.
  *
+ * (The pointer's push on the gas is not here: it is applied where this texture is read, in stars.frag.ts, so that it can
+ * follow the pointer at the display's rate without this shader having to run any faster than the drift needs.)
+ *
  * Everything is a function of WORLD coordinates (css px, x from the left edge of
  * the page, y relative to the seam line), so the half above a seam and the half
  * below it sample the very same field and meet by construction.
@@ -47,8 +50,6 @@ uniform vec2  uOrigin;   // world position (css px) of the slot's top-left corne
 uniform float uWidth;    // full page width in css px (for horizontal palette runs)
 uniform float uTime;
 uniform float uScroll;   // window.scrollY in css px (0 for the still frame)
-uniform vec2  uPointer;  // pointer in world css px
-uniform float uPointerAmt;
 uniform float uOct;      // base octave count (the gas body uses this + 2)
 uniform float uPalette;  // 0 = blue / violet / magenta, 1 = amber / gold / mint / cyan
 uniform float uBand;     // half-height of the bright core of the band, css px
@@ -122,11 +123,6 @@ void main() {
   // field is scaled up as the page gets narrower (both halves share uWidth).
   float k = clamp(1440.0 / uWidth, 1.0, 2.4);
   vec2 p = vec2(w.x * 0.0022 * k, yRel * 0.0034 * k);
-
-  // A soft push away from the pointer.
-  vec2 dp = w - uPointer;
-  float dl = length(dp) + 0.001;
-  p += (dp / dl) * exp(-dl * dl / 32000.0) * 0.07 * uPointerAmt;
 
   float env  = exp(-pow(yRel / uBand, 2.0));                 // bright core
   float envW = exp(-pow(yRel / (uExtent * 0.58), 2.0));      // wide skirt

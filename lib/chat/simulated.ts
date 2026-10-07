@@ -1,5 +1,8 @@
 import { projects } from "@/data/projects";
 import { achievements } from "@/data/achievements";
+import type { SectionId } from "./actions";
+import { suggestionsFor } from "./context";
+import { tonify, type Tone } from "./tone";
 import type { ChatHistoryItem } from "./validate";
 
 /**
@@ -41,7 +44,19 @@ function findAchievementTitle(match: string): string | undefined {
 
 const BLOCKED_PROBES = ["system prompt", "system instruction", "jailbreak", "ignore previous", "kamu adalah asisten", "prompt rahasia"];
 
-export function getSimulatedReply(message: string, history: ChatHistoryItem[] = []): SimulatedReply {
+export interface SimulatedOptions {
+  tone?: Tone;
+  /** Where the visitor is, for the suggestions when nothing in the question matched. */
+  section?: SectionId;
+}
+
+/** The offline answer, dressed in the tone the visitor chose (the live model does that for real). */
+export function getSimulatedReply(message: string, history: ChatHistoryItem[] = [], options: SimulatedOptions = {}): SimulatedReply {
+  const reply = baseReply(message, history, options.section);
+  return options.tone && options.tone !== "default" ? { ...reply, reply: tonify(reply.reply, options.tone) } : reply;
+}
+
+function baseReply(message: string, history: ChatHistoryItem[], section?: SectionId): SimulatedReply {
   const msg = message.toLowerCase();
 
   if (BLOCKED_PROBES.some((p) => msg.includes(p))) {
@@ -49,6 +64,14 @@ export function getSimulatedReply(message: string, history: ChatHistoryItem[] = 
       reply:
         "Maaf, saya tidak dapat membagikan instruksi internal atau rahasia sistem saya. Namun, saya sangat senang mendiskusikan keahlian teknologi web Bilal atau membantu Anda menjelajahi website ini!",
       suggestions: ["Apa saja keahlian coding Bilal?", "Tunjukkan proyek game buatanmu", "Bagaimana cara menghubungi Bilal?"],
+    };
+  }
+
+  if (has(msg, "cv", "resume", "curriculum", "berkas lamaran", "riwayat hidup")) {
+    return {
+      reply:
+        "CV Bilal tersedia dalam dua edisi, bahasa Indonesia dan Inggris, keduanya PDF dua halaman dengan isi yang sama. Aku bukakan pilihannya. [ACTION:OPEN_CV]",
+      suggestions: ["Apa saja keahlian coding Bilal?", "Tunjukkan proyek di CV-nya", "Bagaimana cara menghubungi Bilal?"],
     };
   }
 
@@ -172,16 +195,16 @@ export function getSimulatedReply(message: string, history: ChatHistoryItem[] = 
   if (has(msg, "python", "ai", "computer vision", "opencv", "mediapipe", "isyarat", "bisindo")) {
     return {
       reply:
-        "Selain Web Dev, Bilal sedang mengembangkan program Hand Gesture Recognition dengan Python, OpenCV, dan MediaPipe. Tujuannya menerjemahkan bahasa isyarat menjadi subtitle secara real-time.",
-      suggestions: ["Bagaimana detail Hand Gesture Recognition?", "Apakah ini proyek UKM?", "Tunjukkan proyek web"],
+        "Selain web, Bilal mengerjakan Sign Language Recognition System: aplikasi interpretasi bahasa isyarat real-time berbasis kamera dengan Python, OpenCV, dan MediaPipe. Ia juga belajar BISINDO, bahasa isyarat Indonesia.",
+      suggestions: ["Apa saja keahlian coding Bilal?", "Tunjukkan CV-nya", "Tunjukkan proyek web"],
     };
   }
 
   if (has(msg, "organisasi", "ukm", "softdev", "helpdesk")) {
     return {
       reply:
-        "Bilal aktif di UKM Softdev dan sedang mengerjakan proyek HelpDesk kolaboratif menggunakan React, Vite, dan Node.js bersama timnya.",
-      suggestions: ["Apa tugas Bilal di UKM Softdev?", "Buka proyek kolaboratif", "Keahlian coding Bilal"],
+        "Bilal aktif sebagai pengembang di UKM Software Development (Softdev) PENS dan ikut membangun sistem HelpDesk UKM Softdev, dari arsitektur frontend sampai backend: API dan dashboard yang responsif.",
+      suggestions: ["Tunjukkan CV-nya", "Apa saja keahlian coding Bilal?", "Tunjukkan galeri proyek"],
     };
   }
 
@@ -268,6 +291,6 @@ export function getSimulatedReply(message: string, history: ChatHistoryItem[] = 
   return {
     reply:
       "Saya mengerti! Sebagai asisten virtual Bilal, saya bisa bercerita soal keahliannya di Next.js & Three.js/GSAP, kuliahnya di PENS, prestasi LKS Web Technologies, hobi mendaki gunung, hingga proyek-proyek di galeri ini. Silakan tanyakan salah satunya!",
-    suggestions: ["Apa saja keahlian coding Bilal?", "Tunjukkan galeri proyeknya", "Ceritakan tentang kuliahnya di PENS"],
+    suggestions: suggestionsFor(section, "id"),
   };
 }
