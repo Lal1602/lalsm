@@ -102,6 +102,35 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <p>{project.fullDesc}</p>
       </section>
 
+      {project.screenshots && project.screenshots.length > 0 && (
+        <section className="case-section case-gallery-section" aria-label="Project Visual Record">
+          <div className="case-gallery-header">
+            <h2>Visual Record & Field Captures</h2>
+            <p className="case-gallery-meta">
+              {project.screenshots.length} CAPTURES // OBSERVATORY SPECIMEN
+            </p>
+          </div>
+          <div className="case-gallery-grid">
+            {project.screenshots.map((item, idx) => (
+              <figure key={idx} className="case-gallery-figure">
+                <div className="case-gallery-img-wrap">
+                  <Image
+                    src={item.image}
+                    alt={item.alt || item.caption}
+                    fill
+                    sizes="(max-width: 900px) 100vw, 50vw"
+                  />
+                </div>
+                <figcaption className="case-gallery-caption">
+                  <span className="case-gallery-tag">FIG. {String(idx + 1).padStart(2, "0")}</span>
+                  <span className="case-gallery-text">{item.caption}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+
       <nav className="case-pager" aria-label="More projects">
         <Link href={`/projects/${adjacent.prev.slug}`}>
           <small>← Previous</small>

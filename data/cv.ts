@@ -241,6 +241,12 @@ export const cv: Record<CvLang, CvContent> = {
         period: "2026",
         bullets: ["Involved in the campus orientation programme."],
       },
+      {
+        title: "Intern",
+        org: "DPTSI (Directorate of Technology and Information Systems Development), ITS",
+        period: "Jan – Apr 2024 · Jun – Sep 2024",
+        bullets: ["Six months of internship, in two periods, based in the Research Center building of Institut Teknologi Sepuluh Nopember (ITS)."],
+      },
     ],
     projects: [
       {
@@ -340,6 +346,12 @@ export const cv: Record<CvLang, CvContent> = {
         org: "PKKMB x Technogear PENS 2026",
         period: "2026",
         bullets: ["Terlibat dalam agenda orientasi kampus."],
+      },
+      {
+        title: "Magang",
+        org: "DPTSI (Direktorat Pengembangan Teknologi dan Sistem Informasi), ITS",
+        period: "Jan – Apr 2024 · Jun – Sep 2024",
+        bullets: ["Magang selama enam bulan, dalam dua periode, bertempat di Gedung Riset/Research Center Institut Teknologi Sepuluh Nopember (ITS)."],
       },
     ],
     projects: [

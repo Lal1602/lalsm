@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { projects } from "../../data/projects";
 
 test.describe("pages", () => {
   test("home page renders with metadata and a working skip link", async ({ page }) => {
@@ -248,7 +249,7 @@ test.describe("project plates", () => {
     await page.keyboard.press("ArrowLeft");
     await page.keyboard.press("ArrowLeft");
     // From the first plate, left goes to the last: the rail is a loop.
-    await expect(page.locator(".plate-eyebrow")).toContainText("PLATE 18");
+    await expect(page.locator(".plate-eyebrow")).toContainText(`PLATE ${projects.length}`);
     await page.keyboard.press("Home");
     await expect(page.locator(".plate-title")).toHaveText("Herbal Mart");
     await page.keyboard.press("Enter");

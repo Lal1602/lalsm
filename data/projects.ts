@@ -4,6 +4,12 @@
  * read from here — add a project once and it shows up everywhere.
  */
 
+export interface ProjectScreenshot {
+  image: string;
+  caption: string;
+  alt?: string;
+}
+
 export interface Project {
   /** URL-safe id used by /projects/[slug]. */
   slug: string;
@@ -15,6 +21,8 @@ export interface Project {
   image: string;
   /** Live demo URL. Empty string when the project has no public deployment. */
   link: string;
+  /** High-resolution gallery screenshots with descriptive captions. */
+  screenshots?: ProjectScreenshot[];
 }
 
 type ProjectInput = Omit<Project, "slug">;
@@ -169,6 +177,66 @@ const entries: ProjectInput[] = [
     "tech": "Tailwind CSS, GSAP, Lenis, SVG Parallax",
     "image": "/images/project-img/lumiera.jpg",
     "link": "https://lumiera.netlify.app"
+  },
+  {
+    "title": "Isyarat · BisindoCam",
+    "desc": "Real-time Indonesian Sign Language (BISINDO) translation running entirely on-device with MediaPipe and ONNX neural models.",
+    "fullDesc": "Isyarat is an on-device machine learning application that translates Indonesian Sign Language (BISINDO) into text and speech in real time. Built with Next.js and React Three Fiber, it features client-side MediaPipe landmark extraction, quantized ONNX models (Letter MLP & BiGRU WordNet), a 3D animated sign dictionary covering 63 words, and two-way signer-to-listener conversation mode with zero server latency.",
+    "tech": "Next.js, React, MediaPipe, ONNX Runtime, Three.js, TypeScript",
+    "image": "/images/project-img/bisindocam-home.png",
+    "link": "https://bisindo-cam.vercel.app/",
+    "screenshots": [
+      {
+        "image": "/images/project-img/bisindocam-home.png",
+        "caption": "Home Hero — 3D interactive hand model and real-time landmark visualization",
+        "alt": "Isyarat BisindoCam 3D Interactive Hero"
+      },
+      {
+        "image": "/images/project-img/bisindocam-translate.png",
+        "caption": "Translate Mode — Real-time camera recognition for BISINDO fingerspelling and word vocabulary",
+        "alt": "Isyarat BisindoCam Live Translation"
+      },
+      {
+        "image": "/images/project-img/bisindocam-dictionary.png",
+        "caption": "Sign Dictionary — Interactive 3D animated sign browser with looping hand gestures",
+        "alt": "Isyarat BisindoCam 3D Dictionary"
+      },
+      {
+        "image": "/images/project-img/bisindocam-conversation.png",
+        "caption": "Conversation Mode — Two-way signer session with speech synthesis and dual transcripts",
+        "alt": "Isyarat BisindoCam Conversation Mode"
+      }
+    ]
+  },
+  {
+    "title": "Pasang · Sea Almanac",
+    "desc": "A living oceanic almanac where scrolling dives from real-time sea level to Challenger Deep (10,935 m) with lunar tides and depth physics.",
+    "fullDesc": "A living oceanic almanac and deep-sea simulation where scrolling plunges from the water surface down to Challenger Deep (10,935 m). Features real-time local sky gradients, astronomical lunar phase calculation, procedural waves with M2 tidal cycles, wavelength absorption physics (Sunlight Zone), Verlet-chain bioluminescent deep-sea fauna (Midnight Zone), and precision hydrographic sounding instruments (The Abyss).",
+    "tech": "Next.js, TypeScript, HTML5 Canvas, WebGL, Web Audio API",
+    "image": "/images/project-img/pasang-hero.jpg",
+    "link": "https://pasang-one.vercel.app/",
+    "screenshots": [
+      {
+        "image": "/images/project-img/pasang-hero.jpg",
+        "caption": "Surface Horizon — Real-time local sky gradient, calculated lunar phase, and M2 tidal oscillation",
+        "alt": "Pasang Surface Horizon and Astronomical Moon Phase"
+      },
+      {
+        "image": "/images/project-img/pasang-sunlight.jpg",
+        "caption": "Sunlight Zone (0–200 m) — Depth-dependent light wavelength absorption and schooling fish physics",
+        "alt": "Pasang Sunlight Zone Light Absorption"
+      },
+      {
+        "image": "/images/project-img/pasang-midnight.jpg",
+        "caption": "Midnight Zone (1,000–4,000 m) — Dynamic torchlight revealing bioluminescent fauna with Verlet physics",
+        "alt": "Pasang Midnight Zone Bioluminescent Fauna"
+      },
+      {
+        "image": "/images/project-img/pasang-abyss.jpg",
+        "caption": "The Abyss (4,000–10,935 m) — Hydrographic sounding sheet with inverted Everest scale and pressure gauges",
+        "alt": "Pasang The Abyss Sounding Sheet"
+      }
+    ]
   },
 ];
 

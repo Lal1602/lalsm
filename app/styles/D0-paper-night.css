@@ -414,6 +414,44 @@ html[data-theme="light"] .btn-launch-live:hover {
   box-shadow: none;
 }
 
+html[data-theme="light"] .modal-screenshot-hud {
+  background: rgba(246, 244, 239, 0.94);
+  border-color: rgba(var(--ink-rgb), 0.14);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] .modal-screenshot-fig {
+  color: var(--teal);
+}
+
+html[data-theme="light"] .modal-screenshot-label {
+  color: var(--ink);
+}
+
+html[data-theme="light"] .modal-screenshot-controls {
+  border-top-color: rgba(var(--ink-rgb), 0.08);
+}
+
+html[data-theme="light"] .modal-screenshot-nav-btn {
+  background: rgba(var(--ink-rgb), 0.05);
+  border-color: rgba(var(--ink-rgb), 0.12);
+  color: var(--ink);
+}
+
+html[data-theme="light"] .modal-screenshot-nav-btn:hover {
+  background: var(--ink);
+  color: var(--p0);
+}
+
+html[data-theme="light"] .modal-screenshot-dot {
+  background: rgba(var(--ink-rgb), 0.2);
+}
+
+html[data-theme="light"] .modal-screenshot-dot.is-active {
+  background: var(--ink);
+  box-shadow: none;
+}
+
 /* ── 20-marquee-footer.css ── */
 
 html[data-theme="light"] .kinetic-marquee-container {
