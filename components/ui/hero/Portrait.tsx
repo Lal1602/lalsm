@@ -22,7 +22,7 @@ export default function Portrait({ name }: { name: string }) {
         <div className="hx-portrait-in">
           <Image
             className="hx-photo"
-            src="/mee.jpeg"
+            src="/bilal2026.jpeg"
             alt={`Portrait of ${name}`}
             fill
             sizes="(max-width: 860px) 240px, 760px"

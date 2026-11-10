@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { GoogleGenAI, type Content } from "@google/genai";
 import { NextResponse } from "next/server";
 import { buildSystemInstruction } from "@/lib/chat/prompt";
@@ -10,10 +12,42 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
+ * Resolves the Gemini API key, preferring the project-level .env / .env.local file
+ * so an unrelated system-wide environment variable does not shadow the configured key.
+ */
+function resolveApiKey(): string | undefined {
+  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.startsWith("AIzaSy")) {
+    return process.env.GEMINI_API_KEY;
+  }
+  try {
+    for (const filename of [".env.local", ".env"]) {
+      const fullPath = path.resolve(/*turbopackIgnore: true*/ process.cwd(), filename);
+      if (fs.existsSync(fullPath)) {
+        const content = fs.readFileSync(fullPath, "utf8");
+        const match = content.match(/^GEMINI_API_KEY=(.*)$/m);
+        if (match && match[1]?.trim()) {
+          const val = match[1].trim().replace(/^["']|["']$/g, "");
+          if (val) return val;
+        }
+      }
+    }
+  } catch {
+    // Fall back to process.env if filesystem access is restricted
+  }
+  return process.env.GEMINI_API_KEY;
+}
+
+/**
  * Models are tried in order until one answers. Override with GEMINI_MODELS
  * (comma separated) — keep it to models that support systemInstruction.
  */
-const DEFAULT_MODELS = ["gemini-flash-latest", "gemini-2.5-flash-lite"];
+const DEFAULT_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-3.5-flash",
+  "gemini-3.5-flash-lite",
+  "gemini-flash-lite-latest",
+];
 const MODELS = (process.env.GEMINI_MODELS ?? "")
   .split(",")
   .map((m) => m.trim())
@@ -57,7 +91,8 @@ function json(body: unknown, status = 200, headers: Record<string, string> = {})
  * (and say "offline" when it is not) instead of finding out from an answer. Reveals no key and no setting.
  */
 export async function GET() {
-  const live = Boolean(process.env.GEMINI_API_KEY);
+  const apiKey = resolveApiKey();
+  const live = Boolean(apiKey);
   return json({ live });
 }
 
@@ -84,7 +119,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = resolveApiKey();
   if (!apiKey) {
     console.warn("GEMINI_API_KEY is not set; answering from the local simulation.");
     return json({ ...getSimulatedReply(message, history, { tone, section }), source: "simulated" });

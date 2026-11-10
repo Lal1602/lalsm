@@ -192,7 +192,15 @@ function baseReply(message: string, history: ChatHistoryItem[], section?: Sectio
     };
   }
 
-  if (has(msg, "python", "ai", "computer vision", "opencv", "mediapipe", "isyarat", "bisindo")) {
+  if (has(msg, "kamu siapa", "siapa kamu", "siapa anda", "apakah kamu ai", "kamu ai", "ini ai", "model apa", "static message", "bot", "b.i.l.a.l", "bilal ai")) {
+    return {
+      reply:
+        "Saya adalah B.I.L.A.L. (Brain & Intelligent Logic Assistant Link), asisten virtual di portofolio Bilal Sanayu Majid. Saat terhubung online, saya ditenagai langsung oleh model Google Gemini. Dalam mode offline atau fallback simulasi, saya menyajikan informasi cerdas seputar proyek, keahlian, dan prestasi Bilal.",
+      suggestions: ["Apa saja keahlian coding Bilal?", "Tunjukkan proyek unggulan", "Tunjukkan CV-nya"],
+    };
+  }
+
+  if (has(msg, "python", "computer vision", "opencv", "mediapipe", "isyarat", "bisindo", "sign language")) {
     return {
       reply:
         "Selain web, Bilal mengerjakan Sign Language Recognition System: aplikasi interpretasi bahasa isyarat real-time berbasis kamera dengan Python, OpenCV, dan MediaPipe. Ia juga belajar BISINDO, bahasa isyarat Indonesia.",
